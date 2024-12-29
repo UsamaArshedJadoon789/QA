@@ -49,15 +49,8 @@ ENV NUMEXPR_NUM_THREADS=1
 # Expose port
 EXPOSE 8000
 
-# Pre-generate data and visualizations during build with detailed logging
-RUN python3 -c "import matplotlib; matplotlib.use('Agg')" && \
-    PYTHONUNBUFFERED=1 poetry run python -u app/generate_test_data.py 2>&1 | tee /tmp/visualization_generation.log && \
-    cat /tmp/visualization_generation.log && \
-    echo "Checking visualization directory contents:" && \
-    ls -la /app/results/visualizations/ || \
-    (echo "Error: Visualization generation failed. Log contents:" && \
-     cat /tmp/visualization_generation.log && \
-     exit 1)
+# Initialize matplotlib with Agg backend
+RUN python3 -c "import matplotlib; matplotlib.use('Agg')"
 
-# Start the application
-CMD poetry run uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+# Start the application with data generation
+CMD poetry run python -u app/generate_test_data.py && poetry run uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
