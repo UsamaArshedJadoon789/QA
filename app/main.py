@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 app = FastAPI(title="Halal Compliance Monitoring API")
 
 # Data directory for simulation results
-RESULTS_DIR = Path("/app/results")
+RESULTS_DIR = Path("results")
 VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
 
 # Call verify_data_exists during startup
@@ -36,9 +36,9 @@ def verify_data_exists():
     
     # Create and set permissions for results directory
     try:
-        os.makedirs('/app/results', exist_ok=True)
-        os.chmod('/app/results', 0o777)
-        print(f"Results directory created and permissions set: {oct(os.stat('/app/results').st_mode)[-3:]}")
+        os.makedirs('results', exist_ok=True)
+        os.chmod('results', 0o777)
+        print(f"Results directory created and permissions set: {oct(os.stat('results').st_mode)[-3:]}")
     except Exception as e:
         print(f"Error creating results directory: {str(e)}")
     
