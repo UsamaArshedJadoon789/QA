@@ -57,5 +57,18 @@ RUN mkdir -p /app/results/visualizations && \
 # Initialize matplotlib with Agg backend
 RUN python3 -c "import matplotlib; matplotlib.use('Agg')"
 
+# Create a startup script
+RUN echo '#!/bin/bash\n\
+python -u app/generate_test_data.py\n\
+if [ $? -eq 0 ]; then\n\
+  echo "Visualization generation successful"\n\
+  ls -la /app/results/visualizations/slaughterhouse/2d/\n\
+  uvicorn app.main:app --host 0.0.0.0 --port ${PORT}\n\
+else\n\
+  echo "Visualization generation failed"\n\
+  exit 1\n\
+fi' > /app/start.sh && \
+chmod +x /app/start.sh
+
 # Start the application with data generation
-CMD poetry run python -u app/generate_test_data.py && poetry run uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+CMD ["/app/start.sh"]
