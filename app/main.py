@@ -13,6 +13,10 @@ import matplotlib.pyplot as plt
 
 app = FastAPI(title="Halal Compliance Monitoring API")
 
+# Data directory for simulation results
+RESULTS_DIR = Path("/app/results")
+VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
+
 # Call verify_data_exists during startup
 @app.on_event("startup")
 async def startup_event():
@@ -112,13 +116,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data directory for simulation results
-RESULTS_DIR = Path("/app/results")
-VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
-
-# Ensure directories exist
+# Ensure directories exist with proper permissions
 RESULTS_DIR.mkdir(exist_ok=True)
+os.chmod(str(RESULTS_DIR), 0o777)
 VISUALIZATIONS_DIR.mkdir(exist_ok=True, parents=True)
+os.chmod(str(VISUALIZATIONS_DIR), 0o777)
 
 @app.get("/")
 async def root():
@@ -191,7 +193,11 @@ async def get_visualization(model: str, dimension: str, condition: str):
     try:
         # Remove .png from condition if it's already there
         condition = condition.replace('.png', '')
+        # Add 'condition' prefix if not present
+        if not condition.startswith('condition'):
+            condition = f"condition{condition}"
         viz_path = VISUALIZATIONS_DIR / model / dimension / f"{condition}.png"
+        print(f"Looking for visualization at: {viz_path}")
         
         if not viz_path.exists():
             # Try regenerating data if file missing
