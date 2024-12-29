@@ -103,9 +103,14 @@ def verify_data_exists():
         except Exception as e:
             print(f"Unexpected error during data generation: {str(e)}")
             raise
-        except subprocess.CalledProcessError as e:
-            print(f"Error generating data: {e.stderr}")
-            raise RuntimeError("Failed to generate required data files")
+        # Verify all directories exist after generation
+        for model in models:
+            for dim in dimensions:
+                viz_dir = VISUALIZATIONS_DIR / model / dim
+                if not viz_dir.exists():
+                    print(f"Warning: Directory {viz_dir} still does not exist after generation")
+                else:
+                    print(f"Success: Directory {viz_dir} exists with contents: {list(viz_dir.glob('*.png'))}")
 
 # Configure CORS
 app.add_middleware(
@@ -198,6 +203,14 @@ async def get_visualization(model: str, dimension: str, condition: str):
             condition = f"condition{condition}"
         viz_path = VISUALIZATIONS_DIR / model / dimension / f"{condition}.png"
         print(f"Looking for visualization at: {viz_path}")
+        
+        # Debug logging
+        print(f"Directory contents:")
+        import os
+        if os.path.exists(str(VISUALIZATIONS_DIR / model / dimension)):
+            print(os.listdir(str(VISUALIZATIONS_DIR / model / dimension)))
+        else:
+            print(f"Directory {VISUALIZATIONS_DIR / model / dimension} does not exist")
         
         if not viz_path.exists():
             # Try regenerating data if file missing
