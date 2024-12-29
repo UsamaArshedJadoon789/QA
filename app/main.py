@@ -20,22 +20,38 @@ async def startup_event():
 
 def verify_data_exists():
     """Verify that all required data files and directories exist."""
-    print(f"Starting data verification process...")
+    print(f"Starting data verification process with enhanced logging...")
+    
+    # Check Python environment and dependencies
+    try:
+        import matplotlib
+        print(f"Matplotlib backend: {matplotlib.get_backend()}")
+        print(f"Matplotlib configuration: {matplotlib.rcParams['backend']}")
+    except Exception as e:
+        print(f"Error checking matplotlib: {str(e)}")
     
     # Create and set permissions for results directory
-    os.makedirs('/app/results', exist_ok=True)
-    os.chmod('/app/results', 0o777)
-    print(f"Results directory created and permissions set")
+    try:
+        os.makedirs('/app/results', exist_ok=True)
+        os.chmod('/app/results', 0o777)
+        print(f"Results directory created and permissions set: {oct(os.stat('/app/results').st_mode)[-3:]}")
+    except Exception as e:
+        print(f"Error creating results directory: {str(e)}")
     
-    # Create visualization directories
+    # Create visualization directories with detailed logging
     models = ['slaughterhouse', 'food_processing']
     dimensions = ['2d', '3d']
     for model in models:
         for dim in dimensions:
-            viz_dir = VISUALIZATIONS_DIR / model / dim
-            viz_dir.mkdir(parents=True, exist_ok=True)
-            os.chmod(str(viz_dir), 0o777)
-            print(f"Created visualization directory: {viz_dir}")
+            try:
+                viz_dir = VISUALIZATIONS_DIR / model / dim
+                viz_dir.mkdir(parents=True, exist_ok=True)
+                os.chmod(str(viz_dir), 0o777)
+                print(f"Created visualization directory: {viz_dir}")
+                print(f"Directory permissions: {oct(os.stat(str(viz_dir)).st_mode)[-3:]}")
+                print(f"Directory exists: {viz_dir.exists()}")
+            except Exception as e:
+                print(f"Error creating visualization directory {viz_dir}: {str(e)}")
     
     required_files = [
         RESULTS_DIR / "slaughterhouse_results.json",
@@ -45,9 +61,15 @@ def verify_data_exists():
     missing_files = [str(f) for f in required_files if not f.exists()]
     if missing_files or not any((VISUALIZATIONS_DIR / 'slaughterhouse' / '2d').glob('*.png')):
         print(f"Missing files or visualizations, regenerating data...")
+        print(f"Missing files: {missing_files}")
+        print(f"Current directory contents: {os.listdir(str(RESULTS_DIR))}")
+        
         try:
             env = os.environ.copy()
             env['PYTHONPATH'] = str(Path(__file__).parent)
+            env['MPLBACKEND'] = 'Agg'  # Force Agg backend
+            
+            print(f"Running generate_test_data.py with PYTHONPATH={env['PYTHONPATH']}")
             result = subprocess.run(
                 [sys.executable, str(Path(__file__).parent / "generate_test_data.py")],
                 capture_output=True,
@@ -55,15 +77,28 @@ def verify_data_exists():
                 check=True,
                 env=env
             )
-            print(f"Data generation output: {result.stdout}")
+            print(f"Data generation stdout: {result.stdout}")
+            print(f"Data generation stderr: {result.stderr}")
             print("Data and visualization generation completed")
             
             # Verify visualization files were created
-            for model in models:
+            for model in models: 
                 for dim in dimensions:
                     viz_path = VISUALIZATIONS_DIR / model / dim
-                    files = list(viz_path.glob('*.png'))
-                    print(f"Generated visualizations for {model}/{dim}: {len(files)} files")
+                    try:
+                        files = list(viz_path.glob('*.png'))
+                        print(f"Generated visualizations for {model}/{dim}: {len(files)} files")
+                        print(f"Files: {[f.name for f in files]}")
+                    except Exception as e:
+                        print(f"Error checking visualization files in {viz_path}: {str(e)}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error running generate_test_data.py: {str(e)}")
+            print(f"Process stdout: {e.stdout}")
+            print(f"Process stderr: {e.stderr}")
+            raise RuntimeError(f"Failed to generate required data files: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error during data generation: {str(e)}")
+            raise
         except subprocess.CalledProcessError as e:
             print(f"Error generating data: {e.stderr}")
             raise RuntimeError("Failed to generate required data files")
