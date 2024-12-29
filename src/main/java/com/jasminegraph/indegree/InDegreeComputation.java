@@ -22,16 +22,25 @@ public class InDegreeComputation {
         
         @Override
         public void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-            String line = value.toString();
-            // Skip comment lines
-            if (line.startsWith("#")) {
+            String line = value.toString().trim();
+            
+            // Skip comment lines and empty lines
+            if (line.isEmpty() || line.startsWith("#")) {
                 return;
             }
             
-            String[] fields = line.split("\t");
-            if (fields.length == 2) {
-                toNode.set(fields[1]);
-                context.write(toNode, one);
+            // Try splitting on tab first, then whitespace if needed
+            String[] fields = line.split("\\s+");
+            
+            if (fields.length >= 2) {
+                String fromNode = fields[0].trim();
+                String toNode = fields[1].trim();
+                
+                // Skip empty nodes
+                if (!fromNode.isEmpty() && !toNode.isEmpty()) {
+                    this.toNode.set(toNode);
+                    context.write(this.toNode, one);
+                }
             }
         }
     }

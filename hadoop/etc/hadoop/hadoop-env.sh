@@ -51,7 +51,13 @@
 
 # The java implementation to use. By default, this environment
 # variable is REQUIRED on ALL platforms except OS X!
-# export JAVA_HOME=
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+# Disable setting process priority since we don't have root access
+export HADOOP_SHELL_SCRIPT_DEBUG=true
+export HADOOP_ROOT_LOGGER=INFO,console
+export HADOOP_SECURE_DN_USER=
+export HADOOP_OPTS="$HADOOP_OPTS -Djava.net.preferIPv4Stack=true"
 
 # Location of Hadoop.  By default, Hadoop will attempt to determine
 # this location based upon its execution path.
