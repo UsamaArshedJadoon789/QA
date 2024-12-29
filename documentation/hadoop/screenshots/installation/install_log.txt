@@ -1,0 +1,24 @@
+Installation timestamp: Sun Dec 29 03:48:02 UTC 2024
+Java version: openjdk version "17.0.13" 2024-10-15
+OpenJDK Runtime Environment (build 17.0.13+11-Ubuntu-2ubuntu122.04)
+OpenJDK 64-Bit Server VM (build 17.0.13+11-Ubuntu-2ubuntu122.04, mixed mode, sharing)
+Downloaded Hadoop version: 3.3.6
+Installation directory: /home/ubuntu/qa/hadoop
+total 128
+drwxr-xr-x 12 ubuntu ubuntu  4096 Dec 29 03:48 .
+drwxrwxr-x  8 ubuntu ubuntu  4096 Dec 29 03:48 ..
+-rw-rw-r--  1 ubuntu ubuntu 24276 Jun 14  2023 LICENSE-binary
+-rw-rw-r--  1 ubuntu ubuntu 15217 Jun  9  2023 LICENSE.txt
+-rw-rw-r--  1 ubuntu ubuntu 29473 Jun  9  2023 NOTICE-binary
+-rw-rw-r--  1 ubuntu ubuntu  1541 Jun  9  2023 NOTICE.txt
+-rw-rw-r--  1 ubuntu ubuntu   175 Jun  9  2023 README.txt
+drwxr-xr-x  2 ubuntu ubuntu  4096 Jun 18  2023 bin
+drwxr-xr-x  3 ubuntu ubuntu  4096 Jun 18  2023 etc
+drwxr-xr-x 10 ubuntu ubuntu  4096 Jun 18  2023 hadoop-3.3.6
+drwxr-xr-x  2 ubuntu ubuntu  4096 Jun 18  2023 include
+drwxr-xr-x  3 ubuntu ubuntu  4096 Jun 18  2023 lib
+drwxr-xr-x  4 ubuntu ubuntu  4096 Jun 18  2023 libexec
+drwxr-xr-x  2 ubuntu ubuntu  4096 Jun 18  2023 licenses-binary
+drwxrwxr-x  2 ubuntu ubuntu  4096 Dec 29 03:47 logs
+drwxr-xr-x  3 ubuntu ubuntu  4096 Jun 18  2023 sbin
+drwxr-xr-x  4 ubuntu ubuntu  4096 Jun 18  2023 share

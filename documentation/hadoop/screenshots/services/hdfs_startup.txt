@@ -1,0 +1,8 @@
+Starting namenodes on [localhost]
+localhost: Warning: Permanently added 'localhost' (ED25519) to the list of known hosts.
+localhost: ubuntu@localhost: Permission denied (publickey,password).
+Starting datanodes
+localhost: ubuntu@localhost: Permission denied (publickey,password).
+Starting secondary namenodes [devin-box]
+devin-box: Warning: Permanently added 'devin-box' (ED25519) to the list of known hosts.
+devin-box: ubuntu@devin-box: Permission denied (publickey,password).

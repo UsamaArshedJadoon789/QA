@@ -1,0 +1,4 @@
+Starting resourcemanager
+ERROR: Cannot set priority of resourcemanager process 31214
+Starting nodemanagers
+localhost: ubuntu@localhost: Permission denied (publickey,password).
