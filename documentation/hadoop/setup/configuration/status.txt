@@ -1,0 +1,14 @@
+=== Configuration Files ===
+total 64
+-rw-r--r-- 1 ubuntu ubuntu  9213 Dec 29 03:54 capacity-scheduler.xml
+-rw-r--r-- 1 ubuntu ubuntu   359 Dec 29 03:54 core-site.xml
+-rw-r--r-- 1 ubuntu ubuntu   731 Dec 29 03:54 hadoop-env.sh
+-rw-r--r-- 1 ubuntu ubuntu 11765 Dec 29 03:54 hadoop-policy.xml
+-rw-r--r-- 1 ubuntu ubuntu   683 Dec 29 03:54 hdfs-rbf-site.xml
+-rw-r--r-- 1 ubuntu ubuntu   431 Dec 29 03:54 hdfs-site.xml
+-rw-r--r-- 1 ubuntu ubuntu   620 Dec 29 03:54 httpfs-site.xml
+-rw-r--r-- 1 ubuntu ubuntu  3518 Dec 29 03:54 kms-acls.xml
+-rw-r--r-- 1 ubuntu ubuntu   682 Dec 29 03:54 kms-site.xml
+-rw-r--r-- 1 ubuntu ubuntu   364 Dec 29 03:54 mapred-site.xml
+-rw-rw-r-- 1 ubuntu ubuntu    28 Dec 29 03:54 status.txt
+-rw-r--r-- 1 ubuntu ubuntu   420 Dec 29 03:54 yarn-site.xml

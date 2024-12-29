@@ -1,0 +1,9 @@
+=== SSH Configuration ===
+total 32
+drwxrwxr-x 1 ubuntu ubuntu 4096 Dec 29 03:51 .
+drwxr-x--- 1 ubuntu ubuntu 4096 Dec 29 03:31 ..
+-rw------- 1 ubuntu ubuntu  570 Dec 29 03:51 authorized_keys
+-rw------- 1 ubuntu ubuntu 2602 Dec 29 03:51 id_rsa
+-rw-r--r-- 1 ubuntu ubuntu  570 Dec 29 03:51 id_rsa.pub
+-rw-r--r-- 1 ubuntu ubuntu 1934 Dec 29 03:54 known_hosts
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzxMS0fx1JE9M06+f5J7g8SYBR6rguZTjgQGAlBOLDv9SpdecRSb0xJxPn0PONgRGHhL43LgcL2LbIIwQh4CKeGs5QBMo8q5wFVQdV51EdoE82sdgFjnMSRTM3znGR9AcLvdrqaRVPh+uLTDYEfh2iNhaE1X51WT/zKlQaDEh+WQ2Fwo+g2goKNDs62LMGGDzQAdyDB15ztVY4/2tdMX7X/g4kq3eyO8AoVjQg2gjftyOMjKXMZZkRXKK2qjqohGxjBhgRNT80gHFjbBcUtsSG6SXrFkpFOvbuWwlbEKeL8tjuTuiFQsTNjXVxzUElPPHgKw69r98ru8kMWx1q2Ff0E8/JpdpBa69rbsW7uR+XHk7lDxPPqO/SfFh8RnYnlRe2Xze1jb3etDLanZGOZUuh32AQ2rMnRMHDv/7yt/iP6ARSBGf+/heZs0ZhDSNcaOOV8DI7iRwmondc8VRVwqP9uAlpc2e5qppNR4ziXekv2WdXEvh0bYcQz//5SwMk16E= ubuntu@devin-box
