@@ -196,21 +196,40 @@ async def get_food_processing_results():
 async def get_visualization(model: str, dimension: str, condition: str):
     """Get pre-generated visualization file."""
     try:
+        # Enhanced logging at start of request
+        print(f"\n=== Visualization Request ===")
+        print(f"Model: {model}, Dimension: {dimension}, Condition: {condition}")
+        
         # Remove .png from condition if it's already there
         condition = condition.replace('.png', '')
         # Add 'condition' prefix if not present
         if not condition.startswith('condition'):
             condition = f"condition{condition}"
+            
         viz_path = VISUALIZATIONS_DIR / model / dimension / f"{condition}.png"
-        print(f"Looking for visualization at: {viz_path}")
+        print(f"\nVisualization Path Details:")
+        print(f"Full path: {viz_path}")
+        print(f"Working directory: {os.getcwd()}")
+        print(f"RESULTS_DIR exists: {os.path.exists(RESULTS_DIR)}")
+        print(f"VISUALIZATIONS_DIR exists: {os.path.exists(VISUALIZATIONS_DIR)}")
         
-        # Debug logging
-        print(f"Directory contents:")
-        import os
-        if os.path.exists(str(VISUALIZATIONS_DIR / model / dimension)):
-            print(os.listdir(str(VISUALIZATIONS_DIR / model / dimension)))
-        else:
-            print(f"Directory {VISUALIZATIONS_DIR / model / dimension} does not exist")
+        # Check directory structure
+        model_dir = VISUALIZATIONS_DIR / model
+        dim_dir = model_dir / dimension
+        print(f"\nDirectory Structure:")
+        print(f"Model dir ({model_dir}) exists: {os.path.exists(model_dir)}")
+        print(f"Dimension dir ({dim_dir}) exists: {os.path.exists(dim_dir)}")
+        
+        if os.path.exists(dim_dir):
+            print(f"\nContents of {dim_dir}:")
+            print(os.listdir(dim_dir))
+            
+        # Check file existence and permissions
+        if os.path.exists(viz_path):
+            print(f"\nFile Details:")
+            print(f"File exists: True")
+            print(f"File permissions: {oct(os.stat(viz_path).st_mode)[-3:]}")
+            print(f"File size: {os.path.getsize(viz_path)} bytes")
         
         if not viz_path.exists():
             # Try regenerating data if file missing
