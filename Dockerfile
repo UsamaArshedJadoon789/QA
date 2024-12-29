@@ -49,6 +49,11 @@ ENV NUMEXPR_NUM_THREADS=1
 # Expose port
 EXPOSE 8000
 
+# Create directories with correct permissions
+RUN mkdir -p /app/results/visualizations && \
+    chmod -R 777 /app/results && \
+    chown -R nobody:nogroup /app/results
+
 # Initialize matplotlib with Agg backend
 RUN python3 -c "import matplotlib; matplotlib.use('Agg')"
 
