@@ -62,11 +62,18 @@ def verify_data_exists():
         RESULTS_DIR / "food_processing_results.json"
     ]
     
-    missing_files = [str(f) for f in required_files if not f.exists()]
-    if missing_files or not any((VISUALIZATIONS_DIR / 'slaughterhouse' / '2d').glob('*.png')):
-        print(f"Missing files or visualizations, regenerating data...")
-        print(f"Missing files: {missing_files}")
-        print(f"Current directory contents: {os.listdir(str(RESULTS_DIR))}")
+    # Always regenerate visualizations on startup
+    print(f"Forcing regeneration of data and visualizations...")
+    print(f"Current directory contents: {os.listdir(str(RESULTS_DIR))}")
+    # Clear any existing visualizations
+    import shutil
+    for model in ['slaughterhouse', 'food_processing']:
+        for dim in ['2d', '3d']:
+            viz_dir = VISUALIZATIONS_DIR / model / dim
+            if viz_dir.exists():
+                shutil.rmtree(str(viz_dir))
+            viz_dir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(viz_dir), 0o777)
         
         try:
             env = os.environ.copy()
