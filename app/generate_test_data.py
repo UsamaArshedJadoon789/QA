@@ -260,7 +260,7 @@ def generate_visualization(data, title, model_type, condition, dimension):
     plt.tight_layout()
     try:
         # Save with optimized settings and verify
-        plt.savefig(filename, dpi=100, bbox_inches='tight', optimize=True)
+        plt.savefig(filename, dpi=100, bbox_inches='tight')
         os.chmod(filename, 0o777)  # Ensure file is readable
         
         logger.info(f"\n=== Save Complete ===")
