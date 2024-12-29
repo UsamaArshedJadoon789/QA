@@ -1,0 +1,12 @@
+# Dataset files (too large for git)
+datasets/*.txt
+
+# OS files
+.DS_Store
+*.swp
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
