@@ -214,23 +214,108 @@
             <h3>6.1 Java Environment</h3>
             <p>Java installation verification:</p>
             <div class="config" id="java-setup">
-            Loading installation logs...
+openjdk version "17.0.13" 2024-10-15
+OpenJDK Runtime Environment (build 17.0.13+11-Ubuntu-2ubuntu122.04)
+OpenJDK 64-Bit Server VM (build 17.0.13+11-Ubuntu-2ubuntu122.04, mixed mode, sharing)
             </div>
+            <p class="description">Java 17 is required for running Hadoop 3.x. The OpenJDK implementation provides full compatibility with Hadoop's requirements.</p>
         </div>
 
         <div class="subsection">
             <h3>6.2 Hadoop Environment</h3>
-            <p>Hadoop installation details:</p>
+            <p>Hadoop 3.3.6 Installation Details:</p>
             <div class="config" id="hadoop-setup">
-            Loading Hadoop configuration...
+Hadoop 3.3.6
+Source code repository https://github.com/apache/hadoop.git -r 1be78238728da9266a4f88195058f08fd012bf9c
+Compiled by ubuntu on 2023-06-18T08:22Z
+Compiled on platform linux-x86_64
             </div>
+            <p class="description">Key Environment Variables:</p>
+            <ul class="env-vars">
+                <li>JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64</li>
+                <li>HADOOP_HOME=/home/ubuntu/qa/hadoop</li>
+            </ul>
+            <p class="description">These environment variables must be set correctly for Hadoop to function properly.</p>
         </div>
 
         <div class="subsection">
-            <h3>6.3 Directory Structure</h3>
-            <p>Current Hadoop configuration structure:</p>
-            <div class="config" id="dir-structure">
-            Loading directory structure...
+            <h3>6.3 Configuration Files</h3>
+            <p>Essential Hadoop Configuration:</p>
+            <div class="config-section">
+                <h4>core-site.xml</h4>
+                <p class="description">Core configuration: Sets the HDFS hostname and temporary directory location.</p>
+                <div class="xml-content">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;fs.defaultFS&lt;/name&gt;
+        &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+        &lt;value&gt;/home/ubuntu/qa/hadoop_tmp&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+                </div>
+            </div>
+            
+            <div class="config-section">
+                <h4>hdfs-site.xml</h4>
+                <p class="description">HDFS configuration: Sets replication factor and storage directories for NameNode/DataNode.</p>
+                <div class="xml-content">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;dfs.replication&lt;/name&gt;
+        &lt;value&gt;1&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;
+        &lt;value&gt;/home/ubuntu/qa/hadoop_tmp/dfs/name&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;
+        &lt;value&gt;/home/ubuntu/qa/hadoop_tmp/dfs/data&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h4>mapred-site.xml</h4>
+                <p class="description">MapReduce configuration: Specifies YARN as the runtime framework and sets classpath.</p>
+                <div class="xml-content">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;
+        &lt;value&gt;yarn&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;mapreduce.application.classpath&lt;/name&gt;
+        &lt;value&gt;$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h4>yarn-site.xml</h4>
+                <p class="description">YARN configuration: Configures NodeManager services and environment variables.</p>
+                <div class="xml-content">
+&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
+        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;yarn.nodemanager.env-whitelist&lt;/name&gt;
+        &lt;value&gt;JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+                </div>
+            </div>
             </div>
         </div>
     </div>
@@ -270,10 +355,47 @@
             overflow-y: auto;
             border: 1px solid #ddd;
         }
+        .config-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: #fff;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+        }
+        .config-section h4 {
+            color: #24292e;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .description {
+            color: #586069;
+            font-size: 14px;
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .env-vars {
+            background: #f6f8fa;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .env-vars li {
+            font-family: monospace;
+            color: #24292e;
+        }
         .timestamp {
             color: #666;
             font-size: 0.9em;
             font-style: italic;
+        }
+        .xml-content {
+            background: #f6f8fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
         }
     </style>
 
