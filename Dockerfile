@@ -30,6 +30,9 @@ RUN mkdir -p /app/results/visualizations/slaughterhouse/2d && \
     mkdir -p /app/results/visualizations/food_processing/3d && \
     chmod -R 777 /app/results
 
+# Create a volume for persistent storage
+VOLUME ["/app/results"]
+
 # Set environment variables
 ENV PORT=8000
 ENV HOST=0.0.0.0

@@ -25,17 +25,26 @@ def ensure_directories():
     try:
         # Create main results directory
         RESULTS_DIR.mkdir(exist_ok=True, parents=True)
+        os.chmod(str(RESULTS_DIR), 0o777)
+        logger.info(f"Created and set permissions for {RESULTS_DIR}")
         
         # Create visualization directories for both models and dimensions
         for model in ['slaughterhouse', 'food_processing']:
             for dim in ['2d', '3d']:
                 viz_dir = VISUALIZATIONS_DIR / model / dim
+                if viz_dir.exists():
+                    import shutil
+                    shutil.rmtree(str(viz_dir))
                 viz_dir.mkdir(parents=True, exist_ok=True)
-                logger.info(f"Created directory: {viz_dir}")
-        
-        # Set permissions to ensure write access
-        os.system(f"chmod -R 777 {RESULTS_DIR}")
-        logger.info(f"Set permissions for {RESULTS_DIR}")
+                os.chmod(str(viz_dir), 0o777)
+                logger.info(f"Created and set permissions for: {viz_dir}")
+                
+        # Verify all directories exist with proper permissions
+        for model in ['slaughterhouse', 'food_processing']:
+            for dim in ['2d', '3d']:
+                viz_dir = VISUALIZATIONS_DIR / model / dim
+                logger.info(f"Directory {viz_dir} exists: {viz_dir.exists()}")
+                logger.info(f"Directory {viz_dir} permissions: {oct(os.stat(str(viz_dir)).st_mode)[-3:]}")
     except Exception as e:
         logger.error(f"Error creating directories: {e}")
         raise
