@@ -1,0 +1,30 @@
+=== Dataset Download Process ===
+Downloaded and verified datasets:
+
+File: datasets/com-youtube.ungraph.txt
+# Undirected graph: ../../data/output/youtube.ungraph.txt
+# Youtube
+# Nodes: 1134890 Edges: 2987624
+# FromNodeId	ToNodeId
+1	2
+
+File: datasets/soc-Epinions1.txt
+# Directed graph (each unordered pair of nodes is saved once): soc-Epinions1.txt 
+# Directed Epinions social network
+# Nodes: 75879 Edges: 508837
+# FromNodeId	ToNodeId
+0	4
+
+File: datasets/soc-LiveJournal1.txt
+# Directed graph (each unordered pair of nodes is saved once): soc-LiveJournal1.txt 
+# Directed LiveJournal friednship social network
+# Nodes: 4847571 Edges: 68993773
+# FromNodeId	ToNodeId
+0	1
+
+File: datasets/web-Google.txt
+# Directed graph (each unordered pair of nodes is saved once): web-Google.txt 
+# Webgraph from the Google programming contest, 2002
+# Nodes: 875713 Edges: 5105039
+# FromNodeId	ToNodeId
+0	11342

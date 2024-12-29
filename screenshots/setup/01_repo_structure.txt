@@ -1,0 +1,24 @@
+=== Repository Structure ===
+.
+|-- MACHINE_SPECS.md
+|-- README.md
+|-- datasets
+|   |-- README.md
+|   |-- com-youtube.ungraph.txt
+|   |-- soc-Epinions1.txt
+|   |-- soc-LiveJournal1.txt
+|   `-- web-Google.txt
+`-- screenshots
+    |-- README.md
+    `-- setup
+        `-- 01_repo_structure.txt
+
+3 directories, 9 files
+
+=== Dataset Files ===
+total 1.2G
+-rw-rw-r-- 1 ubuntu ubuntu 1.8K Dec 29 03:31 README.md
+-rw-rw-r-- 1 ubuntu ubuntu  37M Nov 13  2012 com-youtube.ungraph.txt
+-rw-rw-r-- 1 ubuntu ubuntu 5.5M Dec  3  2009 soc-Epinions1.txt
+-rw-rw-r-- 1 ubuntu ubuntu 1.1G Dec  3  2009 soc-LiveJournal1.txt
+-rw-rw-r-- 1 ubuntu ubuntu  72M Dec  3  2009 web-Google.txt

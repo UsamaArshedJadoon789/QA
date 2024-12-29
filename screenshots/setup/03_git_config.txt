@@ -1,0 +1,20 @@
+=== Git Configuration ===
+core.pager=cat | head -n 10000
+merge.conflictstyle=diff3
+credential.helper=store --file /opt/.devin/.devin-integration-git-credentials
+user.name=Devin AI
+user.email=devin@devin.ai
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=https://github.com/UsamaArshedJadoon789/qa.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.main.remote=origin
+branch.main.merge=refs/heads/main
+On branch devin/1735442923-indegree-watermarks
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	screenshots/
+
+nothing added to commit but untracked files present (use "git add" to track)
