@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 # Always use /app/results in production for consistency
-RESULTS_DIR = Path("/app/results")
+RESULTS_DIR = Path("results")
 VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
 
 # Create all required directories with proper permissions
@@ -165,15 +165,12 @@ def generate_visualization(data, title, model_type, condition, dimension):
     viz_dir = VISUALIZATIONS_DIR / model_type / dimension
     viz_dir.mkdir(parents=True, exist_ok=True)
     
-    # Set permissions for all parent directories
-    current_dir = viz_dir
-    while str(current_dir) != '/':
-        try:
-            os.chmod(str(current_dir), 0o777)
-            logger.info(f"Set permissions for directory: {current_dir}")
-            current_dir = current_dir.parent
-        except Exception as e:
-            logger.error(f"Error setting permissions for {current_dir}: {e}")
+    # Set permissions only for visualization directory
+    try:
+        os.chmod(str(viz_dir), 0o777)
+        logger.info(f"Set permissions for directory: {viz_dir}")
+    except Exception as e:
+        logger.error(f"Error setting permissions for {viz_dir}: {e}")
     
     # Construct filename and ensure parent directory permissions
     filename = viz_dir / f"condition{condition}.png"
