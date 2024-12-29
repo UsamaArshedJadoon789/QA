@@ -36,3 +36,5 @@ Thumbs.db
 *.zip
 *.tar.gz
 *.rar
+hadoop/lib/native/libhdfspp.a
+hadoop/share/hadoop/yarn/hadoop-yarn-applications-catalog-webapp-3.3.6.war
