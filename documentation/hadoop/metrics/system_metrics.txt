@@ -1,0 +1,82 @@
+System Resource Usage
+Memory Usage:
+               total        used        free      shared  buff/cache   available
+Mem:           7.8Gi       4.3Gi       2.6Gi        34Mi       897Mi       3.2Gi
+Swap:             0B          0B          0B
+
+CPU Usage:
+top - 04:33:39 up  1:18,  4 users,  load average: 3.42, 19.32, 12.52
+Tasks: 123 total,   1 running, 122 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  3.2 us,  0.0 sy,  0.0 ni, 96.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :   7967.9 total,   2617.0 free,   4453.4 used,    897.5 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.   3227.8 avail Mem 
+
+    PID USER      PR  NI    VIRT    RES    SHR S  %CPU  %MEM     TIME+ COMMAND
+  53523 ubuntu    20   0 4660360   1.1g     32 S   6.2  13.9   0:31.64 java
+      1 root      20   0  101008   8984   5160 S   0.0   0.1   0:04.83 systemd
+      2 root      20   0       0      0      0 S   0.0   0.0   0:00.00 kthreadd
+      3 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_gp
+      4 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 rcu_par+
+      6 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 kworker+
+      8 root       0 -20       0      0      0 I   0.0   0.0   0:00.00 mm_perc+
+      9 root      20   0       0      0      0 S   0.0   0.0   0:00.00 rcu_tas+
+     10 root      20   0       0      0      0 S   0.0   0.0   0:00.74 ksoftir+
+     11 root      20   0       0      0      0 I   0.0   0.0   0:01.81 rcu_sch+
+     12 root      rt   0       0      0      0 S   0.0   0.0   0:00.04 migrati+
+     14 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/0
+     15 root      20   0       0      0      0 S   0.0   0.0   0:00.00 cpuhp/1
+
+Disk Usage:
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/vdb                 125G  7.2G  112G   7% /rom/overlay
+overlayfs:/overlay/root  125G  7.2G  112G   7% /
+/dev/vdc                 2.8M   17K  2.5M   1% /mnt/host_share
+tmpfs                    3.9G     0  3.9G   0% /dev/shm
+tmpfs                    1.6G  212K  1.6G   1% /run
+tmpfs                    5.0M     0  5.0M   0% /run/lock
+tmpfs                    3.9G   20M  3.9G   1% /tmp
+tmpfs                    3.9G   24K  3.9G   1% /var/lib/systemd
+
+IO Statistics:
+Linux 5.10.223 (devin-box) 	12/29/24 	_x86_64_	(2 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           3.48    7.35    5.52    0.09    0.00   83.57
+
+Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd
+vda             292.91      1094.52         0.00         0.00    5175774          0          0
+vdb             292.52       635.19      2754.72         0.00    3003677   13026572          0
+vdc               0.01         0.04         0.00         0.00        198          8          0
+
+
+
+Detailed IO Stats:
+Linux 5.10.223 (devin-box) 	12/29/24 	_x86_64_	(2 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           3.48    7.35    5.52    0.09    0.00   83.57
+
+Device            r/s     rkB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wkB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dkB/s   drqm/s  %drqm d_await dareq-sz     f/s f_await  aqu-sz  %util
+vda            292.91   1094.51     0.00   0.00    0.14     3.74    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.04   2.24
+vdb            107.39    635.18     0.00   0.00    0.18     5.91  185.13   2754.71     0.00   0.00    0.51    14.88    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.11   1.44
+vdc              0.01      0.04     0.00   0.00    0.07     3.36    0.00      0.00     0.00   0.00    0.12     1.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.50    0.50    1.00    0.00    0.00   98.00
+
+Device            r/s     rkB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wkB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dkB/s   drqm/s  %drqm d_await dareq-sz     f/s f_await  aqu-sz  %util
+vda              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+vdb              0.00      0.00     0.00   0.00    0.00     0.00    1.00      4.00     0.00   0.00    1.00     4.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.40
+vdc              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.51    0.51    0.00    0.00    0.00   98.99
+
+Device            r/s     rkB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wkB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dkB/s   drqm/s  %drqm d_await dareq-sz     f/s f_await  aqu-sz  %util
+vda              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+vdb              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+vdc              0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+
+

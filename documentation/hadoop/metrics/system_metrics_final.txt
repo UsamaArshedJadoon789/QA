@@ -1,0 +1,30 @@
+Memory Usage:
+               total        used        free      shared  buff/cache   available
+Mem:           7.8Gi       4.4Gi       2.5Gi        34Mi       897Mi       3.1Gi
+Swap:             0B          0B          0B
+
+CPU Usage:
+top - 04:34:33 up  1:19,  4 users,  load average: 1.36, 16.07, 11.80
+Tasks: 123 total,   1 running, 122 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.0 us,  3.1 sy,  3.1 ni, 93.8 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 st
+MiB Mem :   7967.9 total,   2575.2 free,   4494.9 used,    897.8 buff/cache
+MiB Swap:      0.0 total,      0.0 free,      0.0 used.   3186.3 avail Mem 
+
+IO Statistics:
+Linux 5.10.223 (devin-box) 	12/29/24 	_x86_64_	(2 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           3.45    7.35    5.49    0.09    0.00   83.62
+
+Device            r/s     rkB/s   rrqm/s  %rrqm r_await rareq-sz     w/s     wkB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dkB/s   drqm/s  %drqm d_await dareq-sz     f/s f_await  aqu-sz  %util
+vda            289.60   1082.15     0.00   0.00    0.14     3.74    0.00      0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.04   2.22
+vdb            106.19    628.04     0.00   0.00    0.18     5.91  183.19   2724.48     0.00   0.00    0.51    14.87    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.11   1.42
+vdc              0.01      0.04     0.00   0.00    0.07     3.36    0.00      0.00     0.00   0.00    0.12     1.00    0.00      0.00     0.00   0.00    0.00     0.00    0.00    0.00    0.00   0.00
+
+
+
+Storage Usage:
+Filesystem               Size  Used Avail Use% Mounted on
+/dev/vdb                 125G  7.2G  112G   7% /rom/overlay
+overlayfs:/overlay/root  125G  7.2G  112G   7% /
+/dev/vdc                 2.8M   17K  2.5M   1% /mnt/host_share

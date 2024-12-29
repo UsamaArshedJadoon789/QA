@@ -1,0 +1,150 @@
+=== Starting Hadoop Services ===
+Starting namenodes on [devin-box]
+devin-box: ERROR: JAVA_HOME is not set and could not be found.
+Starting datanodes
+localhost: ERROR: JAVA_HOME is not set and could not be found.
+Starting secondary namenodes [devin-box]
+devin-box: ERROR: JAVA_HOME is not set and could not be found.
+Starting resourcemanager
+ERROR: Cannot set priority of resourcemanager process 59966
+Starting nodemanagers
+localhost: ERROR: JAVA_HOME is not set and could not be found.
+=== Creating HDFS Directories ===
+mkdir: `/user/ubuntu/input/epinions': Input/output error
+mkdir: `/user/ubuntu/input/youtube': Input/output error
+mkdir: `/user/ubuntu/input/google': Input/output error
+mkdir: `/user/ubuntu/output': Input/output error
+=== Copying Datasets to HDFS ===
+put: `/user/ubuntu/input/epinions/': No such file or directory: `file:///user/ubuntu/input/epinions'
+put: `/user/ubuntu/input/youtube/': No such file or directory: `file:///user/ubuntu/input/youtube'
+put: `/user/ubuntu/input/google/': No such file or directory: `file:///user/ubuntu/input/google'
+=== Running MapReduce Jobs ===
+Processing Epinions dataset...
+2024-12-29 04:12:34,028 INFO impl.MetricsConfig: Loaded properties from hadoop-metrics2.properties
+2024-12-29 04:12:34,127 INFO impl.MetricsSystemImpl: Scheduled Metric snapshot period at 10 second(s).
+2024-12-29 04:12:34,127 INFO impl.MetricsSystemImpl: JobTracker metrics system started
+2024-12-29 04:12:34,194 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+2024-12-29 04:12:34,279 INFO mapreduce.JobSubmitter: Cleaning up the staging area file:/tmp/hadoop/mapred/staging/ubuntu1786075099/.staging/job_local1786075099_0001
+Exception in thread "main" org.apache.hadoop.mapreduce.lib.input.InvalidInputException: Input path does not exist: file:/user/ubuntu/input/epinions/soc-Epinions1.txt
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.singleThreadedListStatus(FileInputFormat.java:340)
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.listStatus(FileInputFormat.java:279)
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getSplits(FileInputFormat.java:404)
+	at org.apache.hadoop.mapreduce.JobSubmitter.writeNewSplits(JobSubmitter.java:310)
+	at org.apache.hadoop.mapreduce.JobSubmitter.writeSplits(JobSubmitter.java:327)
+	at org.apache.hadoop.mapreduce.JobSubmitter.submitJobInternal(JobSubmitter.java:200)
+	at org.apache.hadoop.mapreduce.Job$11.run(Job.java:1678)
+	at org.apache.hadoop.mapreduce.Job$11.run(Job.java:1675)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1899)
+	at org.apache.hadoop.mapreduce.Job.submit(Job.java:1675)
+	at org.apache.hadoop.mapreduce.Job.waitForCompletion(Job.java:1696)
+	at com.jasminegraph.indegree.InDegreeComputation.main(InDegreeComputation.java:89)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:328)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:241)
+Caused by: java.io.IOException: Input path does not exist: file:/user/ubuntu/input/epinions/soc-Epinions1.txt
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.singleThreadedListStatus(FileInputFormat.java:313)
+	... 19 more
+
+real	0m1.252s
+user	0m1.940s
+sys	0m0.218s
+Processing YouTube dataset...
+2024-12-29 04:12:35,481 INFO impl.MetricsConfig: Loaded properties from hadoop-metrics2.properties
+2024-12-29 04:12:35,581 INFO impl.MetricsSystemImpl: Scheduled Metric snapshot period at 10 second(s).
+2024-12-29 04:12:35,581 INFO impl.MetricsSystemImpl: JobTracker metrics system started
+2024-12-29 04:12:35,645 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+2024-12-29 04:12:35,707 INFO mapreduce.JobSubmitter: Cleaning up the staging area file:/tmp/hadoop/mapred/staging/ubuntu1597065373/.staging/job_local1597065373_0001
+Exception in thread "main" org.apache.hadoop.mapreduce.lib.input.InvalidInputException: Input path does not exist: file:/user/ubuntu/input/youtube/com-youtube.ungraph.txt
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.singleThreadedListStatus(FileInputFormat.java:340)
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.listStatus(FileInputFormat.java:279)
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getSplits(FileInputFormat.java:404)
+	at org.apache.hadoop.mapreduce.JobSubmitter.writeNewSplits(JobSubmitter.java:310)
+	at org.apache.hadoop.mapreduce.JobSubmitter.writeSplits(JobSubmitter.java:327)
+	at org.apache.hadoop.mapreduce.JobSubmitter.submitJobInternal(JobSubmitter.java:200)
+	at org.apache.hadoop.mapreduce.Job$11.run(Job.java:1678)
+	at org.apache.hadoop.mapreduce.Job$11.run(Job.java:1675)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1899)
+	at org.apache.hadoop.mapreduce.Job.submit(Job.java:1675)
+	at org.apache.hadoop.mapreduce.Job.waitForCompletion(Job.java:1696)
+	at com.jasminegraph.indegree.InDegreeComputation.main(InDegreeComputation.java:89)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:328)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:241)
+Caused by: java.io.IOException: Input path does not exist: file:/user/ubuntu/input/youtube/com-youtube.ungraph.txt
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.singleThreadedListStatus(FileInputFormat.java:313)
+	... 19 more
+
+real	0m1.439s
+user	0m1.946s
+sys	0m0.204s
+Processing Google dataset...
+2024-12-29 04:12:36,608 INFO impl.MetricsConfig: Loaded properties from hadoop-metrics2.properties
+2024-12-29 04:12:36,696 INFO impl.MetricsSystemImpl: Scheduled Metric snapshot period at 10 second(s).
+2024-12-29 04:12:36,696 INFO impl.MetricsSystemImpl: JobTracker metrics system started
+2024-12-29 04:12:36,770 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+2024-12-29 04:12:36,839 INFO mapreduce.JobSubmitter: Cleaning up the staging area file:/tmp/hadoop/mapred/staging/ubuntu914949221/.staging/job_local914949221_0001
+Exception in thread "main" org.apache.hadoop.mapreduce.lib.input.InvalidInputException: Input path does not exist: file:/user/ubuntu/input/google/web-Google.txt
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.singleThreadedListStatus(FileInputFormat.java:340)
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.listStatus(FileInputFormat.java:279)
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.getSplits(FileInputFormat.java:404)
+	at org.apache.hadoop.mapreduce.JobSubmitter.writeNewSplits(JobSubmitter.java:310)
+	at org.apache.hadoop.mapreduce.JobSubmitter.writeSplits(JobSubmitter.java:327)
+	at org.apache.hadoop.mapreduce.JobSubmitter.submitJobInternal(JobSubmitter.java:200)
+	at org.apache.hadoop.mapreduce.Job$11.run(Job.java:1678)
+	at org.apache.hadoop.mapreduce.Job$11.run(Job.java:1675)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:712)
+	at java.base/javax.security.auth.Subject.doAs(Subject.java:439)
+	at org.apache.hadoop.security.UserGroupInformation.doAs(UserGroupInformation.java:1899)
+	at org.apache.hadoop.mapreduce.Job.submit(Job.java:1675)
+	at org.apache.hadoop.mapreduce.Job.waitForCompletion(Job.java:1696)
+	at com.jasminegraph.indegree.InDegreeComputation.main(InDegreeComputation.java:89)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:328)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:241)
+Caused by: java.io.IOException: Input path does not exist: file:/user/ubuntu/input/google/web-Google.txt
+	at org.apache.hadoop.mapreduce.lib.input.FileInputFormat.singleThreadedListStatus(FileInputFormat.java:313)
+	... 19 more
+
+real	0m1.121s
+user	0m1.867s
+sys	0m0.181s
+=== Collecting Results ===
+get: `/user/ubuntu/output/epinions/part-r-00000': No such file or directory
+get: `/user/ubuntu/output/youtube/part-r-00000': No such file or directory
+get: `/user/ubuntu/output/google/part-r-00000': No such file or directory
+=== Stopping Hadoop Services ===
+Stopping nodemanagers
+localhost: ERROR: JAVA_HOME is not set and could not be found.
+Stopping resourcemanager
+Stopping namenodes on [devin-box]
+devin-box: ERROR: JAVA_HOME is not set and could not be found.
+Stopping datanodes
+localhost: ERROR: JAVA_HOME is not set and could not be found.
+Stopping secondary namenodes [devin-box]
+devin-box: ERROR: JAVA_HOME is not set and could not be found.
+=== Results Summary ===
+Epinions Results:
+head: cannot open 'results/epinions_indegree.txt' for reading: No such file or directory
+...
+tail: cannot open 'results/epinions_indegree.txt' for reading: No such file or directory
+YouTube Results:
+head: cannot open 'results/youtube_indegree.txt' for reading: No such file or directory
+...
+tail: cannot open 'results/youtube_indegree.txt' for reading: No such file or directory
+Google Results:
+head: cannot open 'results/google_indegree.txt' for reading: No such file or directory
+...
+tail: cannot open 'results/google_indegree.txt' for reading: No such file or directory
