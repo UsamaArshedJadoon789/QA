@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hadoop Setup Documentation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            max-width: 1200px;
+        }
+        .section {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .config {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hadoop Installation and Configuration Documentation</h1>
+    
+    <div class="section">
+        <h2>1. Environment Setup</h2>
+        <p><strong>Java Environment:</strong></p>
+        <div class="config">
+        JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64
+        Java Version: OpenJDK 17.0.13
+        </div>
+        
+        <p><strong>Hadoop Environment:</strong></p>
+        <div class="config">
+        HADOOP_HOME=/home/ubuntu/qa/hadoop
+        Hadoop Version: 3.3.6
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Configuration Files</h2>
+        
+        <p><strong>core-site.xml</strong> - Basic Hadoop Configuration:</p>
+        <div class="config">
+        &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        &lt;configuration&gt;
+            &lt;property&gt;
+                &lt;name&gt;fs.defaultFS&lt;/name&gt;
+                &lt;value&gt;hdfs://localhost:9000&lt;/value&gt;
+            &lt;/property&gt;
+            &lt;property&gt;
+                &lt;name&gt;hadoop.tmp.dir&lt;/name&gt;
+                &lt;value&gt;/home/ubuntu/qa/hadoop_tmp&lt;/value&gt;
+            &lt;/property&gt;
+        &lt;/configuration&gt;
+        </div>
+
+        <p><strong>hdfs-site.xml</strong> - HDFS Configuration:</p>
+        <div class="config">
+        &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        &lt;configuration&gt;
+            &lt;property&gt;
+                &lt;name&gt;dfs.replication&lt;/name&gt;
+                &lt;value&gt;1&lt;/value&gt;
+            &lt;/property&gt;
+            &lt;property&gt;
+                &lt;name&gt;dfs.namenode.name.dir&lt;/name&gt;
+                &lt;value&gt;/home/ubuntu/qa/hadoop_tmp/dfs/name&lt;/value&gt;
+            &lt;/property&gt;
+            &lt;property&gt;
+                &lt;name&gt;dfs.datanode.data.dir&lt;/name&gt;
+                &lt;value&gt;/home/ubuntu/qa/hadoop_tmp/dfs/data&lt;/value&gt;
+            &lt;/property&gt;
+        &lt;/configuration&gt;
+        </div>
+
+        <p><strong>mapred-site.xml</strong> - MapReduce Configuration:</p>
+        <div class="config">
+        &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        &lt;configuration&gt;
+            &lt;property&gt;
+                &lt;name&gt;mapreduce.framework.name&lt;/name&gt;
+                &lt;value&gt;yarn&lt;/value&gt;
+            &lt;/property&gt;
+            &lt;property&gt;
+                &lt;name&gt;mapreduce.application.classpath&lt;/name&gt;
+                &lt;value&gt;$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*&lt;/value&gt;
+            &lt;/property&gt;
+        &lt;/configuration&gt;
+        </div>
+
+        <p><strong>yarn-site.xml</strong> - YARN Configuration:</p>
+        <div class="config">
+        &lt;?xml version="1.0" encoding="UTF-8"?&gt;
+        &lt;configuration&gt;
+            &lt;property&gt;
+                &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
+                &lt;value&gt;mapreduce_shuffle&lt;/value&gt;
+            &lt;/property&gt;
+            &lt;property&gt;
+                &lt;name&gt;yarn.nodemanager.env-whitelist&lt;/name&gt;
+                &lt;value&gt;JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME&lt;/value&gt;
+            &lt;/property&gt;
+        &lt;/configuration&gt;
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3. Installation Steps</h2>
+        <ol>
+            <li>Set up Java environment and verify installation</li>
+            <li>Download and extract Hadoop 3.3.6</li>
+            <li>Configure environment variables (JAVA_HOME, HADOOP_HOME, PATH)</li>
+            <li>Create and configure Hadoop configuration files</li>
+            <li>Format HDFS namenode</li>
+            <li>Verify installation with hadoop version command</li>
+        </ol>
+    </div>
+
+    <div class="section">
+        <h2>4. Directory Structure</h2>
+        <div class="config">
+        /home/ubuntu/qa/
+        ├── hadoop/
+        │   ├── bin/
+        │   ├── etc/hadoop/
+        │   │   ├── core-site.xml
+        │   │   ├── hdfs-site.xml
+        │   │   ├── mapred-site.xml
+        │   │   └── yarn-site.xml
+        │   └── ...
+        ├── hadoop_tmp/
+        │   └── dfs/
+        │       ├── name/
+        │       └── data/
+        └── screenshots/
+            └── hadoop/
+                ├── config/
+                └── installation_log.txt
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>5. Installation Screenshots and Verification</h2>
+        <div class="subsection">
+            <h3>5.1 Environment Setup</h3>
+            <p>Environment variables properly configured:</p>
+            <div class="config">
+            JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64
+            HADOOP_HOME=/home/ubuntu/qa/hadoop
+            PATH includes Hadoop binaries
+            </div>
+        </div>
+        
+        <div class="subsection">
+            <h3>5.2 Hadoop Version Verification</h3>
+            <p>Successfully verified Hadoop installation:</p>
+            <div class="config">
+            $ hadoop version
+            Hadoop 3.3.6
+            Source code repository https://github.com/apache/hadoop.git
+            Compiled by ubuntu on 2023-06-18T08:22Z
+            Compiled on platform linux-x86_64
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3>5.3 HDFS Namenode Formatting</h3>
+            <p>Successfully formatted HDFS namenode:</p>
+            <div class="config">
+            Namenode formatted at: /home/ubuntu/qa/hadoop_tmp/dfs/name
+            Datanode directory: /home/ubuntu/qa/hadoop_tmp/dfs/data
+            Format completed successfully
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3>5.4 Configuration Summary</h3>
+            <p>All configuration files are properly set up in <code>$HADOOP_HOME/etc/hadoop/</code>:</p>
+            <ul>
+                <li>core-site.xml - Basic Hadoop configuration</li>
+                <li>hdfs-site.xml - HDFS configuration</li>
+                <li>mapred-site.xml - MapReduce framework configuration</li>
+                <li>yarn-site.xml - YARN resource manager configuration</li>
+            </ul>
+        </div>
+
+        <div class="subsection">
+            <h3>5.5 Next Steps</h3>
+            <p>To start Hadoop services:</p>
+            <div class="config">
+            1. Start HDFS:
+               $ start-dfs.sh
+            
+            2. Start YARN:
+               $ start-yarn.sh
+            
+            3. Verify services:
+               $ jps
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>6. Installation Logs</h2>
+        <div class="subsection">
+            <h3>6.1 Java Environment</h3>
+            <p>Java installation verification:</p>
+            <div class="config" id="java-setup">
+            Loading installation logs...
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3>6.2 Hadoop Environment</h3>
+            <p>Hadoop installation details:</p>
+            <div class="config" id="hadoop-setup">
+            Loading Hadoop configuration...
+            </div>
+        </div>
+
+        <div class="subsection">
+            <h3>6.3 Directory Structure</h3>
+            <p>Current Hadoop configuration structure:</p>
+            <div class="config" id="dir-structure">
+            Loading directory structure...
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .subsection {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+        }
+        .subsection h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        code {
+            background: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        ul li:before {
+            content: "✓";
+            color: #27ae60;
+            margin-right: 10px;
+        }
+        .config {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+    </style>
+
+    <script>
+        // Load installation logs
+        fetch('images/installation_details.txt')
+            .then(response => response.text())
+            .then(text => {
+                const sections = text.split('===');
+                sections.forEach(section => {
+                    if (section.includes('Java Installation')) {
+                        document.getElementById('java-setup').textContent = section;
+                    } else if (section.includes('Hadoop Installation')) {
+                        document.getElementById('hadoop-setup').textContent = section;
+                    } else if (section.includes('Directory Structure')) {
+                        document.getElementById('dir-structure').textContent = section;
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading logs:', error));
+    </script>
+</body>
+</html>

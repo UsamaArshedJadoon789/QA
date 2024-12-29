@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
+        .section { margin-bottom: 30px; }
+        h2 { color: #333; border-bottom: 2px solid #333; }
+    </style>
+</head>
+<body>
+    <h1>Setup Documentation</h1>
+    
+    <div class="section">
+        <h2>1. Dataset Downloads and Verification</h2>
+        <pre>
+-rw-rw-r-- 1 ubuntu ubuntu  37M Nov 13  2012 datasets/com-youtube.ungraph.txt
+-rw-rw-r-- 1 ubuntu ubuntu 5.5M Dec  3  2009 datasets/soc-Epinions1.txt
+-rw-rw-r-- 1 ubuntu ubuntu 1.1G Dec  3  2009 datasets/soc-LiveJournal1.txt
+-rw-rw-r-- 1 ubuntu ubuntu  72M Dec  3  2009 datasets/web-Google.txt
+        </pre>
+    </div>
+
+    <div class="section">
+        <h2>2. Package Installation</h2>
+        <pre>
+ii  tree                          2.0.2-1                           amd64        displays an indented directory tree, in color
+        </pre>
+    </div>
+
+    <div class="section">
+        <h2>3. Repository Structure</h2>
+        <pre>
+.
+|-- MACHINE_SPECS.md
+|-- README.md
+|-- datasets
+|   |-- README.md
+|   |-- com-youtube.ungraph.txt
+|   |-- soc-Epinions1.txt
+|   |-- soc-LiveJournal1.txt
+|   `-- web-Google.txt
+`-- screenshots
+    |-- README.md
+    `-- setup
+        |-- 01_repo_structure.txt
+        |-- 02_machine_specs.txt
+        |-- 03_git_config.txt
+        `-- 04_dataset_downloads.txt
+        </pre>
+    </div>
+
+    <div class="section">
+        <h2>4. Machine Specifications</h2>
+        <h3>Operating System</h3>
+        <pre>
+Distributor ID: Ubuntu
+Description:    Ubuntu 22.04.5 LTS
+Release:        22.04
+Codename:       jammy
+        </pre>
+
+        <h3>CPU Information</h3>
+        <pre>
+Architecture:        x86_64
+CPU(s):             2
+Model name:         AMD EPYC
+Thread(s) per core: 1
+Core(s) per socket: 2
+Socket(s):          1
+L1d cache:          64 KiB (2 instances)
+L1i cache:          64 KiB (2 instances)
+L2 cache:           1 MiB (2 instances)
+L3 cache:           32 MiB (1 instance)
+Virtualization:     AMD-V
+        </pre>
+
+        <h3>Memory Information</h3>
+        <pre>
+               total        used        free      shared  buff/cache   available
+Mem:           7.8Gi       678Mi       1.6Gi        37Mi       5.5Gi       6.8Gi
+Swap:             0B          0B          0B
+        </pre>
+    </div>
+
+    <div class="section">
+        <h2>5. Git Configuration</h2>
+        <pre>
+user.name=Devin AI
+user.email=devin@devin.ai
+remote.origin.url=https://github.com/UsamaArshedJadoon789/qa.git
+branch.main.remote=origin
+branch.main.merge=refs/heads/main
+        </pre>
+    </div>
+</body>
+</html>

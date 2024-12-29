@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup and Installation Documentation</title>
+    <style>
+        body { 
+            background: #000;
+            color: #fff;
+            font-family: monospace;
+            padding: 20px;
+            white-space: pre-wrap;
+        }
+        .header {
+            color: #0f0;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+=== Setup Documentation Screenshots ===
+
+1. Package Installation Log
+--------------------------------
+Installing tree package:
+ii  tree                          2.0.2-1                           amd64        displays an indented directory tree, in color
+
+2. Dataset Downloads Verification
+--------------------------------
+Downloaded datasets in /home/ubuntu/qa/datasets/:
+-rw-rw-r-- 1 ubuntu ubuntu  37M Nov 13  2012 datasets/com-youtube.ungraph.txt
+-rw-rw-r-- 1 ubuntu ubuntu 5.5M Dec  3  2009 datasets/soc-Epinions1.txt
+-rw-rw-r-- 1 ubuntu ubuntu 1.1G Dec  3  2009 datasets/soc-LiveJournal1.txt
+-rw-rw-r-- 1 ubuntu ubuntu  72M Dec  3  2009 datasets/web-Google.txt
+
+3. Repository Structure
+--------------------------------
+.
+|-- MACHINE_SPECS.md
+|-- README.md
+|-- build
+|   `-- index.html
+|-- datasets
+|   |-- README.md
+|   |-- com-youtube.ungraph.txt
+|   |-- soc-Epinions1.txt
+|   |-- soc-LiveJournal1.txt
+|   `-- web-Google.txt
+`-- screenshots
+    |-- README.md
+    `-- setup
+        |-- 01_repo_structure.txt
+        |-- 02_machine_specs.txt
+        |-- 03_git_config.txt
+        `-- 04_dataset_downloads.txt
+
+4. Machine Specifications
+--------------------------------
+Linux devin-box 5.10.223 #11 SMP Wed Dec 11 10:33:41 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
+Architecture:                         x86_64
+CPU op-mode(s):                       32-bit, 64-bit
+Address sizes:                        48 bits physical, 48 bits virtual
+Byte Order:                           Little Endian
+CPU(s):                               2
+
+Memory:
+               total        used        free      shared  buff/cache   available
+Mem:           7.8Gi       685Mi       1.6Gi        33Mi       5.5Gi       6.8Gi
+Swap:             0B          0B          0B
+
+5. Git Configuration
+--------------------------------
+core.pager=cat | head -n 10000
+merge.conflictstyle=diff3
+credential.helper=store --file /opt/.devin/.devin-integration-git-credentials
+user.name=Devin AI
+user.email=devin@devin.ai
+core.repositoryformatversion=0
+core.filemode=true
+core.bare=false
+core.logallrefupdates=true
+remote.origin.url=https://github.com/UsamaArshedJadoon789/qa.git
+remote.origin.fetch=+refs/heads/*:refs/remotes/origin/*
+branch.main.remote=origin
+branch.main.merge=refs/heads/main
+
+Setup documentation completed on Sun Dec 29 03:35:29 UTC 2024
+</body>
+</html>

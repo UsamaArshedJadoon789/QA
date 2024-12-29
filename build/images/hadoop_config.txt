@@ -1,0 +1,102 @@
+=== Environment Variables ===
+JAVA_HOME=/usr/lib/jvm/java-1.17.0-openjdk-amd64
+HADOOP_HOME=/home/ubuntu/qa/hadoop
+PATH=/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/opt/.devin/package/custom_binaries:/home/ubuntu/.local/bin:/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:/home/ubuntu/.pyenv/shims:/home/ubuntu/.pyenv/bin:/opt/.devin/package/custom_binaries:/home/ubuntu/.nvm/versions/node/v22.11.0/bin:/home/ubuntu/.cargo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/ubuntu/.local/share/coursier/bin:/home/ubuntu/qa/hadoop/bin:/home/ubuntu/qa/hadoop/sbin:/home/ubuntu/qa/hadoop/bin:/home/ubuntu/qa/hadoop/sbin
+=== Hadoop Version ===
+Hadoop 3.3.6
+Source code repository https://github.com/apache/hadoop.git -r 1be78238728da9266a4f88195058f08fd012bf9c
+Compiled by ubuntu on 2023-06-18T08:22Z
+Compiled on platform linux-x86_64
+Compiled with protoc 3.7.1
+From source with checksum 5652179ad55f76cb287d9c633bb53bbd
+This command was run using /home/ubuntu/qa/hadoop/share/hadoop/common/hadoop-common-3.3.6.jar
+=== Core Configuration ===
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+    <property>
+        <name>hadoop.tmp.dir</name>
+        <value>/home/ubuntu/qa/hadoop_tmp</value>
+    </property>
+</configuration>
+=== HDFS Configuration ===
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>/home/ubuntu/qa/hadoop_tmp/dfs/name</value>
+    </property>
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>/home/ubuntu/qa/hadoop_tmp/dfs/data</value>
+    </property>
+</configuration>
+=== MapReduce Configuration ===
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+    <property>
+        <name>mapreduce.application.classpath</name>
+        <value>$HADOOP_HOME/share/hadoop/mapreduce/*:$HADOOP_HOME/share/hadoop/mapreduce/lib/*</value>
+    </property>
+</configuration>
+=== YARN Configuration ===
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+    <property>
+        <name>yarn.nodemanager.env-whitelist</name>
+        <value>JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_HOME</value>
+    </property>
+</configuration>
+=== Directory Structure ===
+hadoop/etc/hadoop
+|-- capacity-scheduler.xml
+|-- configuration.xsl
+|-- container-executor.cfg
+|-- core-site.xml
+|-- hadoop-env.cmd
+|-- hadoop-env.sh
+|-- hadoop-metrics2.properties
+|-- hadoop-policy.xml
+|-- hadoop-user-functions.sh.example
+|-- hdfs-rbf-site.xml
+|-- hdfs-site.xml
+|-- httpfs-env.sh
+|-- httpfs-log4j.properties
+|-- httpfs-site.xml
+|-- kms-acls.xml
+|-- kms-env.sh
+|-- kms-log4j.properties
+|-- kms-site.xml
+|-- log4j.properties
+|-- mapred-env.cmd
+|-- mapred-env.sh
+|-- mapred-queues.xml.template
+|-- mapred-site.xml
+|-- shellprofile.d
+|   `-- example.sh
+|-- ssl-client.xml.example
+|-- ssl-server.xml.example
+|-- user_ec_policies.xml.template
+|-- workers
+|-- yarn-env.cmd
+|-- yarn-env.sh
+|-- yarn-site.xml
+`-- yarnservice-log4j.properties
+
+1 directory, 32 files
