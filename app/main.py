@@ -19,11 +19,23 @@ async def startup_event():
     verify_data_exists()
 
 def verify_data_exists():
-    """Verify that all required data files exist."""
-    print(f"Checking /app/results directory: exists={os.path.isdir('/app/results')}")
-    if os.path.isdir('/app/results'):
-        print(f"Contents of /app/results: {os.listdir('/app/results')}")
-        print(f"Permissions of /app/results: {oct(os.stat('/app/results').st_mode)[-3:]}")
+    """Verify that all required data files and directories exist."""
+    print(f"Starting data verification process...")
+    
+    # Create and set permissions for results directory
+    os.makedirs('/app/results', exist_ok=True)
+    os.chmod('/app/results', 0o777)
+    print(f"Results directory created and permissions set")
+    
+    # Create visualization directories
+    models = ['slaughterhouse', 'food_processing']
+    dimensions = ['2d', '3d']
+    for model in models:
+        for dim in dimensions:
+            viz_dir = VISUALIZATIONS_DIR / model / dim
+            viz_dir.mkdir(parents=True, exist_ok=True)
+            os.chmod(str(viz_dir), 0o777)
+            print(f"Created visualization directory: {viz_dir}")
     
     required_files = [
         RESULTS_DIR / "slaughterhouse_results.json",
@@ -31,17 +43,27 @@ def verify_data_exists():
     ]
     
     missing_files = [str(f) for f in required_files if not f.exists()]
-    if missing_files:
-        print(f"Missing required files: {missing_files}")
-        print("Generating data files...")
+    if missing_files or not any((VISUALIZATIONS_DIR / 'slaughterhouse' / '2d').glob('*.png')):
+        print(f"Missing files or visualizations, regenerating data...")
         try:
+            env = os.environ.copy()
+            env['PYTHONPATH'] = str(Path(__file__).parent)
             result = subprocess.run(
                 [sys.executable, str(Path(__file__).parent / "generate_test_data.py")],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                env=env
             )
-            print("Data generation completed successfully")
+            print(f"Data generation output: {result.stdout}")
+            print("Data and visualization generation completed")
+            
+            # Verify visualization files were created
+            for model in models:
+                for dim in dimensions:
+                    viz_path = VISUALIZATIONS_DIR / model / dim
+                    files = list(viz_path.glob('*.png'))
+                    print(f"Generated visualizations for {model}/{dim}: {len(files)} files")
         except subprocess.CalledProcessError as e:
             print(f"Error generating data: {e.stderr}")
             raise RuntimeError("Failed to generate required data files")
