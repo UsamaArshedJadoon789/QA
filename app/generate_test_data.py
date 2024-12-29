@@ -138,21 +138,35 @@ def process_condition(model_type: str, condition: int) -> Dict:
     gc.collect()
     return serializable_result
 
-# Process slaughterhouse conditions one at a time
-slaughterhouse_results = {}
-for i in range(1, 7):
-    slaughterhouse_results[f"condition{i}"] = process_condition('slaughterhouse', i)
-    gc.collect()
+def generate_test_data():
+    """Generate test data and visualizations for both models"""
+    # Process slaughterhouse conditions one at a time
+    slaughterhouse_results = {}
+    for i in range(1, 7):
+        slaughterhouse_results[f"condition{i}"] = process_condition('slaughterhouse', i)
+        gc.collect()
 
-# Process food processing conditions one at a time
-food_processing_results = {}
-for i in range(1, 4):
-    food_processing_results[f"condition{i}"] = process_condition('food_processing', i)
-    gc.collect()
+    # Process food processing conditions one at a time
+    food_processing_results = {}
+    for i in range(1, 4):
+        food_processing_results[f"condition{i}"] = process_condition('food_processing', i)
+        gc.collect()
 
-# Save results
-(RESULTS_DIR / "slaughterhouse_results.json").write_text(json.dumps(slaughterhouse_results))
-(RESULTS_DIR / "food_processing_results.json").write_text(json.dumps(food_processing_results))
+    # Save results
+    (RESULTS_DIR / "slaughterhouse_results.json").write_text(json.dumps(slaughterhouse_results))
+    (RESULTS_DIR / "food_processing_results.json").write_text(json.dumps(food_processing_results))
+
+    # Generate visualizations for both models
+    generate_visualizations_with_cleanup('slaughterhouse', slaughterhouse_results, 6)
+    generate_visualizations_with_cleanup('food_processing', food_processing_results, 3)
+
+    return {
+        "slaughterhouse_results": slaughterhouse_results,
+        "food_processing_results": food_processing_results
+    }
+
+if __name__ == "__main__":
+    generate_test_data()
 
 def generate_visualization(data, title, model_type, condition, dimension):
     """Create enhanced visualization with compliance and time comparison"""
@@ -319,5 +333,4 @@ def generate_visualizations_with_cleanup(model_type, results, conditions):
                 gc.collect()
 
 # Generate visualizations for both models
-generate_visualizations_with_cleanup('slaughterhouse', slaughterhouse_results, 6)
-generate_visualizations_with_cleanup('food_processing', food_processing_results, 3)
+# Visualization generation moved into generate_test_data() function
