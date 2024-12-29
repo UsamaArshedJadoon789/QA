@@ -13,17 +13,49 @@ import matplotlib.pyplot as plt
 
 app = FastAPI(title="Halal Compliance Monitoring API")
 
+# Data directory for simulation results
+RESULTS_DIR = Path("/app/results")
+VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
+
 # Call verify_data_exists during startup
 @app.on_event("startup")
 async def startup_event():
     verify_data_exists()
 
 def verify_data_exists():
-    """Verify that all required data files exist."""
-    print(f"Checking /app/results directory: exists={os.path.isdir('/app/results')}")
-    if os.path.isdir('/app/results'):
-        print(f"Contents of /app/results: {os.listdir('/app/results')}")
-        print(f"Permissions of /app/results: {oct(os.stat('/app/results').st_mode)[-3:]}")
+    """Verify that all required data files and directories exist."""
+    print(f"Starting data verification process with enhanced logging...")
+    
+    # Check Python environment and dependencies
+    try:
+        import matplotlib
+        print(f"Matplotlib backend: {matplotlib.get_backend()}")
+        print(f"Matplotlib configuration: {matplotlib.rcParams['backend']}")
+    except Exception as e:
+        print(f"Error checking matplotlib: {str(e)}")
+    
+    # Create and set permissions for results directory
+    try:
+        os.makedirs('/app/results', exist_ok=True)
+        os.chmod('/app/results', 0o777)
+        print(f"Results directory created and permissions set: {oct(os.stat('/app/results').st_mode)[-3:]}")
+    except Exception as e:
+        print(f"Error creating results directory: {str(e)}")
+    
+    # Create visualization directories with detailed logging
+    models = ['slaughterhouse', 'food_processing']
+    dimensions = ['2d', '3d']
+    for model in models:
+        for dim in dimensions:
+            try:
+                viz_dir = VISUALIZATIONS_DIR / model / dim
+                viz_dir.mkdir(parents=True, exist_ok=True)
+                os.chmod(str(viz_dir), 0o777)
+                print(f"Created visualization directory: {viz_dir}")
+                print(f"Directory permissions: {oct(os.stat(str(viz_dir)).st_mode)[-3:]}")
+                print(f"Directory exists: {viz_dir.exists()}")
+            except Exception as e:
+                print(f"Error creating visualization directory {viz_dir}: {str(e)}")
     
     required_files = [
         RESULTS_DIR / "slaughterhouse_results.json",
@@ -31,20 +63,54 @@ def verify_data_exists():
     ]
     
     missing_files = [str(f) for f in required_files if not f.exists()]
-    if missing_files:
-        print(f"Missing required files: {missing_files}")
-        print("Generating data files...")
+    if missing_files or not any((VISUALIZATIONS_DIR / 'slaughterhouse' / '2d').glob('*.png')):
+        print(f"Missing files or visualizations, regenerating data...")
+        print(f"Missing files: {missing_files}")
+        print(f"Current directory contents: {os.listdir(str(RESULTS_DIR))}")
+        
         try:
+            env = os.environ.copy()
+            env['PYTHONPATH'] = str(Path(__file__).parent)
+            env['MPLBACKEND'] = 'Agg'  # Force Agg backend
+            
+            print(f"Running generate_test_data.py with PYTHONPATH={env['PYTHONPATH']}")
             result = subprocess.run(
                 [sys.executable, str(Path(__file__).parent / "generate_test_data.py")],
                 capture_output=True,
                 text=True,
-                check=True
+                check=True,
+                env=env
             )
-            print("Data generation completed successfully")
+            print(f"Data generation stdout: {result.stdout}")
+            print(f"Data generation stderr: {result.stderr}")
+            print("Data and visualization generation completed")
+            
+            # Verify visualization files were created
+            for model in models: 
+                for dim in dimensions:
+                    viz_path = VISUALIZATIONS_DIR / model / dim
+                    try:
+                        files = list(viz_path.glob('*.png'))
+                        print(f"Generated visualizations for {model}/{dim}: {len(files)} files")
+                        print(f"Files: {[f.name for f in files]}")
+                    except Exception as e:
+                        print(f"Error checking visualization files in {viz_path}: {str(e)}")
         except subprocess.CalledProcessError as e:
-            print(f"Error generating data: {e.stderr}")
-            raise RuntimeError("Failed to generate required data files")
+            print(f"Error running generate_test_data.py: {str(e)}")
+            print(f"Process stdout: {e.stdout}")
+            print(f"Process stderr: {e.stderr}")
+            raise RuntimeError(f"Failed to generate required data files: {str(e)}")
+        except Exception as e:
+            print(f"Unexpected error during data generation: {str(e)}")
+            raise
+        # Verify all directories exist after generation
+        for model in models:
+            for dim in dimensions:
+                viz_dir = VISUALIZATIONS_DIR / model / dim
+                if not viz_dir.exists():
+                    print(f"Warning: Directory {viz_dir} still does not exist after generation")
+                else:
+                    print(f"Success: Directory {viz_dir} exists with contents: {list(viz_dir.glob('*.png'))}")
 
 # Configure CORS
 app.add_middleware(
@@ -55,13 +121,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Data directory for simulation results
-RESULTS_DIR = Path("/app/results")
-VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
-
-# Ensure directories exist
+# Ensure directories exist with proper permissions
 RESULTS_DIR.mkdir(exist_ok=True)
+os.chmod(str(RESULTS_DIR), 0o777)
 VISUALIZATIONS_DIR.mkdir(exist_ok=True, parents=True)
+os.chmod(str(VISUALIZATIONS_DIR), 0o777)
 
 @app.get("/")
 async def root():
@@ -132,9 +196,40 @@ async def get_food_processing_results():
 async def get_visualization(model: str, dimension: str, condition: str):
     """Get pre-generated visualization file."""
     try:
+        # Enhanced logging at start of request
+        print(f"\n=== Visualization Request ===")
+        print(f"Model: {model}, Dimension: {dimension}, Condition: {condition}")
+        
         # Remove .png from condition if it's already there
         condition = condition.replace('.png', '')
+        # Add 'condition' prefix if not present
+        if not condition.startswith('condition'):
+            condition = f"condition{condition}"
+            
         viz_path = VISUALIZATIONS_DIR / model / dimension / f"{condition}.png"
+        print(f"\nVisualization Path Details:")
+        print(f"Full path: {viz_path}")
+        print(f"Working directory: {os.getcwd()}")
+        print(f"RESULTS_DIR exists: {os.path.exists(RESULTS_DIR)}")
+        print(f"VISUALIZATIONS_DIR exists: {os.path.exists(VISUALIZATIONS_DIR)}")
+        
+        # Check directory structure
+        model_dir = VISUALIZATIONS_DIR / model
+        dim_dir = model_dir / dimension
+        print(f"\nDirectory Structure:")
+        print(f"Model dir ({model_dir}) exists: {os.path.exists(model_dir)}")
+        print(f"Dimension dir ({dim_dir}) exists: {os.path.exists(dim_dir)}")
+        
+        if os.path.exists(dim_dir):
+            print(f"\nContents of {dim_dir}:")
+            print(os.listdir(dim_dir))
+            
+        # Check file existence and permissions
+        if os.path.exists(viz_path):
+            print(f"\nFile Details:")
+            print(f"File exists: True")
+            print(f"File permissions: {oct(os.stat(viz_path).st_mode)[-3:]}")
+            print(f"File size: {os.path.getsize(viz_path)} bytes")
         
         if not viz_path.exists():
             # Try regenerating data if file missing

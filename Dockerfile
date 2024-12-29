@@ -30,9 +30,6 @@ RUN mkdir -p /app/results/visualizations/slaughterhouse/2d && \
     mkdir -p /app/results/visualizations/food_processing/3d && \
     chmod -R 777 /app/results
 
-# Create a volume for results persistence
-VOLUME ["/app/results"]
-
 # Set environment variables
 ENV PORT=8000
 ENV HOST=0.0.0.0
@@ -49,15 +46,26 @@ ENV NUMEXPR_NUM_THREADS=1
 # Expose port
 EXPOSE 8000
 
-# Pre-generate data and visualizations during build with detailed logging
-RUN python3 -c "import matplotlib; matplotlib.use('Agg')" && \
-    PYTHONUNBUFFERED=1 poetry run python -u app/generate_test_data.py 2>&1 | tee /tmp/visualization_generation.log && \
-    cat /tmp/visualization_generation.log && \
-    echo "Checking visualization directory contents:" && \
-    ls -la /app/results/visualizations/ || \
-    (echo "Error: Visualization generation failed. Log contents:" && \
-     cat /tmp/visualization_generation.log && \
-     exit 1)
+# Create directories with correct permissions
+RUN mkdir -p /app/results/visualizations && \
+    chmod -R 777 /app/results && \
+    chown -R nobody:nogroup /app/results
 
-# Start the application
-CMD poetry run uvicorn app.main:app --host 0.0.0.0 --port ${PORT}
+# Initialize matplotlib with Agg backend
+RUN python3 -c "import matplotlib; matplotlib.use('Agg')"
+
+# Create a startup script
+RUN echo '#!/bin/bash\n\
+python -u app/generate_test_data.py\n\
+if [ $? -eq 0 ]; then\n\
+  echo "Visualization generation successful"\n\
+  ls -la /app/results/visualizations/slaughterhouse/2d/\n\
+  uvicorn app.main:app --host 0.0.0.0 --port ${PORT}\n\
+else\n\
+  echo "Visualization generation failed"\n\
+  exit 1\n\
+fi' > /app/start.sh && \
+chmod +x /app/start.sh
+
+# Start the application with data generation
+CMD ["/app/start.sh"]

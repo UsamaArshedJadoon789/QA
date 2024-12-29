@@ -152,12 +152,26 @@ def generate_visualization(data, title, model_type, condition, dimension):
     plt.clf()  # Clear any existing plots
     plt.close('all')  # Close all figures to free memory
     
-    # Ensure visualization directory exists
+    # Ensure visualization directory exists with proper permissions
     viz_dir = VISUALIZATIONS_DIR / model_type / dimension
     viz_dir.mkdir(parents=True, exist_ok=True)
     
-    # Construct filename
+    # Set permissions for all parent directories
+    current_dir = viz_dir
+    while str(current_dir) != '/':
+        try:
+            os.chmod(str(current_dir), 0o777)
+            logger.info(f"Set permissions for directory: {current_dir}")
+            current_dir = current_dir.parent
+        except Exception as e:
+            logger.error(f"Error setting permissions for {current_dir}: {e}")
+    
+    # Construct filename and ensure parent directory permissions
     filename = viz_dir / f"condition{condition}.png"
+    logger.info(f"\n=== Visualization Setup ===")
+    logger.info(f"Target file: {filename}")
+    logger.info(f"Directory exists: {viz_dir.exists()}")
+    logger.info(f"Directory permissions: {oct(os.stat(str(viz_dir)).st_mode)[-3:]}")
     
     # Lower memory usage settings
     plt.rcParams['figure.dpi'] = 100  # Lower DPI
@@ -236,10 +250,22 @@ def generate_visualization(data, title, model_type, condition, dimension):
     
     plt.tight_layout()
     try:
+        # Save with optimized settings and verify
         plt.savefig(filename, dpi=100, bbox_inches='tight', optimize=True)
-        logger.info(f"Successfully saved visualization: {filename} for {model_type} {dimension} condition {condition}")
+        os.chmod(filename, 0o777)  # Ensure file is readable
+        
+        logger.info(f"\n=== Save Complete ===")
+        logger.info(f"Successfully saved visualization: {filename}")
+        logger.info(f"File exists: {os.path.exists(filename)}")
+        logger.info(f"File size: {os.path.getsize(filename)} bytes")
+        logger.info(f"File permissions: {oct(os.stat(filename).st_mode)[-3:]}")
+        
     except Exception as e:
-        logger.error(f"Failed to save visualization: {filename} for {model_type} {dimension} condition {condition}: {e}")
+        logger.error(f"\n=== Save Failed ===")
+        logger.error(f"Failed to save visualization: {filename}")
+        logger.error(f"Error: {str(e)}")
+        logger.error(f"Current working directory: {os.getcwd()}")
+        logger.error(f"Directory listing: {os.listdir(os.path.dirname(filename))}")
         raise
     finally:
         plt.close('all')  # Ensure cleanup even if save fails
