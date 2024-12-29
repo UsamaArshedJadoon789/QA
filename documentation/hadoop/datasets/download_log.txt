@@ -1,0 +1,6 @@
+Dataset download timestamp: Sun Dec 29 04:11:48 UTC 2024
+Dataset sizes:
+   508841 datasets/epinions/soc-Epinions1.txt
+  5105043 datasets/google/web-Google.txt
+  2987628 datasets/youtube/com-youtube.ungraph.txt
+  8601512 total
