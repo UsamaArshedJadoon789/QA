@@ -1,12 +1,38 @@
-# Dataset files (too large for git)
-datasets/*.txt
+# Build and binary files
+*.class
+build/
+target/
+*.jar
+*.war
+*.ear
 
-# OS files
+# Hadoop specific
+hadoop/logs/
+hadoop/tmp/
+hadoop/dfs/
+*.log
+*.out
+*.out.*
+
+# Dataset files
+datasets/*/
+!datasets/README.md
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Temporary files
+*.tmp
+tmp/
+.mtj.tmp/
+
+# System files
 .DS_Store
-*.swp
-*~
+Thumbs.db
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
+# Package files
+*.zip
+*.tar.gz
+*.rar
