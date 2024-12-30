@@ -3,36 +3,32 @@ services:
     name: halal-compliance-api
     env: python
     buildCommand: |
+      python -m pip install --upgrade pip
+      pip install -r app/requirements.txt
       mkdir -p app/results/visualizations
       chmod -R 777 app/results
-      pip install -r app/requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd app && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PORT
         value: 8000
       - key: PYTHONPATH
-        value: .
+        value: ./app
       - key: CORS_ORIGINS
         value: "*"
-    headers:
-      - path: /*
-        name: Access-Control-Allow-Origin
-        value: "*"
-      - path: /*
-        name: Cache-Control
-        value: no-cache
 
   - type: static
     name: halal-compliance-frontend
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    headers:
-      - path: /*
-        name: Access-Control-Allow-Origin
-        value: "*"
-      - path: /*
-        name: Cache-Control
-        value: no-cache
+    buildCommand: |
+      cd frontend
+      npm install
+      npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
-      - key: VITE_API_URL 
+      - key: NODE_VERSION
+        value: 18
+      - key: VITE_API_URL
         value: "https://halal-compliance-api.onrender.com"
