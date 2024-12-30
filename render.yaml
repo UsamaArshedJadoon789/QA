@@ -9,14 +9,11 @@ services:
         value: 8000
       - key: PYTHONPATH
         value: .
-  - type: static
+  - type: web
     name: halal-compliance-frontend
     env: static
-    buildCommand: |
-      cd frontend
-      npm install
-      npm run build
-    staticPublishPath: frontend/dist
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
     routes:
       - type: rewrite
         source: /*
@@ -26,6 +23,8 @@ services:
         value: 18
       - key: VITE_API_URL
         value: https://halal-compliance-api.onrender.com
-      - key: PYTHONPATH
-        value: .
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
     autoDeploy: true
