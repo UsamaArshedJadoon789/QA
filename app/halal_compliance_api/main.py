@@ -14,8 +14,17 @@ import matplotlib.pyplot as plt
 app = FastAPI(title="Halal Compliance Monitoring API")
 
 # Data directory for simulation results
-RESULTS_DIR = Path("app/results")
+RESULTS_DIR = Path("/tmp/app/results")  # Use /tmp for guaranteed write access
 VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
+
+# Create directories with proper permissions at startup
+os.makedirs(RESULTS_DIR, exist_ok=True)
+os.makedirs(VISUALIZATIONS_DIR, exist_ok=True)
+try:
+    os.chmod(str(RESULTS_DIR), 0o777)
+    os.chmod(str(VISUALIZATIONS_DIR), 0o777)
+except Exception as e:
+    print(f"Warning: Could not set permissions: {e}")
 
 # Call verify_data_exists during startup
 @app.on_event("startup")

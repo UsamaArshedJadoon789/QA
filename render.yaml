@@ -10,7 +10,7 @@ services:
       mkdir -p app/results/visualizations/food_processing/2d
       mkdir -p app/results/visualizations/food_processing/3d
       chmod -R 777 app/results
-    startCommand: cd app && uvicorn halal_compliance_api.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd app && PYTHONPATH=/app uvicorn halal_compliance_api.main:app --host 0.0.0.0 --port $PORT --reload
     envVars:
       - key: PORT
         value: 8000
