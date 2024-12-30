@@ -3,12 +3,10 @@ services:
     name: halal-compliance-backend
     env: python
     buildCommand: cd backend && pip install -r requirements.txt
-    startCommand: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
-      - key: CORS_ALLOW_ORIGINS
-        value: "*"
 
   - type: static
     name: halal-compliance-frontend
