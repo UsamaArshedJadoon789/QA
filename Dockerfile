@@ -17,7 +17,7 @@ COPY app/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app .
+COPY app/halal_compliance_api ./halal_compliance_api
 
 # Create results directory with proper permissions
 RUN mkdir -p results/visualizations/slaughterhouse/2d && \
@@ -34,6 +34,7 @@ ENV PORT=8000
 ENV HOST=0.0.0.0
 ENV PYTHONUNBUFFERED=1
 ENV MPLBACKEND=Agg
+ENV PYTHONPATH=/app
 
 # Expose port
 EXPOSE 8000
