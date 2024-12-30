@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: halal-compliance-api
+Version: 1.0.0
+Summary: Halal Compliance Monitoring System API
+Requires-Python: >=3.8
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: numpy
+Requires-Dist: matplotlib
+Requires-Dist: pandas
