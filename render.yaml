@@ -22,23 +22,24 @@ services:
         value: "Agg"
     routes:
       - type: rewrite
-        source: /api/*
-        destination: /api/$1
-      - type: rewrite
         source: /*
         destination: /
 
-  - type: static
+  - type: web
     name: halal-compliance-frontend
+    env: node
     buildCommand: |
       cd frontend
       npm install
       npm run build
-    staticPublishPath: ./frontend/dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    startCommand: cd frontend && npx serve -s dist -l $PORT
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: VITE_API_URL
+        value: "https://halal-compliance-api.onrender.com/api"
+      - key: PORT
+        value: 10000
     headers:
       - path: /*
         name: Access-Control-Allow-Origin
@@ -46,13 +47,5 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
-      - path: /*
-        name: X-Frame-Options
-        value: ALLOWALL
-    envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: VITE_API_URL
-        value: "https://halal-compliance-api.onrender.com/api"
     pullRequestPreviewsEnabled: true
     autoDeploy: true
