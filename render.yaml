@@ -21,9 +21,9 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
-  - type: web
+
+  - type: static
     name: halal-compliance-frontend
-    env: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: frontend/dist
     headers:
@@ -33,13 +33,6 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
     envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: VITE_API_URL
-        value: https://halal-compliance-api.onrender.com
-    autoDeploy: true
+      - key: VITE_API_URL 
+        value: "https://halal-compliance-api.onrender.com"
