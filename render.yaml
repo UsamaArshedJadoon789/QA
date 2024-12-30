@@ -2,8 +2,11 @@ services:
   - type: web
     name: halal-compliance-api
     env: python
-    buildCommand: pip install -r app/requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --reload
+    buildCommand: |
+      mkdir -p app/results/visualizations
+      chmod -R 777 app/results
+      pip install -r app/requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PORT
         value: 8000
