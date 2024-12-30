@@ -3,7 +3,7 @@ import axios from 'axios';
 import Plot from 'plotly.js-dist-min';
 import './App.css';
 
-const API_URL = 'https://halal-compliance-api-zbtmhgoo.fly.dev';
+const API_URL = 'https://halal-compliance-app-mbb3wpxe.devinapps.com';
 
 function App() {
   const [results, setResults] = useState(null);
@@ -106,7 +106,7 @@ function App() {
               </div>
             ) : (
               <img 
-                src={`${API_URL}/api/visualizations/${selectedModel}/2d/condition${selectedCondition}`}
+                src={`${API_URL}/api/visualizations/${selectedModel}/2d/condition${selectedCondition}.png`}
                 alt={`${selectedModel} condition ${selectedCondition} visualization`}
                 className="visualization"
                 onError={handleImageError}

@@ -11,6 +11,108 @@ import matplotlib.pyplot as plt
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+def generate_visualization(data, title, model_type, condition, dimension):
+    """Create enhanced visualization with compliance and time comparison"""
+    import gc
+    gc.collect()  # Force garbage collection before visualization
+    plt.clf()  # Clear any existing plots
+    plt.close('all')  # Close all figures to free memory
+    
+    # Ensure visualization directory exists with proper permissions
+    viz_dir = VISUALIZATIONS_DIR / model_type / dimension
+    viz_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Set permissions only for visualization directory
+    try:
+        os.chmod(str(viz_dir), 0o777)
+        logger.info(f"Set permissions for directory: {viz_dir}")
+    except Exception as e:
+        logger.error(f"Error setting permissions for {viz_dir}: {e}")
+    
+    # Construct filename and ensure parent directory permissions
+    filename = viz_dir / f"condition{condition}.png"
+    logger.info(f"\n=== Visualization Setup ===")
+    logger.info(f"Target file: {filename}")
+    logger.info(f"Directory exists: {viz_dir.exists()}")
+    logger.info(f"Directory permissions: {oct(os.stat(str(viz_dir)).st_mode)[-3:]}")
+    
+    # Lower memory usage settings
+    plt.rcParams['figure.dpi'] = 100  # Lower DPI
+    plt.rcParams['savefig.dpi'] = 100  # Lower save DPI
+    plt.rcParams['figure.max_open_warning'] = 10  # Lower figure warning threshold
+    
+    if "2d" in str(filename):
+        plt.figure(figsize=(15, 6))
+        
+        # Plot 1: Compliance Statistics with Error Bars
+        plt.subplot(1, 2, 1)
+        compliant = data["compliant"]["mean"]
+        non_compliant = data["non_compliant"]["mean"]
+        
+        # Create bar plot with error bars
+        categories = ['Compliant', 'Non-Compliant']
+        values = [compliant, non_compliant]
+        errors = [data["compliant"]["std"], data["non_compliant"]["std"]]
+        
+        plt.bar(categories, values, yerr=errors, capsize=5)
+        plt.title(f"{title}\nCompliance Statistics")
+        plt.ylabel('Count')
+        
+        # Plot 2: Time Comparison
+        plt.subplot(1, 2, 2)
+        automated_time = data["automated_time"]["mean"]
+        human_time = data["human_time"]["mean"]
+        time_categories = ['Automated', 'Human']
+        time_values = [automated_time, human_time]
+        time_errors = [data["automated_time"]["std"], data["human_time"]["std"]]
+        
+        plt.bar(time_categories, time_values, yerr=time_errors, capsize=5)
+        plt.title('Processing Time Comparison')
+        plt.ylabel('Time (seconds)')
+    else:  # 3D visualization
+        fig = plt.figure(figsize=(10, 8))
+        ax = fig.add_subplot(111, projection='3d')
+        
+        # Create 3D bar plot
+        x_pos = np.array([0, 1])
+        y_pos = np.array([0, 1])
+        x_pos, y_pos = np.meshgrid(x_pos, y_pos)
+        
+        # Flatten for bar3d
+        x_pos = x_pos.flatten()
+        y_pos = y_pos.flatten()
+        z_pos = np.zeros_like(x_pos)
+        
+        # Define dimensions
+        dx = dy = 0.8
+        dz = np.array([
+            data["compliant"]["mean"],
+            data["non_compliant"]["mean"],
+            data["automated_time"]["mean"],
+            data["human_time"]["mean"]
+        ])
+        
+        # Create 3D bars
+        ax.bar3d(x_pos, y_pos, z_pos, dx, dy, dz)
+        
+        # Customize 3D plot
+        ax.set_title(f"{title}\n3D Visualization")
+        ax.set_xticks([0.4, 1.4])
+        ax.set_yticks([0.4, 1.4])
+        ax.set_xticklabels(['Compliance', 'Time'])
+        ax.set_yticklabels(['Metric 1', 'Metric 2'])
+    
+    # Save plot with proper permissions
+    try:
+        plt.savefig(filename)
+        os.chmod(str(filename), 0o777)
+        logger.info(f"Successfully saved and set permissions for: {filename}")
+    except Exception as e:
+        logger.error(f"Error saving visualization to {filename}: {e}")
+    finally:
+        plt.close('all')  # Ensure figure is closed
+        gc.collect()  # Force garbage collection
+
 # Always use /app/results in production for consistency
 RESULTS_DIR = Path("results")
 VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
@@ -157,8 +259,43 @@ def generate_test_data():
     (RESULTS_DIR / "food_processing_results.json").write_text(json.dumps(food_processing_results))
 
     # Generate visualizations for both models
-    generate_visualizations_with_cleanup('slaughterhouse', slaughterhouse_results, 6)
-    generate_visualizations_with_cleanup('food_processing', food_processing_results, 3)
+    for i in range(1, 7):
+        try:
+            generate_visualization(
+                slaughterhouse_results[f"condition{i}"],
+                f"Slaughterhouse Condition {i} Compliance",
+                'slaughterhouse',
+                i,
+                '2d'
+            )
+            generate_visualization(
+                slaughterhouse_results[f"condition{i}"],
+                f"Slaughterhouse Condition {i} Compliance",
+                'slaughterhouse',
+                i,
+                '3d'
+            )
+        except Exception as e:
+            logger.error(f"Error generating visualization for slaughterhouse condition {i}: {e}")
+
+    for i in range(1, 4):
+        try:
+            generate_visualization(
+                food_processing_results[f"condition{i}"],
+                f"Food Processing Condition {i} Compliance",
+                'food_processing',
+                i,
+                '2d'
+            )
+            generate_visualization(
+                food_processing_results[f"condition{i}"],
+                f"Food Processing Condition {i} Compliance",
+                'food_processing',
+                i,
+                '3d'
+            )
+        except Exception as e:
+            logger.error(f"Error generating visualization for food_processing condition {i}: {e}")
 
     return {
         "slaughterhouse_results": slaughterhouse_results,
@@ -271,8 +408,8 @@ def generate_visualization(data, title, model_type, condition, dimension):
     plt.tight_layout()
     try:
         # Save with optimized settings and verify
-        plt.savefig(filename, dpi=100, bbox_inches='tight')
-        os.chmod(filename, 0o777)  # Ensure file is readable
+        plt.savefig(filename, dpi=100)
+        os.chmod(str(filename), 0o777)  # Ensure file is readable
         
         logger.info(f"\n=== Save Complete ===")
         logger.info(f"Successfully saved visualization: {filename}")
