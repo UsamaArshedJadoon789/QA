@@ -12,8 +12,7 @@ dependencies = [
     "uvicorn",
     "numpy",
     "matplotlib",
-    "pandas"
+    "pandas",
+    "python-multipart",
+    "aiofiles"
 ]
-
-[tool.setuptools]
-packages = ["app"]

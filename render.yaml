@@ -7,7 +7,7 @@ services:
       pip install -r app/requirements.txt
       mkdir -p app/results/visualizations
       chmod -R 777 app/results
-    startCommand: cd app && uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd app && uvicorn halal_compliance_api.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PORT
         value: 8000

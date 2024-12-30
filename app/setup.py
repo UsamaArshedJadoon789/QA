@@ -1,9 +1,9 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name="halal-compliance-api",
     version="1.0.0",
-    packages=find_packages(),
+    py_modules=['main', 'generate_test_data', 'startup'],
     install_requires=[
         "fastapi",
         "uvicorn",
