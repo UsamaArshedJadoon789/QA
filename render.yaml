@@ -20,6 +20,13 @@ services:
         value: "*"
       - key: MPLBACKEND
         value: "Agg"
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: /api/$1
+      - type: rewrite
+        source: /*
+        destination: /
 
   - type: static
     name: halal-compliance-frontend
@@ -41,3 +48,6 @@ services:
       - path: /*
         name: Cache-Control
         value: no-cache
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
