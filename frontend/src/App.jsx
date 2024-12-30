@@ -15,7 +15,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get('http://localhost:8080/api/results');
+      const response = await axios.get('https://halal-compliance-qa.onrender.com/api/results');
       if (!response.data || (!response.data.slaughterhouse && !response.data.food_processing)) {
         throw new Error('Invalid or missing data received from server');
       }
@@ -104,7 +104,7 @@ function App() {
               </div>
             ) : (
               <img 
-                src={`http://localhost:8080/api/visualizations/${selectedModel}/2d/condition${selectedCondition}.png`}
+                src={`https://halal-compliance-qa.onrender.com/api/visualizations/${selectedModel}/2d/condition${selectedCondition}.png`}
                 alt={`${selectedModel} condition ${selectedCondition} visualization`}
                 className="visualization"
                 onError={handleImageError}
