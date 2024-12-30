@@ -1,8 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
-import matplotlib.pyplot as plt
-from pathlib import Path
 import os
 
 app = FastAPI()
@@ -14,9 +12,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-RESULTS_DIR = Path("results")
-RESULTS_DIR.mkdir(exist_ok=True)
 
 @app.get("/")
 async def root():

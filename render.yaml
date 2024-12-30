@@ -1,22 +1,11 @@
 services:
   - type: web
     name: halal-compliance-backend
-    env: docker
-    dockerfilePath: backend/Dockerfile
-    buildCommand: ""
-    startCommand: ""
+    env: python
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: PORT
-        value: 8000
-
-  - type: static
-    name: halal-compliance-frontend
-    buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: frontend/dist
-    headers:
-      - path: /*
-        name: Access-Control-Allow-Origin
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: CORS_ALLOW_ORIGINS
         value: "*"
-      - path: /*
-        name: Cache-Control
-        value: no-cache
