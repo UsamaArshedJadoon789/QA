@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, Response
 import os
 from pathlib import Path
 import json
@@ -123,7 +123,7 @@ def verify_data_exists():
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -227,6 +227,14 @@ async def get_visualization(model: str, dimension: str, condition: str):
         print(f"Model dir ({model_dir}) exists: {os.path.exists(model_dir)}")
         print(f"Dimension dir ({dim_dir}) exists: {os.path.exists(dim_dir)}")
         
+        # Set proper headers for static file serving
+        headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'GET, OPTIONS',
+            'Access-Control-Allow-Headers': '*',
+            'Cache-Control': 'no-cache'
+        }
+        
         if os.path.exists(dim_dir):
             print(f"\nContents of {dim_dir}:")
             print(os.listdir(dim_dir))
@@ -253,11 +261,24 @@ async def get_visualization(model: str, dimension: str, condition: str):
                 )
         
         try:
-            return FileResponse(
-                str(viz_path),
-                media_type="image/png",
-                filename=f"{condition}.png"
-            )
+            if not viz_path.exists():
+                # Try regenerating data if file missing
+                verify_data_exists()
+            
+            if viz_path.exists():
+                with open(str(viz_path), 'rb') as f:
+                    image_bytes = f.read()
+                
+                headers.update({
+                    'Content-Type': 'image/png',
+                    'Content-Disposition': f'inline; filename="{condition}.png"'
+                })
+                
+                return Response(
+                    content=image_bytes,
+                    media_type="image/png",
+                    headers=headers
+                )
         except Exception as e:
             return JSONResponse(
                 status_code=500,

@@ -3,8 +3,6 @@ import axios from 'axios';
 import Plot from 'plotly.js-dist-min';
 import './App.css';
 
-const API_URL = 'https://halal-compliance-app-mbb3wpxe.devinapps.com';
-
 function App() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
@@ -17,7 +15,7 @@ function App() {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`${API_URL}/api/results`);
+      const response = await axios.get('https://halal-compliance-api.onrender.com/api/results');
       if (!response.data || (!response.data.slaughterhouse && !response.data.food_processing)) {
         throw new Error('Invalid or missing data received from server');
       }
@@ -106,7 +104,7 @@ function App() {
               </div>
             ) : (
               <img 
-                src={`${API_URL}/api/visualizations/${selectedModel}/2d/condition${selectedCondition}.png`}
+                src={`https://halal-compliance-api.onrender.com/api/visualizations/${selectedModel}/2d/condition${selectedCondition}.png`}
                 alt={`${selectedModel} condition ${selectedCondition} visualization`}
                 className="visualization"
                 onError={handleImageError}

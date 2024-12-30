@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Halal Compliance Monitoring</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .visualization { max-width: 100%; height: auto; margin: 20px 0; }
+        .controls { margin-bottom: 20px; }
+        select { margin: 0 10px; padding: 5px; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Halal Compliance Monitoring Visualizations</h1>
+    <div class="controls">
+        <label>Model:</label>
+        <select id="modelSelect">
+            <option value="slaughterhouse">Slaughterhouse</option>
+            <option value="food_processing">Food Processing</option>
+        </select>
+        <label>Condition:</label>
+        <select id="conditionSelect">
+            <option value="1">Condition 1</option>
+            <option value="2">Condition 2</option>
+            <option value="3">Condition 3</option>
+            <option value="4">Condition 4</option>
+            <option value="5">Condition 5</option>
+            <option value="6">Condition 6</option>
+        </select>
+    </div>
+    <div id="visualization">
+        <img id="vizImage" class="visualization" />
+    </div>
+    <div id="error" class="error"></div>
+
+    <script>
+        const API_URL = 'https://halal-compliance-app-mbb3wpxe.devinapps.com';
+        
+        function updateVisualization() {
+            const model = document.getElementById('modelSelect').value;
+            const condition = document.getElementById('conditionSelect').value;
+            const img = document.getElementById('vizImage');
+            const error = document.getElementById('error');
+            
+            img.src = `${API_URL}/api/visualizations/${model}/2d/condition${condition}.png`;
+            img.onerror = () => {
+                error.textContent = 'Failed to load visualization';
+                img.style.display = 'none';
+            };
+            img.onload = () => {
+                error.textContent = '';
+                img.style.display = 'block';
+            };
+        }
+
+        document.getElementById('modelSelect').addEventListener('change', updateVisualization);
+        document.getElementById('conditionSelect').addEventListener('change', updateVisualization);
+        
+        // Initial load
+        updateVisualization();
+    </script>
+</body>
+</html>

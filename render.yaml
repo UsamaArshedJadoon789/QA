@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: halal-compliance-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/main.py
+    envVars:
+      - key: PORT
+        value: 8000
+  - type: static
+    name: halal-compliance-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+      - key: PYTHONPATH
+        value: .
+    autoDeploy: true
