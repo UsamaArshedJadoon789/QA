@@ -5,9 +5,12 @@ services:
     buildCommand: |
       python -m pip install --upgrade pip
       pip install -r app/requirements.txt
-      mkdir -p app/results/visualizations
+      mkdir -p app/results/visualizations/slaughterhouse/2d
+      mkdir -p app/results/visualizations/slaughterhouse/3d
+      mkdir -p app/results/visualizations/food_processing/2d
+      mkdir -p app/results/visualizations/food_processing/3d
       chmod -R 777 app/results
-    startCommand: cd app && uvicorn halal_compliance_api.main:app --host 0.0.0.0 --port $PORT
+    startCommand: cd app && uvicorn main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PORT
         value: 8000
@@ -15,6 +18,8 @@ services:
         value: ./app
       - key: CORS_ORIGINS
         value: "*"
+      - key: MPLBACKEND
+        value: "Agg"
 
   - type: static
     name: halal-compliance-frontend
