@@ -1,62 +1,17 @@
 services:
   - type: web
-    name: halal-compliance-api
+    name: halal-compliance-backend
     env: python
-    buildCommand: |
-      python -m pip install --upgrade pip
-      pip install -r app/requirements.txt
-      pip install fastapi uvicorn
-      mkdir -p /tmp/app/results/visualizations/slaughterhouse/2d
-      mkdir -p /tmp/app/results/visualizations/slaughterhouse/3d
-      mkdir -p /tmp/app/results/visualizations/food_processing/2d
-      mkdir -p /tmp/app/results/visualizations/food_processing/3d
-      chmod -R 777 /tmp/app/results
-    startCommand: cd app/halal_compliance_api && PYTHONPATH=/app/halal_compliance_api uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
-      - key: PORT
-        value: 8000
-      - key: PYTHONPATH
-        value: /app/halal_compliance_api
-      - key: CORS_ORIGINS
-        value: "*"
-      - key: MPLBACKEND
-        value: "Agg"
-    headers:
-      - path: /*
-        name: Access-Control-Allow-Origin
-        value: "*"
-      - path: /*
-        name: Access-Control-Allow-Methods
-        value: "GET, POST, OPTIONS"
-      - path: /*
-        name: Access-Control-Allow-Headers
-        value: "*"
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /
+      - key: PYTHON_VERSION
+        value: 3.12.0
+    autoDeploy: true
 
-  - type: web
+  - type: static
     name: halal-compliance-frontend
     env: static
     buildCommand: cd frontend && npm install && npm run build
-    staticPublishPath: ./frontend/dist
-    startCommand: npx serve -s frontend/dist -l $PORT
-    envVars:
-      - key: NODE_VERSION
-        value: 18
-      - key: VITE_API_URL
-        value: "https://halal-compliance-api.onrender.com"
-      - key: PORT
-        value: 3000
-    headers:
-      - path: /*
-        name: Access-Control-Allow-Origin
-        value: "*"
-      - path: /*
-        name: Cache-Control
-        value: "no-cache"
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
+    staticPublishPath: frontend/dist
+    autoDeploy: true
