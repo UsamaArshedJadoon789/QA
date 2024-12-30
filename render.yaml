@@ -27,7 +27,7 @@ services:
       cd frontend
       npm install
       npm run build
-    staticPublishPath: ./frontend/dist
+    staticPublishPath: frontend/dist
     routes:
       - type: rewrite
         source: /*
@@ -37,3 +37,7 @@ services:
         value: 18
       - key: VITE_API_URL
         value: "https://halal-compliance-api.onrender.com"
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
