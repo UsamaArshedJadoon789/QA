@@ -20,27 +20,42 @@ services:
         value: "*"
       - key: MPLBACKEND
         value: "Agg"
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /*
+        name: Access-Control-Allow-Methods
+        value: "GET, POST, OPTIONS"
+      - path: /*
+        name: Access-Control-Allow-Headers
+        value: "*"
     routes:
       - type: rewrite
         source: /*
         destination: /
 
-  - type: static
+  - type: web
     name: halal-compliance-frontend
+    env: static
     buildCommand: cd frontend && npm install && npm run build
     staticPublishPath: ./frontend/dist
+    startCommand: npx serve -s frontend/dist -l $PORT
     envVars:
       - key: NODE_VERSION
         value: 18
       - key: VITE_API_URL
-        value: "https://halal-compliance-api.onrender.com/api"
+        value: "https://halal-compliance-api.onrender.com"
+      - key: PORT
+        value: 3000
     headers:
       - path: /*
         name: Access-Control-Allow-Origin
         value: "*"
+      - path: /*
+        name: Cache-Control
+        value: "no-cache"
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
-    pullRequestPreviewsEnabled: true
-    autoDeploy: true
