@@ -34,7 +34,7 @@ services:
       cd frontend
       npm install
       npm run build
-    staticPublishPath: frontend/dist
+    staticPublishPath: ./frontend/dist
     routes:
       - type: rewrite
         source: /*
@@ -51,3 +51,5 @@ services:
       - path: /*
         name: Access-Control-Allow-Origin
         value: "*"
+    pullRequestPreviewsEnabled: true
+    autoDeploy: true
