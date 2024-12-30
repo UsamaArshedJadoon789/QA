@@ -7,7 +7,9 @@ services:
     envVars:
       - key: PORT
         value: 8000
-  - type: static
+      - key: PYTHONPATH
+        value: .
+  - type: web
     name: halal-compliance-frontend
     env: static
     buildCommand: cd frontend && npm install && npm run build
@@ -16,6 +18,13 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
-      - key: PYTHONPATH
-        value: .
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: VITE_API_URL
+        value: https://halal-compliance-api.onrender.com
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-cache
     autoDeploy: true
