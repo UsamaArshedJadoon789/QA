@@ -5,17 +5,18 @@ services:
     buildCommand: |
       python -m pip install --upgrade pip
       pip install -r app/requirements.txt
+      pip install fastapi uvicorn
       mkdir -p /tmp/app/results/visualizations/slaughterhouse/2d
       mkdir -p /tmp/app/results/visualizations/slaughterhouse/3d
       mkdir -p /tmp/app/results/visualizations/food_processing/2d
       mkdir -p /tmp/app/results/visualizations/food_processing/3d
       chmod -R 777 /tmp/app/results
-    startCommand: cd app && PYTHONPATH=/app uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    startCommand: cd app/halal_compliance_api && PYTHONPATH=/app/halal_compliance_api uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
     envVars:
       - key: PORT
         value: 8000
       - key: PYTHONPATH
-        value: ./app
+        value: /app/halal_compliance_api
       - key: CORS_ORIGINS
         value: "*"
       - key: MPLBACKEND
