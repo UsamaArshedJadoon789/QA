@@ -3,12 +3,21 @@ services:
     name: halal-compliance-api
     env: python
     buildCommand: pip install -r app/requirements.txt
-    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --reload
     envVars:
       - key: PORT
         value: 8000
       - key: PYTHONPATH
         value: .
+      - key: CORS_ORIGINS
+        value: "*"
+    headers:
+      - path: /*
+        name: Access-Control-Allow-Origin
+        value: "*"
+      - path: /*
+        name: Cache-Control
+        value: no-cache
   - type: web
     name: halal-compliance-frontend
     env: static
