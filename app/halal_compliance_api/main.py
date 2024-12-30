@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 app = FastAPI(title="Halal Compliance Monitoring API")
 
 # Data directory for simulation results
-RESULTS_DIR = Path("results")
+RESULTS_DIR = Path("app/results")
 VISUALIZATIONS_DIR = RESULTS_DIR / "visualizations"
 
 # Call verify_data_exists during startup
@@ -24,12 +24,12 @@ async def startup_event():
     print("Starting application initialization...")
     try:
         # Create results directory if it doesn't exist
-        os.makedirs('app/results', exist_ok=True)
-        os.makedirs('app/results/visualizations', exist_ok=True)
+        os.makedirs(RESULTS_DIR, exist_ok=True)
+        os.makedirs(VISUALIZATIONS_DIR, exist_ok=True)
         
         # Set permissions
-        os.chmod('app/results', 0o777)
-        os.chmod('app/results/visualizations', 0o777)
+        os.chmod(str(RESULTS_DIR), 0o777)
+        os.chmod(str(VISUALIZATIONS_DIR), 0o777)
         
         # Generate test data
         verify_data_exists()
@@ -49,14 +49,6 @@ def verify_data_exists():
         print(f"Matplotlib configuration: {matplotlib.rcParams['backend']}")
     except Exception as e:
         print(f"Error checking matplotlib: {str(e)}")
-    
-    # Create and set permissions for results directory
-    try:
-        os.makedirs('results', exist_ok=True)
-        os.chmod('results', 0o777)
-        print(f"Results directory created and permissions set: {oct(os.stat('results').st_mode)[-3:]}")
-    except Exception as e:
-        print(f"Error creating results directory: {str(e)}")
     
     # Create visualization directories with detailed logging
     models = ['slaughterhouse', 'food_processing']
