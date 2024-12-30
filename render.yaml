@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: halal-compliance-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app/main.py
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: PYTHONPATH
+        value: .
+    autoDeploy: true
