@@ -1,5 +1,1 @@
-fastapi==0.104.1
-uvicorn==0.24.0
-numpy==1.26.2
-matplotlib==3.8.2
-python-multipart==0.0.6
+fastapi==0.104.1\nuvicorn==0.24.0\nnumpy==1.26.2\nmatplotlib==3.8.2\npython-multipart==0.0.6\npython-dotenv==1.0.0
