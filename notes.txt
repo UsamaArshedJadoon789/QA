@@ -1,0 +1,49 @@
+FreeCAD TechDraw Environment Setup
+
+1. Installation Requirements:
+- FreeCAD 0.21.2 or later
+- System Python 3.10+ (not pyenv)
+- Required packages:
+  * freecad-python3
+  * python3-pyside2
+  * python3-pivy
+  * imagemagick (for image conversion)
+
+2. Environment Variables:
+- DISPLAY=''  # Headless operation
+- QT_QPA_PLATFORM='offscreen'  # Qt rendering mode
+- FREECAD_LIB='/usr/lib/freecad/lib'  # FreeCAD library path
+- PYTHONPATH='/usr/lib/freecad-python3/lib:/usr/lib/freecad/lib'  # Python module path
+- COIN_GL_NO_WINDOW='1'  # Disable window creation
+- QT_QPA_FONTDIR='/usr/share/fonts/truetype'  # Font directory
+- QT_QPA_PLATFORM_PLUGIN_PATH='/usr/lib/x86_64-linux-gnu/qt5/plugins'  # Qt plugins
+
+3. Python Path Configuration:
+Required directories in PYTHONPATH:
+- /usr/lib/freecad-python3/lib
+- /usr/lib/freecad/lib
+- /usr/share/freecad/Mod
+- /usr/lib/python3/dist-packages
+
+4. TechDraw Configuration:
+- Template location: /usr/share/freecad/Mod/TechDraw/Templates/
+- Default template: A3_Landscape_blank.svg
+- Drawing parameters:
+  * Scale (main views): 1:50
+  * Scale (details): 1:10
+  * Export resolution: 2048x1536 px
+  * DPI: 300
+
+5. Export Process:
+1. Create TechDraw page and template
+2. Set up projection views
+3. Export to SVG
+4. Convert to PNG using ImageMagick
+5. Verify output quality and dimensions
+
+6. Troubleshooting:
+- Use system Python (/usr/bin/python3)
+- Verify all environment variables are set
+- Check template file permissions
+- Ensure proper Qt platform plugin configuration
+- Monitor FreeCAD console for errors
