@@ -53,10 +53,11 @@ def create_report():
     doc = SimpleDocTemplate(
         'output/documentation/structural_analysis_report.pdf',
         pagesize=pagesizes.A4,
-        rightMargin=25*mm,
-        leftMargin=25*mm,
-        topMargin=20*mm,
-        bottomMargin=20*mm
+        rightMargin=30*mm,
+        leftMargin=30*mm,
+        topMargin=25*mm,
+        bottomMargin=25*mm,
+        allowSplitting=True
     )
     
     # Initialize styles
@@ -83,19 +84,26 @@ def create_report():
         name='BodyText',
         parent=styles['Normal'],
         fontName=normal_font,
-        fontSize=11,
+        fontSize=10,
         leading=14,
-        alignment=TA_JUSTIFY
+        alignment=TA_JUSTIFY,
+        spaceBefore=6,
+        spaceAfter=6,
+        allowWidows=2,
+        allowOrphans=2,
+        splitLongWords=True
     ))
     
     styles.add(ParagraphStyle(
         name='Equation',
         parent=styles['Normal'],
         fontName=normal_font,
-        fontSize=11,
+        fontSize=10,
         alignment=TA_CENTER,
-        spaceAfter=10,
-        spaceBefore=10
+        spaceAfter=8,
+        spaceBefore=8,
+        allowWidows=2,
+        allowOrphans=2
     ))
     
     # Initialize calculations
@@ -1010,15 +1018,22 @@ def generate_pdf_report():
         displayDocTitle=1,  # Show document title in PDF properties
         cropMarks=False,    # No crop marks needed
         enforceColorSpace='RGB',  # Force RGB color space
-        allowSplitting=0,   # Prevent table rows from splitting across pages
-        showBoundary=0      # No page boundary
+        allowSplitting=1,   # Allow content to split across pages when needed
+        showBoundary=0,     # No page boundary
+        splitLongWords=1    # Allow long words to split if necessary
     )
     
-    # Configure page layout settings
+    # Configure page layout settings with more flexible spacing
     doc._calc()  # Force margin calculation
     width, height = A4
     doc.width = width - (2 * margin)  # Available width for content
     doc.height = height - (2 * margin)  # Available height for content
+    
+    # Add flexible spacing configuration
+    doc.bottomMargin = margin + 10  # Extra space at bottom
+    doc.topMargin = margin + 10     # Extra space at top
+    doc.allowWidows = 0    # Prevent single lines at bottom of page
+    doc.allowOrphans = 0   # Prevent single lines at top of page
     
     # Get calculation results
     calc = WoodStructureCalculations()
