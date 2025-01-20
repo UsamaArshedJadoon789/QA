@@ -1,0 +1,819 @@
+
+Analyzing PDF: /home/ubuntu/attachments/ad93d7f9-8ad0-4a68-9e64-4cf2b135e276/DOC-20250119-WA0109..pdf
+
+Document has 17 pages
+
+=== Page 1 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+Civil Engineering Project - Dataset 5
+Structural and Thermal Analysis Report
+Warsaw University of Technology
+Environmental Engineering Department
+January 19, 2025
+1
+Building Specications
+1.1
+Geometric Parameters
+ Width (b) = 7.2 m
+ Length 1 (L1) = 6.6 m
+ Length 2 (L2) = 10.8 m
+ Height 1 (h1) = 2.5 m
+ Height 2 (h2) = 2.65 m
+ Roof angle (α) = 16°
+ Purlin spacing (s) = 1.1 m
+ Ground Level = -1.4 m.a.s.l
+1.2
+Materials
+ Walls: MAX 220 block
+ Thermal insulation: Mineral wool
+ Roong: Steel tile 0.6 mm
+ Structure: C27 timber class
+2
+Structural Analysis
+2.1
+A. Rafter Analysis
+2.1.1
+Material Properties - C27 Timber
+According to EN 338, the C27 timber class has the following characteristic properties:
+Page 1 of 17
+
+
+Found 0 images on page 1
+
+=== Page 2 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+fm,k = 27 N/mm2
+(characteristic bending strength)
+fc,0,k = 22 N/mm2
+(characteristic compression strength)
+E0,mean = 11.5 kN/mm2
+(mean modulus of elasticity)
+ρk = 370 kg/m3
+(characteristic density)
+(1)
+Design factors according to EN 1995-1-1:
+ γM = 1.3 (partial safety factor for timber)
+ kmod = 0.8 (modication factor for Service Class 2)
+2.1.2
+Design Strength Calculations
+The design bending strength is calculated as:
+fm,d = kmod × fm,k
+γM
+= 0.8 × 27
+1.3
+= 16.62 N/mm2
+(2)
+where:
+ fm,d is the design bending strength
+ kmod accounts for load duration and moisture content
+ fm,k is the characteristic bending strength
+ γM is the partial safety factor for material properties
+2.1.3
+Load Analysis
+According to Eurocode (EN 1990, EN 1991), we must consider all relevant actions on the
+structure:
+Dead Loads (G)
+The permanent actions include:
+gk,tile = 0.047 kN/m²
+(steel tile 0.6mm)
+gk,struct = 0.15 kN/m²
+(supporting structure)
+gk,total = 0.197 kN/m²
+(total dead load)
+(3)
+Snow Load (S)
+According to EN 1991-1-3 (Eurocode 1: Actions on structures - Part 1-3:
+General actions - Snow loads), the characteristic snow load on the roof is calculated using the
+following formula:
+s = µ1 × Ce × Ct × sk
+[kN/m²]
+(4)
+where:
+ s is the snow load on the roof [kN/m²]
+ µ1 is the roof shape coecient, determined by roof pitch angle:
+ For α = 16°: µ1 = 0.8 (linear interpolation between 0.8 for α ≤30° and 0.0 for
+α ≥60°)
+ Ce is the exposure coecient:
+Page 2 of 17
+
+
+Found 0 images on page 2
+
+=== Page 3 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+ Ce = 1.0 for normal topography (no signicant removal of snow by wind)
+ Ct is the thermal coecient:
+ Ct = 1.0 for normal thermal insulation (< 1.0 only for glazed roofs)
+ sk = 0.7 kN/m² is the characteristic ground snow load for Warsaw region (Zone 2)
+Step-by-step calculation:
+1. Determine µ1 based on roof angle:
+ α = 16° →µ1 = 0.8
+2. Verify exposure conditions:
+ Normal topography →Ce = 1.0
+3. Check thermal conditions:
+ Standard roof insulation →Ct = 1.0
+4. Look up ground snow load:
+ Warsaw (Zone 2) →sk = 0.7 kN/m²
+5. Calculate roof snow load:
+s = 0.8 × 1.0 × 1.0 × 0.7 = 0.56 kN/m²
+(5)
+Wind Load (W)
+According to EN 1991-1-4 (Eurocode 1: Actions on structures - Part 1-4:
+General actions - Wind actions), the peak velocity pressure is calculated through a series of
+steps:
+1. Basic Wind Velocity
+The basic wind velocity is dened as:
+vb = cdir × cseason × vb,0
+[m/s]
+(6)
+where:
+ vb is the basic wind velocity [m/s]
+ cdir = 1.0 is the directional factor (recommended value)
+ cseason = 1.0 is the season factor (recommended value)
+ vb,0 = 22 m/s is the fundamental basic wind velocity for Warsaw region
+2. Mean Wind Velocity
+The mean wind velocity at height z is calculated as:
+vm(z) = cr(z) × co(z) × vb
+[m/s]
+(7)
+where:
+ cr(z) is the roughness factor
+ co(z) = 1.0 is the orography factor (for at terrain)
+ For terrain category III (suburban area):
+ z0 = 0.3 m (roughness length)
+ zmin = 5 m (minimum height)
+Page 3 of 17
+
+
+Found 0 images on page 3
+
+=== Page 4 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+3. Peak Velocity Pressure
+The peak velocity pressure at height z is given by:
+qp(z) = ce(z) × qb = ce(z) × 1
+2ρv2
+b
+[kN/m²]
+(8)
+where:
+ qp(z) is the peak velocity pressure [kN/m²]
+ ce(z) = 1.6 is the exposure factor at height z = 2.65m
+ ρ = 1.25 kg/m³ is the air density
+ qb is the basic velocity pressure [kN/m²]
+Step-by-step calculation:
+1. Calculate basic wind velocity:
+vb = 1.0 × 1.0 × 22 = 22 m/s
+(9)
+2. Calculate basic velocity pressure:
+qb = 1
+2 × 1.25 × 222 = 0.302 kN/m²
+(10)
+3. Determine exposure factor:
+ For z = 2.65m, terrain category III: ce(z) = 1.6
+4. Calculate peak velocity pressure:
+qp(z) = 1.6 × 0.302 = 0.483 kN/m²
+(11)
+This peak velocity pressure is used for determining the wind forces on the building structure,
+considering pressure coecients for dierent building surfaces.
+2.1.4
+Ultimate Limit State Analysis
+According to EN 1990, we analyze two load combinations to determine the critical design load:
+Load Combinations
+Ed1 = 1.35G + 1.5S + 1.5ψ0W
+Ed2 = 1.35G + 1.5W + 1.5ψ0S
+(12)
+where:
+ G = 0.25 kN/m² (total dead load)
+ S = 0.56 kN/m² (snow load)
+ W = 0.483 kN/m² (wind load)
+ ψ0 = 0.6 (combination factor)
+Resulting in:
+Ed1 = 1.35(0.25) + 1.5(0.56) + 1.5(0.6)(0.483) = 1.401 kN/m²
+Ed2 = 1.35(0.25) + 1.5(0.483) + 1.5(0.5)(0.56) = 1.337 kN/m²
+(13)
+Design load: Ed = max(Ed1, Ed2) = 1.401 kN/m²
+Page 4 of 17
+
+
+Found 0 images on page 4
+
+=== Page 5 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+2.2
+B. Purlin Analysis (80Ö160mm)
+2.2.1
+Section Properties
+The purlin's geometric characteristics:
+A = b × h = 80 × 160 = 12, 800 mm2
+W = b × h2
+6
+= 80 × 1602
+6
+= 341, 333 mm3
+I = b × h3
+12
+= 80 × 1603
+12
+= 27, 306, 667 mm4
+(14)
+2.2.2
+Bending Moment Analysis
+Design load per purlin:
+w = Ed × s = 1.401 × 1.1 = 1.541 kN/m
+(15)
+Maximum bending moment (simple beam):
+Mmax = w × L2
+8
+= 1.541 × 1.82
+8
+= 0.623 kNm
+(16)
+2.2.3
+Stress Verication
+Bending stress calculation:
+σm,d = Mmax
+W
+= 0.623 × 106
+341, 333
+= 1.83 N/mm²
+(17)
+Verication against design strength:
+σm,d = 1.83 N/mm² < fm,d = 16.62 N/mm²
+✓
+(18)
+2.3
+C. Column and Brace Analysis
+2.3.1
+Angle Brace Design (60Ö100mm)
+Force analysis for 45° brace:
+N = Ed × Atrib × sin(45°) = 1.401 × 2.75 × 0.707 = 2.71 kN
+(19)
+where Atrib is the tributary area = 1.1m Ö 2.5m = 2.75 m²
+Tensile stress verication:
+σt,0,d = N
+A = 2.71 × 103
+6, 000
+= 0.452 N/mm²
+(20)
+Design tensile strength:
+ft,0,d = kmod × ft,0,k
+γM
+= 0.8 × 16
+1.3
+= 9.85 N/mm²
+(21)
+Verication:
+σt,0,d = 0.452 N/mm² < ft,0,d = 9.85 N/mm²
+✓
+(22)
+Page 5 of 17
+
+
+Found 0 images on page 5
+
+=== Page 6 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+3
+D. Thermal Analysis
+3.1
+Wall Assembly Analysis
+According to EN ISO 6946 (Building components and building elements - Thermal resistance
+and thermal transmittance - Calculation methods), the thermal performance of the wall assem-
+bly is analyzed through the following steps:
+3.1.1
+Thermal Resistance Calculation Principles
+The thermal resistance of each homogeneous material layer is calculated using:
+R = d
+λ
+[m²K/W]
+(23)
+where:
+ R is the thermal resistance of the material layer [m²K/W]
+ d is the thickness of the material layer [m]
+ λ is the design thermal conductivity of the material [W/(m·K)]
+3.1.2
+Layer-by-Layer Analysis
+1. MAX 220 Block
+Material properties and thermal resistance:
+R1 = d1
+λ1
+= 0.22
+0.33 = 0.667 m²K/W
+(24)
+where:
+ d1 = 220 mm = 0.22 m (material thickness)
+ λ1 = 0.33 W/(m·K) (thermal conductivity per manufacturer specications)
+ R1 = 0.667 m²K/W (calculated thermal resistance)
+2. Mineral Wool Insulation
+Material properties and thermal resistance:
+R2 = d2
+λ2
+= 0.15
+0.035 = 4.286 m²K/W
+(25)
+where:
+ d2 = 150 mm = 0.15 m (insulation thickness)
+ λ2 = 0.035 W/(m·K) (thermal conductivity per EN ISO 10456)
+ R2 = 4.286 m²K/W (calculated thermal resistance)
+3. Surface Resistances
+According to EN ISO 6946, Table 1:
+ Internal surface resistance (vertical wall):
+ Rsi = 0.13 m²K/W (horizontal heat ow)
+ External surface resistance:
+ Rse = 0.04 m²K/W (all directions)
+Page 6 of 17
+
+
+Found 0 images on page 6
+
+=== Page 7 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+3.1.3
+Total Thermal Resistance
+The total thermal resistance is calculated by summing all layer resistances:
+RT = Rsi +
+n
+X
+j=1
+Rj + Rse
+[m²K/W]
+(26)
+For our wall assembly:
+RT = Rsi + R1 + R2 + Rse = 0.13 + 0.667 + 4.286 + 0.04 = 5.123 m²K/W
+(27)
+3.1.4
+Thermal Transmittance (U-value)
+The thermal transmittance is calculated as:
+U = 1
+RT
+[W/(m²K)]
+(28)
+For our wall assembly:
+U =
+1
+5.123 = 0.195 W/(m²K)
+(29)
+Verication against requirements:
+ Calculated U-value: 0.195 W/(m²K)
+ Maximum allowed U-value per local regulations: 0.20 W/(m²K)
+ Verdict: 0.195 < 0.20
+✓
+This conrms that the wall assembly meets thermal performance requirements with a 2.5
+3.2
+Roof Assembly Analysis
+3.2.1
+Layer Conguration
+1. Steel Tile
+R1 = d1
+λ1
+= 0.0006
+50
+= 0.000012 m²K/W
+(30)
+2. Ventilated Air Gap
+R2 = 0.16 m²K/W (standard value for ventilated air layer)
+3. Mineral Wool Insulation
+R3 = d3
+λ3
+= 0.20
+0.035 = 5.714 m²K/W
+(31)
+4. Surface Resistances
+ Internal (upward heat ow): Rsi = 0.10 m²K/W
+ External: Rse = 0.04 m²K/W
+3.2.2
+Total Thermal Performance
+RT = Rsi + R1 + R2 + R3 + Rse = 0.10 + 0.000012 + 0.16 + 5.714 + 0.04 = 6.014 m²K/W (32)
+Heat transfer coecient:
+U = 1
+RT
+=
+1
+6.014 = 0.166 W/(m2K) < 0.18 W/(m2K)
+✓
+(33)
+Page 7 of 17
+
+
+Found 0 images on page 7
+
+=== Page 8 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+4
+Load Distribution Analysis
+Figure 1: Comprehensive analysis of structural loads showing snow load distribution (0.56
+kN/m²) and wind pressure (0.483 kN/m²). The diagram illustrates the combined eect of
+vertical and horizontal forces on the building structure, demonstrating load paths and structural
+response under design conditions.
+Page 8 of 17
+
+
+Found 1 images on page 8
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: RGB
+Saved as: extracted_image_p8_1.png
+
+=== Page 9 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+5
+Thermal Bridge Analysis
+Figure 2: Detailed analysis of thermal bridging at the wall-roof junction. The diagram shows
+temperature gradients and heat ow patterns through the building envelope, highlighting crit-
+ical areas for thermal performance optimization. The analysis demonstrates eective thermal
+bridge mitigation through proper insulation placement and material selection.
+6
+Technical Drawings
+6.1
+Drawing Specications
+Drawing Type
+Scale
+Key Elements
+Format
+Vertical Projection
+1:50
+Heights, angles, wall sections
+DXF/PNG
+Horizontal Projection
+1:50
+Dimensions, layout, spacing
+DXF/PNG
+Construction Details
+1:10
+Connections, assemblies
+DXF/PNG
+Table 1: Technical drawing specications and formats
+Page 9 of 17
+
+
+Found 1 images on page 9
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: RGB
+Saved as: extracted_image_p9_1.png
+
+=== Page 10 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+6.2
+Main Projections
+6.2.1
+Vertical Projection (1:50)
+Figure 3: Vertical projection (Scale 1:50) showing building elevations and structural congu-
+ration. The drawing illustrates the primary heights (h1=2.5m, h2=2.65m), roof angle (16°),
+and ground level (-1.4 m.a.s.l). Wall construction utilizes MAX 220 block with mineral wool
+insulation for optimal thermal performance.
+ Building heights: h1 = 2.5m, h2 = 2.65m
+ Roof angle: α = 16°
+ Ground level: -1.4 m.a.s.l
+ Wall construction: MAX 220 block with mineral wool insulation
+ Column placement and foundation connections
+ Structural grid and dimensions
+Page 10 of 17
+
+
+Found 1 images on page 10
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: L
+Saved as: extracted_image_p10_1.png
+
+=== Page 11 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+6.3
+Building Layout
+6.3.1
+Horizontal Projection (1:50)
+Figure 4: Horizontal projection (Scale 1:50) detailing building layout and dimensions. The
+plan shows primary measurements: width (b=7.2m), lengths (L1=6.6m, L2=10.8m), and purlin
+spacing (s=1.1m). Structural grid and member placement are indicated for precise construction
+reference.
+ Building width (b) = 7.2m
+ Length dimensions: L1 = 6.6m, L2 = 10.8m
+ Purlin spacing (s) = 1.1m
+ Column layout and structural grid
+ Wall thickness and insulation details
+ Structural member placement
+Page 11 of 17
+
+
+Found 1 images on page 11
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: L
+Saved as: extracted_image_p11_1.png
+
+=== Page 12 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+6.4
+Structural Details
+6.4.1
+Construction Details (1:10)
+Figure 5: Construction details (Scale 1:10) illustrating critical structural connections and assem-
+blies. Key components include C27 timber elements (columns 150Ö150mm, purlins 80Ö160mm,
+rafters 100Ö200mm) and wall assembly (MAX 220 block + 150mm mineral wool). Details show
+precise connection methods and thermal envelope integration for optimal performance.
+ Column-foundation connection with base plate detail
+ Roof-column connection with C27 timber elements
+ Wall-roof junction showing thermal insulation layers
+ Purlin-rafter connection details (80Ö160mm and 100Ö200mm sections)
+ Material specications and assembly methods
+ Thermal envelope construction details
+Page 12 of 17
+
+
+Found 1 images on page 12
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: L
+Saved as: extracted_image_p12_1.png
+
+=== Page 13 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+6.4.2
+Thermal Envelope Details
+Figure 6: Detailed thermal performance specications for wall and roof assemblies. The wall
+assembly (U=0.195 W/m²K) consists of MAX 220 block and 150mm mineral wool insulation.
+The roof assembly (U=0.166 W/m²K) utilizes 200mm mineral wool and ventilated air gap
+design for optimal thermal performance.
+Page 13 of 17
+
+
+Found 1 images on page 13
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: RGB
+Saved as: extracted_image_p13_1.png
+
+=== Page 14 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+6.4.3
+Structural Connection Details
+Figure 7: Detailed specications of critical structural connections and assemblies. The column-
+foundation connection utilizes a 200Ö200Ö10mm base plate with M16 grade 8.8 anchor bolts.
+The roof-column connection implements 6mm steel plates with M12 grade 8.8 bolts for secure
+joining of C27 timber members.
+7
+Summary of Results
+7.1
+Structural Analysis Results
+7.1.1
+Load and Momentum Analysis
+Cross Section Load Analysis
+Design loads per EN 1990:
+gk = 0.297 kN/m2
+(dead load)
+sk = 0.56 kN/m2
+(snow load)
+wk = 0.483 kN/m2
+(wind load)
+(34)
+Momentum and Bending Movement
+For rafter (100Ö200mm):
+MEd = Ed × s × l2
+8
+= 1.401 × 1.1 × 5.622
+8
+= 6.12 kNm
+(35)
+Page 14 of 17
+
+
+Found 1 images on page 14
+
+Image 1:
+Format: PNG
+Size: (2048, 1536)
+Mode: RGB
+Saved as: extracted_image_p14_1.png
+
+=== Page 15 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+For purlin (80Ö160mm):
+MEd = w × l2
+8
+= 1.541 × 1.82
+8
+= 0.623 kNm
+(36)
+Building Stress Analysis
+Bending stress in critical elements:
+σm,d,rafter = MEd
+W
+= 6.12 × 106
+666, 667
+= 9.18 N/mm²
+σm,d,purlin = MEd
+W
+= 0.623 × 106
+341, 333
+= 1.83 N/mm²
+(37)
+Movement of Inertia
+Section properties for main elements:
+Irafter = b × h3
+12
+= 100 × 2003
+12
+= 66.67 × 106 mm4
+Ipurlin = b × h3
+12
+= 80 × 1603
+12
+= 27.31 × 106 mm4
+(38)
+Cross Section of Angle Brace
+Properties of 60Ö100mm angle brace:
+Abrace = b × h = 60 × 100 = 6, 000 mm²
+Wbrace = b × h2
+6
+= 60 × 1002
+6
+= 100, 000 mm³
+Ibrace = b × h3
+12
+= 60 × 1003
+12
+= 5.00 × 106 mm4
+(39)
+Calculating Strengths
+Design strengths per EN 1995-1-1:
+fm,d = kmod × fm,k
+γM
+= 0.8 × 27
+1.3
+= 16.62 N/mm²
+fc,0,d = kmod × fc,0,k
+γM
+= 0.8 × 22
+1.3
+= 13.54 N/mm²
+ft,0,d = kmod × ft,0,k
+γM
+= 0.8 × 16
+1.3
+= 9.85 N/mm²
+(40)
+Eort of Actions
+Combined actions per EN 1990:
+Ed1 = 1.35G + 1.5S + 1.5ψ0W = 1.401 kN/m²
+Ed2 = 1.35G + 1.5W + 1.5ψ0S = 1.337 kN/m²
+NEd,brace = Ed × Atrib × sin(45°) = 2.71 kN
+(41)
+Layer-by-Layer Thermal Analysis
+Wall assembly thermal resistances:
+Rsi = 0.13 m²K/W
+(internal surface)
+R1 = 0.22
+0.33 = 0.667 m²K/W
+(MAX 220 block)
+R2 = 0.15
+0.035 = 4.286 m²K/W
+(mineral wool)
+Rse = 0.04 m²K/W
+(external surface)
+(42)
+Page 15 of 17
+
+
+Found 0 images on page 15
+
+=== Page 16 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+Roof assembly thermal resistances:
+Rsi = 0.10 m²K/W
+(internal surface)
+R1 = 0.0006
+50
+= 0.000012 m²K/W
+(steel tile)
+R2 = 0.16 m²K/W
+(ventilated air gap)
+R3 = 0.20
+0.035 = 5.714 m²K/W
+(mineral wool)
+Rse = 0.04 m²K/W
+(external surface)
+(43)
+7.1.2
+Ultimate Limit State (ULS) Verication
+ Purlin Design (80Ö160mm C27):
+ Design load: w = 1.541 kN/m
+ Maximum moment: Mmax = 0.623 kNm
+ Bending stress: σm,d = 1.83 N/mm² < fm,d = 16.62 N/mm² ✓
+ Rafter Design (100Ö200mm C27):
+ Design load: Ed = 1.401 kN/m²
+ Maximum moment: Mmax = 6.12 kNm
+ Bending stress: σm,d = 9.18 N/mm² < fm,d = 16.62 N/mm² ✓
+ Angle Brace Analysis (60Ö100mm):
+ Axial force: N = 2.71 kN
+ Tensile stress: σt,0,d = 0.452 N/mm² < ft,0,d = 9.85 N/mm² ✓
+7.1.3
+Cross-Section Properties
+ Purlin (80Ö160mm):
+ Area: A = 12, 800 mm²
+ Section modulus: W = 341, 333 mm³
+ Moment of inertia: I = 27, 306, 667 mm4
+ Rafter (100Ö200mm):
+ Area: A = 20, 000 mm²
+ Section modulus: W = 666, 667 mm³
+ Moment of inertia: I = 66, 666, 667 mm4
+7.2
+Thermal Performance Results
+7.2.1
+Wall Assembly
+Total thermal resistance: RT = 5.123 m²K/W
+ MAX 220 block: R1 = 0.667 m²K/W
+ Mineral wool (150mm): R2 = 4.286 m²K/W
+ Surface resistances: Rsi + Rse = 0.17 m²K/W
+ U-value: 0.195 W/(m2K) < 0.20 W/(m2K) ✓
+Page 16 of 17
+
+
+Found 0 images on page 16
+
+=== Page 17 ===
+
+Text content:
+Civil Engineering Project
+Dataset 5 Analysis
+7.2.2
+Roof Assembly
+Total thermal resistance: RT = 6.014 m²K/W
+ Steel tile: R1 = 0.000012 m²K/W
+ Ventilated air gap: R2 = 0.16 m²K/W
+ Mineral wool (200mm): R3 = 5.714 m²K/W
+ Surface resistances: Rsi + Rse = 0.14 m²K/W
+ U-value: 0.166 W/(m2K) < 0.18 W/(m2K) ✓
+8
+Conclusion
+All structural elements and thermal assemblies meet the required performance criteria according
+to relevant Eurocode standards:
+ All ULS verications passed with adequate safety margins
+ Cross-section properties ensure ecient load distribution
+ Thermal performance exceeds minimum requirements for both wall and roof assemblies
+ All connections and details follow standard specications
+Page 17 of 17
+
+
+Found 0 images on page 17

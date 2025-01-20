@@ -1,0 +1,101 @@
+# FreeCAD Macro for generating drawings
+import FreeCAD as App
+import Draft
+import Part
+import Import
+import math
+
+# Create new document
+doc = App.newDocument()
+
+# Dataset 5 specifications (all dimensions in mm for 1:50 scale)
+width = 7200
+length1 = 6600
+length2 = 10800
+height1 = 2500
+height2 = 2650
+angle = 16
+spacing = 1100
+ground_level = -1400
+
+# Create horizontal projection (top view)
+rect = Draft.makeRectangle(length1, width)
+
+# Add rafters
+rafter_count = int(length1 / spacing) + 1
+rafters = []
+for i in range(rafter_count):
+    pos = i * spacing
+    if pos <= length1:
+        rafter = Draft.makeRectangle(200, width)
+        Draft.move(rafter, App.Vector(pos, 0, 0))
+        rafters.append(rafter)
+
+# Add purlins
+purlin_spacing = 1500
+purlin_count = int(width / purlin_spacing) + 1
+purlins = []
+for i in range(purlin_count):
+    pos = i * purlin_spacing
+    if pos <= width:
+        purlin = Draft.makeRectangle(length1, 150)
+        Draft.move(purlin, App.Vector(0, pos, 0))
+        purlins.append(purlin)
+
+doc.recompute()
+Import.export([rect] + rafters + purlins, "horizontal_projection.dxf")
+
+# Create vertical projection (side view)
+points = [
+    App.Vector(0, ground_level, 0),
+    App.Vector(0, height1, 0),
+    App.Vector(width, height2, 0),
+    App.Vector(width, ground_level, 0)
+]
+outline = Draft.makeWire(points, closed=True)
+
+# Add roof structure
+angle_rad = math.radians(angle)
+roof_height = width * math.tan(angle_rad)
+
+# Add rafters in vertical view
+vertical_rafters = []
+for i in range(int(width / spacing) + 1):
+    pos = i * spacing
+    if pos <= width:
+        h = height1 + (pos/width)*(height2-height1)
+        rafter = Draft.makeWire([
+            App.Vector(pos, h, 0),
+            App.Vector(pos, h - 200, 0)
+        ])
+        vertical_rafters.append(rafter)
+
+# Add thermal insulation layer
+insulation_points = [
+    App.Vector(0, height1, 0),
+    App.Vector(width, height2, 0),
+    App.Vector(width, height2 - 200, 0),
+    App.Vector(0, height1 - 200, 0)
+]
+insulation = Draft.makeWire(insulation_points, closed=True)
+
+# Add columns
+columns = []
+column_spacing = 2000
+for i in range(int(width / column_spacing) + 1):
+    pos = i * column_spacing
+    if pos <= width:
+        h = height1 + (pos/width)*(height2-height1)
+        column = Draft.makeWire([
+            App.Vector(pos, ground_level, 0),
+            App.Vector(pos, h, 0)
+        ])
+        columns.append(column)
+
+doc.recompute()
+Import.export([outline, insulation] + vertical_rafters + columns, "vertical_projection.dxf")
+
+# Save FreeCAD document
+doc.saveAs("building_drawings.FCStd")
+
+print("Drawings generated successfully!")

@@ -1,0 +1,70 @@
+
+Wood Structure Analysis Results (Dataset 5)
+===========================================
+
+1. Design Strength Values:
+Bending strength (fm,d): 16.62 MPa
+Tensile strength (ft,0,d): 9.85 MPa
+Compressive strength (fc,0,d): 13.54 MPa
+
+2. Load Analysis:
+Characteristic total load: 2.10 kN/m²
+Design load: 2.71 kN/m²
+
+3. Rafter Forces:
+Rafter length: 3.75 m
+Maximum moment: 4.58 kNm
+Axial force: 17.04 kN
+
+4. Purlin Forces:
+Purlin load: 2.99 kN/m
+Maximum moment: 0.45 kNm
+
+5. Thermal Performance Analysis:
+Surface Resistances:
+Internal surface resistance (R_si): 0.100 m²·K/W
+External surface resistance (R_se): 0.040 m²·K/W
+
+Layer Properties:
+
+Steel tile roofing:
+  Thickness: 0.6 mm
+  Thermal conductivity: 50.000 W/m·K
+  Thermal resistance: 0.000 m²·K/W
+  Density: 7850 kg/m³
+
+C27 timber structure:
+  Thickness: 100.0 mm
+  Thermal conductivity: 0.130 W/m·K
+  Thermal resistance: 0.769 m²·K/W
+  Density: 370 kg/m³
+
+Mineral wool insulation:
+  Thickness: 200.0 mm
+  Thermal conductivity: 0.040 W/m·K
+  Thermal resistance: 5.000 m²·K/W
+  Density: 20 kg/m³
+
+Total thermal resistance: 5.91 m²·K/W
+Overall U-value: 0.17 W/m²·K
+
+6. Ultimate Limit State Verification:
+Bending stress: 9.53 MPa
+Compressive stress: 1.42 MPa
+Utilization ratio: 0.68
+Passes ULS: Yes
+
+7. Serviceability Limit State Verification:
+Instantaneous deflection: 5.80 mm
+Final deflection: 10.44 mm
+Limit L/300: 12.48 mm
+Passes SLS: Yes
+
+8. Column Buckling Analysis:
+Slenderness ratio: 43.30
+Relative slenderness: 0.60
+Buckling factor kc: 0.917
+Design strength: 12.41 MPa
+Actual stress: 0.43 MPa
+Utilization ratio: 0.03
+Passes buckling check: Yes
