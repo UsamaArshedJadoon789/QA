@@ -906,7 +906,7 @@ def create_brace_diagram():
     plt.close()
 
 def prepare_image_for_pdf(image_path, temp_files, temp_dirs):
-    """Prepare image for PDF embedding with correct DPI"""
+    """Prepare image for PDF embedding with correct DPI and format"""
     print(f"\nPreparing image for PDF: {image_path}")
     
     # Create output directory if it doesn't exist
@@ -918,12 +918,16 @@ def prepare_image_for_pdf(image_path, temp_files, temp_dirs):
     # Open image with PIL
     pil_img = PILImage.open(image_path)
     
-    # Convert to RGB if necessary
-    if pil_img.mode != 'RGB':
-        pil_img = pil_img.convert('RGB')
+    # Always convert to RGB for consistency
+    pil_img = pil_img.convert('RGB')
     
-    # Get dimensions in pixels
+    # Ensure minimum resolution
     w_px, h_px = pil_img.size
+    min_width = 1200  # Minimum width for good quality
+    if w_px < min_width:
+        scale = min_width / w_px
+        new_size = (int(w_px * scale), int(h_px * scale))
+        pil_img = pil_img.resize(new_size, PILImage.Resampling.LANCZOS)
     
     # Calculate size in points (72 points = 1 inch)
     w_points = float(w_px) / dpi * 72
@@ -965,6 +969,22 @@ def generate_pdf_report():
     import os
     import tempfile
     from reportlab.lib import pagesizes
+
+    def add_figure_with_caption(image_path, caption_text, story, temp_files, temp_dirs):
+        """Helper function to add figure with caption and spacing"""
+        try:
+            figure = prepare_image_for_pdf(image_path, temp_files, temp_dirs)
+            figure.hAlign = 'CENTER'
+            story.append(Spacer(1, 12))  # Space before figure
+            story.append(figure)
+            story.append(Spacer(1, 6))   # Space between figure and caption
+            story.append(Paragraph(caption_text, caption_style))
+            story.append(Spacer(1, 24))  # Space after caption
+            return True
+        except Exception as e:
+            print(f"Warning: Failed to add figure {image_path}: {e}")
+            return False
+
     # Configure reportlab for high quality
     pagesize = (pagesizes.A4[0], pagesizes.A4[1])
     
@@ -972,22 +992,33 @@ def generate_pdf_report():
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import inch
     
-    # Use A4 size directly
+    # Define page margins (1.25 inches)
+    margin = 90  # 1.25 inches in points
+    
+    # Use A4 size with proper margins
     doc = SimpleDocTemplate(
         "structural_analysis_report.pdf",
-        pagesize=pagesize,
-        rightMargin=72,
-        leftMargin=72,
-        topMargin=72,
-        bottomMargin=72,
+        pagesize=A4,
+        rightMargin=margin,
+        leftMargin=margin,
+        topMargin=margin,
+        bottomMargin=margin,
         initialFontSize=11,
         defaultImageDPI=300,
         pageCompression=0,  # Disable compression to preserve image quality
         invariant=1,        # Ensure consistent rendering
         displayDocTitle=1,  # Show document title in PDF properties
         cropMarks=False,    # No crop marks needed
-        enforceColorSpace='RGB'  # Force RGB color space
+        enforceColorSpace='RGB',  # Force RGB color space
+        allowSplitting=0,   # Prevent table rows from splitting across pages
+        showBoundary=0      # No page boundary
     )
+    
+    # Configure page layout settings
+    doc._calc()  # Force margin calculation
+    width, height = A4
+    doc.width = width - (2 * margin)  # Available width for content
+    doc.height = height - (2 * margin)  # Available height for content
     
     # Get calculation results
     calc = WoodStructureCalculations()
@@ -1010,7 +1041,13 @@ def generate_pdf_report():
     create_section_diagram()
     create_brace_diagram()
     
-    # Add diagrams to report
+    # Initialize document content once
+    story = []
+    temp_files = []
+    temp_dirs = []
+    
+    print("\nProcessing diagrams...")
+    # Add diagrams to report with progress tracking
     diagram_files = [
         'force_diagram.png',
         'thermal_diagram.png',
@@ -1018,16 +1055,20 @@ def generate_pdf_report():
         'brace_diagram.png'
     ]
     
-    for diagram in diagram_files:
+    total_diagrams = len(diagram_files)
+    for idx, diagram in enumerate(diagram_files, 1):
+        print(f"\nProcessing diagram {idx}/{total_diagrams}: {diagram}")
         if os.path.exists(diagram):
-            img = prepare_image_for_pdf(diagram, temp_files, temp_dirs)
-            story.append(img)
-            story.append(Spacer(1, 20))
+            try:
+                img = prepare_image_for_pdf(diagram, temp_files, temp_dirs)
+                story.append(img)
+                story.append(Spacer(1, 20))
+                print(f"Successfully added {diagram}")
+            except Exception as e:
+                print(f"Warning: Failed to process {diagram}: {e}")
+                continue
     
-    # Initialize document content
-    story = []
-    temp_files = []
-    temp_dirs = []
+    print("\nAll diagrams processed. Moving to technical content...")
     
     # Define styles
     styles = getSampleStyleSheet()
@@ -1083,21 +1124,20 @@ def generate_pdf_report():
     
     # 2.1 Load Distribution Analysis
     story.append(Paragraph("2.1 Load Distribution Analysis", subheading_style))
-    # Add load distribution diagram with center alignment
-    load_dist = prepare_image_for_pdf('output/figures/load_distribution.png', temp_files, temp_dirs)
-    load_dist.hAlign = 'CENTER'
-    story.append(load_dist)
-    story.append(Paragraph("Figure 1: Load distribution showing snow load (0.56 kN/m²) and wind pressure (0.483 kN/m²)", caption_style))
-    story.append(Spacer(1, 30))
-    
+    # Add load distribution diagram
+    add_figure_with_caption(
+        'output/figures/load_distribution.png',
+        "Figure 1: Load distribution showing snow load (0.56 kN/m²) and wind pressure (0.483 kN/m²)",
+        story, temp_files, temp_dirs
+    )
+
     # 2.2 Combined Load Analysis
     story.append(Paragraph("2.2 Combined Load Analysis", subheading_style))
-    # Add combined load analysis with center alignment
-    combined_load = prepare_image_for_pdf('output/figures/combined_load_analysis.png', temp_files, temp_dirs)
-    combined_load.hAlign = 'CENTER'
-    story.append(combined_load)
-    story.append(Paragraph("Figure 2: Combined load effects and ULS load combinations analysis", caption_style))
-    story.append(Spacer(1, 30))
+    add_figure_with_caption(
+        'output/figures/combined_load_analysis.png',
+        "Figure 2: Combined load effects and ULS load combinations analysis",
+        story, temp_files, temp_dirs
+    )
     
     # The thermal analysis section has been moved and consolidated with section 5
     
@@ -1107,30 +1147,27 @@ def generate_pdf_report():
     
     # 4.1 Stress Analysis
     story.append(Paragraph("4.1 Stress Analysis", subheading_style))
-    # Add stress analysis with center alignment
-    stress_analysis = prepare_image_for_pdf('output/figures/stress_analysis.png', temp_files, temp_dirs)
-    stress_analysis.hAlign = 'CENTER'
-    story.append(stress_analysis)
-    story.append(Paragraph("Figure 5: Bending moment diagram and stress distribution analysis", caption_style))
-    story.append(Spacer(1, 30))
+    add_figure_with_caption(
+        'output/figures/stress_analysis.png',
+        "Figure 5: Bending moment diagram and stress distribution analysis",
+        story, temp_files, temp_dirs
+    )
     
     # 4.2 Connection Details
     story.append(Paragraph("4.2 Connection Details", subheading_style))
-    # Add connection detail with center alignment
-    connection_detail = prepare_image_for_pdf('output/figures/connection_detail.png', temp_files, temp_dirs)
-    connection_detail.hAlign = 'CENTER'
-    story.append(connection_detail)
-    story.append(Paragraph("Figure 6: Rafter-purlin connection detail with dimensions", caption_style))
-    story.append(Spacer(1, 30))
+    add_figure_with_caption(
+        'output/figures/connection_detail.png',
+        "Figure 6: Rafter-purlin connection detail with dimensions",
+        story, temp_files, temp_dirs
+    )
     
     # 4.3 Cross-Section Analysis
     story.append(Paragraph("4.3 Cross-Section Analysis", subheading_style))
-    # Add cross-section analysis with center alignment
-    cross_section = prepare_image_for_pdf('output/figures/cross_sections.png', temp_files, temp_dirs)
-    cross_section.hAlign = 'CENTER'
-    story.append(cross_section)
-    story.append(Paragraph("Figure 7: Cross-sectional analysis of structural members", caption_style))
-    story.append(Spacer(1, 30))
+    add_figure_with_caption(
+        'output/figures/cross_sections.png',
+        "Figure 7: Cross-sectional analysis of structural members",
+        story, temp_files, temp_dirs
+    )
     
     print("All diagrams integrated successfully.")
     
@@ -1155,25 +1192,39 @@ def generate_pdf_report():
     styles['Heading2'].spaceBefore = 18
     styles['Heading2'].spaceAfter = 12
     
-    # Ensure proper image handling
-    for img in story:
-        if isinstance(img, Image):
-            img.hAlign = 'CENTER'  # Center all images
-            img._offs_x = 0        # Reset x offset
-            img._offs_y = 0        # Reset y offset
-            # Add padding around images
-            story.insert(story.index(img), Spacer(1, 12))
-            story.insert(story.index(img) + 2, Spacer(1, 12))
+    # Process story elements to ensure proper image handling
+    processed_story = []
+    for item in story:
+        if isinstance(item, Image):
+            processed_story.append(Spacer(1, 12))  # Space before image
+            item.hAlign = 'CENTER'  # Center all images
+            item._offs_x = 0        # Reset x offset
+            item._offs_y = 0        # Reset y offset
+            processed_story.append(item)
+            processed_story.append(Spacer(1, 12))  # Space after image
+        else:
+            processed_story.append(item)
     
-    # Add spacer for consistent spacing
+    # Replace story with processed version
+    story = processed_story
+
+    # Add final spacer for consistent spacing
     story.append(Spacer(1, 30))
     
-    # Add force diagram with proper DPI and center alignment
-    force_diagram = prepare_image_for_pdf('force_diagram.png', temp_files, temp_dirs)
-    force_diagram.hAlign = 'CENTER'  # Center align image
-    story.append(force_diagram)
-    story.append(Paragraph("Figure 1: Force distribution diagram showing applied loads", caption_style))
-    story.append(Spacer(1, 30))  # Consistent spacing after figure
+    # Add spacing configuration for elements
+    styles['Normal'].spaceBefore = 12
+    styles['Normal'].spaceAfter = 12
+    styles['Heading1'].spaceBefore = 24
+    styles['Heading1'].spaceAfter = 18
+    styles['Heading2'].spaceBefore = 18
+    styles['Heading2'].spaceAfter = 12
+    
+    # Add figures with captions
+    add_figure_with_caption(
+        'force_diagram.png',
+        "Figure 1: Force distribution diagram showing applied loads",
+        story, temp_files, temp_dirs
+    )
 
     
     # Styles
@@ -1885,10 +1936,10 @@ def generate_pdf_report():
     
     brace_results = [
         ["Parameter", "Value", "Unit"],
-        ["Axial force", f"{brace['axial_force']:.2f}", "kN"],
-        ["Slenderness ratio", f"{brace['slenderness_ratio']:.2f}", "-"],
-        ["Critical buckling load", f"{brace['critical_buckling_load']/1000:.2f}", "kN"],
-        ["Utilization ratio", f"{brace['utilization_ratio']:.2f}", "-"]
+        ["Axial force", f"{brace['forces']['axial_force']:.2f}", "kN"],
+        ["Slenderness ratio", f"{brace['buckling_analysis']['slenderness_ratio']:.2f}", "-"],
+        ["Critical buckling load", f"{brace['forces']['critical_buckling_load']:.2f}", "kN"],
+        ["Utilization ratio", f"{brace['buckling_analysis']['utilization_ratio']:.2f}", "-"]
     ]
     
     brace_table = Table(brace_results)
@@ -1972,12 +2023,12 @@ def generate_pdf_report():
     
     uls_results = [
         ["Parameter", "Value", "Unit"],
-        ["Bending stress", f"{uls['bending_stress']:.2f}", "MPa"],
-        ["Compressive stress", f"{uls['compressive_stress']:.2f}", "MPa"],
-        ["Shear stress", f"{uls['shear_stress']:.2f}", "MPa"],
-        ["Combined stress", f"{uls['combined_stress']:.2f}", "MPa"],
-        ["Utilization ratio", f"{uls['utilization_ratio']:.2f}", "-"],
-        ["ULS verification", "PASS" if uls['passes_ULS'] else "FAIL", "-"]
+        ["Bending stress (rafter)", f"{uls['stresses']['bending_rafter']:.2f}", "MPa"],
+        ["Bending stress (purlin)", f"{uls['stresses']['bending_purlin']:.2f}", "MPa"],
+        ["Tensile stress (brace)", f"{uls['stresses']['tensile_brace']:.2f}", "MPa"],
+        ["Design bending strength", f"{uls['design_strengths']['bending']:.2f}", "MPa"],
+        ["Design tension strength", f"{uls['design_strengths']['tension']:.2f}", "MPa"],
+        ["ULS verification", "PASS" if uls['overall_result'] else "FAIL", "-"]
     ]
     
     uls_table = Table(uls_results)
