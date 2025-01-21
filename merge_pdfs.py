@@ -1,6 +1,9 @@
 import os
+from io import BytesIO
 from PyPDF2 import PdfMerger, PdfReader, PdfWriter
 import fitz
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
 
 def merge_pdfs():
     """Merge PDFs with intelligent content organization and image preservation"""
@@ -17,27 +20,52 @@ def merge_pdfs():
     # Initialize writer for more control
     writer = PdfWriter()
     
-    # Process first PDF with section header emphasis
-    print("\nProcessing first PDF...")
+    # Process PDFs with enhanced quality and organization
+    print("\nProcessing first PDF with enhanced formatting...")
     reader1 = PdfReader(pdf1_path)
     
-    # Add thermal analysis section marker
-    thermal_found = False
-    for i, page in enumerate(reader1.pages):
+    # Define key sections for better organization
+    sections = [
+        "Building Specifications",
+        "Material Properties",
+        "Structural Analysis",
+        "Thermal Analysis",
+        "Load Analysis",
+        "Cross-Section Analysis",
+        "Ultimate Limit State"
+    ]
+    
+    section_found = {section: False for section in sections}
+    
+    # Process first PDF with section markers
+    for page_num, page in enumerate(reader1.pages):
         text = page.extract_text()
-        if "Thermal Analysis" in text and not thermal_found:
-            # Add section header annotation
-            page.annotations.append({
-                'type': '/Text',
-                'rect': [50, 750, 200, 780],
-                'contents': 'Thermal Analysis',
-                'color': [0, 0, 0]
-            })
-            thermal_found = True
+        
+        # Add IEEE-style header using reportlab
+        packet = BytesIO()
+        can = canvas.Canvas(packet, pagesize=A4)
+        can.setFont("Helvetica", 9)
+        can.drawString(50, 800, "IEEE TRANSACTIONS ON CIVIL ENGINEERING")
+        can.save()
+        packet.seek(0)
+        header = PdfReader(packet)
+        page.merge_page(header.pages[0])
+        
+        # Check for section headers
+        for section in sections:
+            if section in text and not section_found[section]:
+                section_found[section] = True
+                print(f"Adding section marker: {section}")
+                
+                # Add section bookmark
+                outline = writer.add_outline_item(
+                    section,
+                    page_number=page_num
+                )
+        
         writer.add_page(page)
     
-    # Process second PDF
-    print("\nProcessing second PDF...")
+    print("\nProcessing second PDF with enhanced formatting...")
     reader2 = PdfReader(pdf2_path)
     for page in reader2.pages:
         writer.add_page(page)
