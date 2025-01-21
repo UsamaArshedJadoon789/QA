@@ -54,6 +54,50 @@ def merge_pdfs():
         can.setFont("Helvetica", 9)
         can.drawString(50, 800, "IEEE TRANSACTIONS ON CIVIL ENGINEERING")
         
+        # Handle references page
+        if "References" in text:
+            from reportlab.lib import colors
+            from reportlab.platypus import Table, TableStyle
+            from reportlab.lib.units import mm
+            
+            # Define references with wrapped text
+            references = [
+                ["[1]", "EN 1995-1-1:2004", "Eurocode 5: Design of timber structures - Part 1-1: General - Common rules and rules for buildings"],
+                ["[2]", "EN 1990:2002", "Eurocode: Basis of structural design"],
+                ["[3]", "EN 1991-1-3:2003", "Eurocode 1: Actions on structures - Part 1-3: General actions - Snow loads"],
+                ["[4]", "EN 1991-1-4:2005", "Eurocode 1: Actions on structures - Part 1-4: General actions - Wind actions"],
+                ["[5]", "EN ISO 6946:2017", "Building components and building elements - Thermal resistance and thermal transmittance"],
+                ["[6]", "EN ISO 13788:2012", "Hygrothermal performance of building components and building elements"]
+            ]
+            
+            # Calculate available width (A4 width = 210mm, margins = 25mm each side)
+            available_width = 160 * mm  # 210mm - 2 * 25mm
+            
+            # Define column widths (in mm)
+            col_widths = [10*mm, 45*mm, 105*mm]  # Total = 160mm
+            
+            # Create table with wrapped text
+            table = Table(references, colWidths=col_widths, repeatRows=1)
+            
+            # Style the table
+            table_style = TableStyle([
+                ('FONTNAME', (0,0), (-1,-1), 'Helvetica'),
+                ('FONTSIZE', (0,0), (-1,-1), 9),
+                ('ALIGN', (0,0), (-1,-1), 'LEFT'),
+                ('VALIGN', (0,0), (-1,-1), 'TOP'),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.black),
+                ('LEFTPADDING', (0,0), (-1,-1), 3),
+                ('RIGHTPADDING', (0,0), (-1,-1), 3),
+                ('TOPPADDING', (0,0), (-1,-1), 3),
+                ('BOTTOMPADDING', (0,0), (-1,-1), 3),
+                ('WORDWRAP', (0,0), (-1,-1)),
+            ])
+            table.setStyle(table_style)
+            
+            # Draw table
+            table.wrapOn(can, available_width, 700)
+            table.drawOn(can, 25*mm, 500)
+        
         # Add figure caption if this is a diagram page (pages 8-10 for our new diagrams)
         if page_num in [7, 8, 9]:  # 0-based indexing
             caption_idx = page_num - 7
