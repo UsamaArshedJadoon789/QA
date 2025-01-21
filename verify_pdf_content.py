@@ -136,7 +136,7 @@ def analyze_pdf_content(pdf_path):
             print("HD Quality: ✗")
 
 if __name__ == "__main__":
-    pdf_path = "dist/documentation/structural_analysis_report.pdf"
+    pdf_path = "output/documentation/structural_analysis_report.pdf"
     if os.path.exists(pdf_path):
         analyze_pdf_content(pdf_path)
     else:

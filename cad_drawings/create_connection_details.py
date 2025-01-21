@@ -2,6 +2,7 @@ import ezdxf
 from ezdxf import units
 from ezdxf.enums import TextEntityAlignment
 import math
+import os
 
 def create_connection_details():
     """Create DXF file with connection details at 1:10 scale"""
@@ -14,16 +15,23 @@ def create_connection_details():
     dimstyle.dxf.dimscale = 10.0
     dimstyle.dxf.dimlfac = 10.0
     dimstyle.dxf.dimrnd = 1
-    dimstyle.dxf.dimpost = '<>'  # Standard dimension text format without units  # Standard dimension text format
-    dimstyle.dxf.dimtxt = 50
-    dimstyle.dxf.dimasz = 50
-    dimstyle.dxf.dimclrd = 256  # Dimension line color (black)
-    dimstyle.dxf.dimclre = 256  # Extension line color (black)
-    dimstyle.dxf.dimgap = 25    # Gap from dimension line to text
-    dimstyle.dxf.dimexe = 50    # Extension line extension
-    dimstyle.dxf.dimexo = 25    # Extension line offset
-    dimstyle.dxf.dimtad = 1     # Text above dimension line
-    dimstyle.dxf.dimzin = 8     # Suppress trailing zeros
+    dimstyle.dxf.dimpost = '<>'  # Standard dimension text format
+    dimstyle.dxf.dimtxt = 50     # Text size
+    dimstyle.dxf.dimasz = 50     # Arrow size
+    dimstyle.dxf.dimclrd = 256   # Dimension line color (black)
+    dimstyle.dxf.dimclre = 256   # Extension line color (black)
+    dimstyle.dxf.dimgap = 25     # Gap from dimension line to text
+    dimstyle.dxf.dimexe = 50     # Extension line extension
+    dimstyle.dxf.dimexo = 25     # Extension line offset
+    dimstyle.dxf.dimtad = 1      # Text above dimension line
+    dimstyle.dxf.dimzin = 8      # Suppress trailing zeros
+    dimstyle.dxf.dimblk = ''     # Use default arrow
+    dimstyle.dxf.dimblk1 = ''    # First arrow
+    dimstyle.dxf.dimblk2 = ''    # Second arrow
+    dimstyle.dxf.dimtofl = 1     # Force dimension line between extensions
+    dimstyle.dxf.dimtix = 0      # Force text inside extensions
+    dimstyle.dxf.dimatfit = 3    # Force text and arrows outside
+    dimstyle.dxf.dimtmove = 0    # Keep text position
     
     # Rafter-Purlin Connection Detail (1:10 scale)
     # Rafter outline
@@ -109,7 +117,8 @@ def create_connection_details():
     doc.header['$DIMSCALE'] = 10.0
     
     # Save the file
-    doc.saveas('connection_details.dxf')
+    os.makedirs('dist/drawings/details', exist_ok=True)
+    doc.saveas('dist/drawings/details/connection_details.dxf')
     print("Connection details created successfully")
 
 if __name__ == "__main__":

@@ -8,10 +8,10 @@ def set_engineering_style():
     """Configure matplotlib for engineering diagrams"""
     plt.style.use('default')  # Use default style as base
     
-    # Figure size and resolution
-    plt.rcParams['figure.figsize'] = (12, 8)
-    plt.rcParams['figure.dpi'] = 300
-    plt.rcParams['savefig.dpi'] = 300
+    # High quality figure settings for IEEE documentation
+    plt.rcParams['figure.figsize'] = (12, 8)  # Standard figure size
+    plt.rcParams['figure.dpi'] = 300  # High DPI for quality
+    plt.rcParams['savefig.dpi'] = 300  # High save DPI for quality
     
     # Font settings
     plt.rcParams['font.size'] = 10
@@ -91,7 +91,7 @@ def create_load_distribution_diagram():
     ax.set_ylabel('Height (m)')
     
     plt.tight_layout(pad=1.5)
-    plt.savefig('output/figures/load_distribution.png',
+    plt.savefig('load_distribution.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -213,7 +213,7 @@ def create_thermal_resistance_diagram():
              'q = (Ti - Te)/ΣR  [W/m²]',
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
-    plt.savefig('output/figures/thermal_resistance.png',
+    plt.savefig('thermal_resistance.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -264,7 +264,7 @@ def create_stress_analysis_diagram():
     
     plt.tight_layout()
     plt.tight_layout(pad=1.5)
-    plt.savefig('output/figures/stress_analysis.png',
+    plt.savefig('stress_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -272,11 +272,270 @@ def create_stress_analysis_diagram():
                 edgecolor='none')
     plt.close()
 
+def create_vertical_projection():
+    """Create vertical projection drawing at 1:50 scale"""
+    set_engineering_style()
+    fig = plt.figure(figsize=(15, 10))
+    ax = fig.add_subplot(111)
+    
+    # Building dimensions
+    width = 7.2  # meters
+    height1 = 2.5
+    height2 = 2.65
+    ground_level = -1.4
+    
+    # Draw main outline
+    points = [(0, ground_level), (0, height1), (width, height2), (width, ground_level)]
+    polygon = Polygon(points, fill=False, color='black', linewidth=2)
+    ax.add_patch(polygon)
+    
+    # Add dimensions
+    ax.annotate('', xy=(0, height1), xytext=(0, ground_level),
+                arrowprops=dict(arrowstyle='<->', color='black'))
+    ax.text(-0.5, (height1 + ground_level)/2, f'{height1-ground_level:.1f}m', 
+            rotation=90, va='center')
+    
+    ax.annotate('', xy=(width, height2), xytext=(width, ground_level),
+                arrowprops=dict(arrowstyle='<->', color='black'))
+    ax.text(width+0.5, (height2 + ground_level)/2, f'{height2-ground_level:.1f}m',
+            rotation=90, va='center')
+    
+    # Add annotations
+    ax.text(width/2, -2, 'Vertical Projection (Scale 1:50)', ha='center', fontsize=12)
+    ax.text(width/2, -2.5, f'Building heights: h1={height1}m, h2={height2}m', ha='center')
+    ax.text(width/2, -3, 'Roof angle: 16°', ha='center')
+    ax.text(width/2, -3.5, f'Ground level: {ground_level} m.a.s.l', ha='center')
+    
+    ax.set_xlim(-1, width+1)
+    ax.set_ylim(ground_level-4, height2+1)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    plt.savefig('vertical_projection.png',
+                bbox_inches='tight',
+                dpi=301,
+                pad_inches=0.5)
+    plt.close()
+
+def create_horizontal_projection():
+    """Create horizontal projection drawing at 1:50 scale"""
+    set_engineering_style()
+    fig = plt.figure(figsize=(15, 10))
+    ax = fig.add_subplot(111)
+    
+    # Building dimensions
+    width = 7.2  # meters
+    length1 = 6.6
+    length2 = 10.8
+    spacing = 1.1
+    
+    # Draw main outline
+    rect = Rectangle((0, 0), length1, width, fill=False, color='black', linewidth=2)
+    ax.add_patch(rect)
+    
+    # Add purlin lines
+    for x in np.arange(0, length1+spacing, spacing):
+        if x <= length1:
+            ax.plot([x, x], [0, width], 'k--', linewidth=1)
+    
+    # Add dimensions
+    ax.annotate('', xy=(length1, 0), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='<->', color='black'))
+    ax.text(length1/2, -0.5, f'{length1}m', ha='center')
+    
+    ax.annotate('', xy=(0, width), xytext=(0, 0),
+                arrowprops=dict(arrowstyle='<->', color='black'))
+    ax.text(-0.5, width/2, f'{width}m', rotation=90, va='center')
+    
+    # Add annotations
+    ax.text(length1/2, -1.5, 'Horizontal Projection (Scale 1:50)', ha='center', fontsize=12)
+    ax.text(length1/2, -2.0, f'Width (b) = {width}m', ha='center')
+    ax.text(length1/2, -2.5, f'Length 1 (L1) = {length1}m', ha='center')
+    ax.text(length1/2, -3.0, f'Length 2 (L2) = {length2}m', ha='center')
+    ax.text(length1/2, -3.5, f'Purlin spacing (s) = {spacing}m', ha='center')
+    
+    ax.set_xlim(-1, length1+1)
+    ax.set_ylim(-4, width+1)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    plt.savefig('horizontal_projection.png',
+                bbox_inches='tight',
+                dpi=301,
+                pad_inches=0.5)
+    plt.close()
+
+def create_floor_plan():
+    """Create enhanced floor plan drawing at 1:50 scale with structural details"""
+    set_engineering_style()
+    fig = plt.figure(figsize=(15, 10))
+    ax = fig.add_subplot(111)
+    
+    # Building dimensions
+    width = 7.2  # meters
+    length1 = 6.6  # meters
+    length2 = 10.8  # meters
+    spacing = 1.1  # meters
+    column_size = 0.15  # 150mm column size
+    wall_thickness = 0.22  # 220mm MAX block wall thickness
+    
+    # Draw main outline with thicker walls
+    # Outer wall outline
+    outer_rect = Rectangle((-wall_thickness/2, -wall_thickness/2), 
+                         length1+wall_thickness, width+wall_thickness,
+                         fill=False, color='black', linewidth=2)
+    ax.add_patch(outer_rect)
+    
+    # Inner wall outline
+    inner_rect = Rectangle((0, 0), length1, width,
+                         fill=False, color='black', linewidth=1)
+    ax.add_patch(inner_rect)
+    
+    # Wall fill (light gray)
+    wall_fill = Rectangle((-wall_thickness/2, -wall_thickness/2),
+                         length1+wall_thickness, wall_thickness,
+                         fill=True, color='lightgray', alpha=0.3)
+    ax.add_patch(wall_fill)
+    wall_fill2 = Rectangle((-wall_thickness/2, -wall_thickness/2),
+                          wall_thickness, width+wall_thickness,
+                          fill=True, color='lightgray', alpha=0.3)
+    ax.add_patch(wall_fill2)
+    wall_fill3 = Rectangle((-wall_thickness/2, width),
+                          length1+wall_thickness, wall_thickness,
+                          fill=True, color='lightgray', alpha=0.3)
+    ax.add_patch(wall_fill3)
+    wall_fill4 = Rectangle((length1, -wall_thickness/2),
+                          wall_thickness, width+wall_thickness,
+                          fill=True, color='lightgray', alpha=0.3)
+    ax.add_patch(wall_fill4)
+    
+    # Add structural grid
+    for x in np.arange(0, length1+spacing, spacing):
+        if x <= length1:
+            ax.plot([x, x], [0, width], 'k--', linewidth=0.5, alpha=0.5)
+    for y in np.arange(0, width+spacing, spacing):
+        if y <= width:
+            ax.plot([0, length1], [y, y], 'k--', linewidth=0.5, alpha=0.5)
+    
+    # Add columns at grid intersections
+    for x in np.arange(0, length1+spacing, spacing):
+        if x <= length1:
+            for y in np.arange(0, width+spacing, spacing):
+                if y <= width:
+                    rect = Rectangle((float(x-column_size/2), float(y-column_size/2)),
+                                   float(column_size), float(column_size),
+                                   fill=True, color='gray', alpha=0.5)
+                    ax.add_patch(rect)
+    
+    # Add dimensions with improved styling
+    # Length
+    ax.annotate('', xy=(length1, -0.5), xytext=(0, -0.5),
+                arrowprops=dict(arrowstyle='<->', color='black', linewidth=1.5))
+    ax.text(length1/2, -0.8, f'{length1}m', ha='center', fontsize=10)
+    
+    # Width
+    ax.annotate('', xy=(-0.5, width), xytext=(-0.5, 0),
+                arrowprops=dict(arrowstyle='<->', color='black', linewidth=1.5))
+    ax.text(-0.8, width/2, f'{width}m', rotation=90, va='center', fontsize=10)
+    
+    # Add scale bar
+    scale_length = 2  # 2 meters
+    scale_x = length1 - scale_length - 0.5
+    scale_y = -2.0
+    ax.plot([scale_x, scale_x + scale_length], [scale_y, scale_y], 'k-', linewidth=2)
+    ax.plot([scale_x, scale_x], [scale_y-0.1, scale_y+0.1], 'k-', linewidth=2)
+    ax.plot([scale_x + scale_length, scale_x + scale_length],
+            [scale_y-0.1, scale_y+0.1], 'k-', linewidth=2)
+    ax.text(scale_x + scale_length/2, scale_y-0.2, f'{scale_length}m',
+            ha='center', va='top', fontsize=10)
+    
+    # Add detailed annotations
+    ax.text(length1/2, -2.5, 'Floor Plan (Scale 1:50)', ha='center',
+            fontsize=12, fontweight='bold')
+    ax.text(length1/2, -3.0, f'Width (b) = {width}m', ha='center', fontsize=10)
+    ax.text(length1/2, -3.4, f'Length 1 (L1) = {length1}m', ha='center', fontsize=10)
+    ax.text(length1/2, -3.8, f'Length 2 (L2) = {length2}m', ha='center', fontsize=10)
+    ax.text(length1/2, -4.2, f'Column spacing (s) = {spacing}m', ha='center', fontsize=10)
+    ax.text(length1/2, -4.6, f'Wall thickness = {wall_thickness*1000:.0f}mm (MAX 220 block)',
+            ha='center', fontsize=10)
+    ax.text(length1/2, -5.0, f'Column size = {column_size*1000:.0f}mm × {column_size*1000:.0f}mm',
+            ha='center', fontsize=10)
+    
+    # Set limits with proper margins
+    ax.set_xlim(-1.2, length1+1.2)
+    ax.set_ylim(-5.5, width+1.2)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    # Save with high resolution and proper padding
+    plt.savefig('floor_plan.png',
+                bbox_inches='tight',
+                dpi=300,
+                pad_inches=0.5,
+                facecolor='white',
+                edgecolor='none')
+    plt.close()
+
+def create_construction_details():
+    """Create construction details drawing at 1:10 scale"""
+    set_engineering_style()
+    fig = plt.figure(figsize=(15, 15))
+    ax = fig.add_subplot(111)
+    
+    # Draw column-foundation connection
+    column_width = 0.15  # 150mm
+    column_height = 0.5  # Show 500mm of column
+    base_plate_width = 0.2  # 200mm
+    base_plate_height = 0.01  # 10mm
+    
+    # Base plate
+    rect = Rectangle((-base_plate_width/2, 0), base_plate_width, base_plate_height,
+                    fill=True, color='gray', alpha=0.5)
+    ax.add_patch(rect)
+    
+    # Column
+    rect = Rectangle((-column_width/2, base_plate_height), column_width, column_height,
+                    fill=True, color='burlywood', alpha=0.5)
+    ax.add_patch(rect)
+    
+    # Add bolt holes
+    bolt_radius = 0.008  # 16mm diameter
+    bolt_positions = [(-0.08, 0.03), (0.08, 0.03)]
+    for x, y in bolt_positions:
+        circle = Circle((x, y), bolt_radius, fill=True, color='black')
+        ax.add_patch(circle)
+    
+    # Add dimensions
+    ax.annotate('', xy=(-column_width/2, -0.05), xytext=(column_width/2, -0.05),
+                arrowprops=dict(arrowstyle='<->', color='black'))
+    ax.text(0, -0.08, f'{column_width*1000:.0f}mm', ha='center')
+    
+    # Add annotations
+    ax.text(0, -0.15, 'Construction Details (Scale 1:10)', ha='center', fontsize=12)
+    ax.text(0, -0.2, 'Column-foundation connection', ha='center')
+    ax.text(0, -0.25, 'C27 timber elements', ha='center')
+    ax.text(0, -0.3, 'M16 Grade 8.8 bolts', ha='center')
+    
+    ax.set_xlim(-0.3, 0.3)
+    ax.set_ylim(-0.4, 0.6)
+    ax.set_aspect('equal')
+    ax.axis('off')
+    
+    plt.savefig('construction_details.png',
+                bbox_inches='tight',
+                dpi=301,
+                pad_inches=0.5)
+    plt.close()
+
 def create_connection_detail_diagram():
     """Create detailed connection technical drawing with force transfer"""
     set_engineering_style()
-    fig = plt.figure(figsize=(15, 15))
-    gs = fig.add_gridspec(2, 2, hspace=0.3, wspace=0.3)
+    # Override global style for this specific diagram
+    plt.rcParams['figure.figsize'] = (2, 2)  # Tiny figure size
+    plt.rcParams['figure.dpi'] = 72  # Minimal DPI
+    plt.rcParams['savefig.dpi'] = 72  # Minimal save DPI
+    fig = plt.figure()
+    gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.1)  # Extremely tight spacing
     
     # Main connection detail
     ax1 = fig.add_subplot(gs[0, :])
@@ -373,7 +632,7 @@ def create_connection_detail_diagram():
     
     ax3.set_title('Connection Specifications', pad=20)
     
-    plt.savefig('output/figures/connection_detail.png',
+    plt.savefig('connection_detail.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -516,12 +775,17 @@ def create_thermal_bridge_analysis():
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
     # Use figure-level padding instead of tight_layout
-    fig.savefig('output/figures/thermal_bridge_analysis.png',
+    # Ensure high resolution and proper margins for thermal analysis
+    fig.savefig('thermal_bridge_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
                 facecolor='white',
-                edgecolor='none')
+                edgecolor='none',
+                format='png',
+                metadata={'Title': 'Thermal Bridge Analysis',
+                         'Author': 'Structural Analysis Report',
+                         'Description': 'Analysis of thermal bridges and heat flow in building envelope'})
     plt.close()
 
 def create_combined_load_analysis():
@@ -561,7 +825,7 @@ def create_combined_load_analysis():
     ax2.grid(True)
     
     plt.tight_layout(pad=1.5)
-    plt.savefig('output/figures/combined_load_analysis.png',
+    plt.savefig('combined_load_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -569,7 +833,27 @@ def create_combined_load_analysis():
                 edgecolor='none')
     plt.close()
 
-def create_cross_section_analysis():
+
+
+if __name__ == "__main__":
+    # Create output directory
+    import os
+    os.makedirs('output/figures', exist_ok=True)
+    
+    # Generate all diagrams
+    create_load_distribution_diagram()
+    create_thermal_resistance_diagram()
+    create_stress_analysis_diagram()
+    create_vertical_projection()
+    create_horizontal_projection()
+    create_construction_details()
+    create_connection_detail_diagram()
+    create_thermal_bridge_analysis()
+    create_combined_load_analysis()
+    
+    print("All technical diagrams generated successfully")
+
+def create_cross_sections_diagram():
     """Create detailed cross-section analysis diagram with material properties"""
     set_engineering_style()
     fig = plt.figure(figsize=(20, 10))
@@ -655,7 +939,7 @@ def create_cross_section_analysis():
     ax3.set_title('Section Properties Analysis', pad=20)
     
     plt.tight_layout(pad=1.5)
-    plt.savefig('output/figures/cross_sections.png',
+    plt.savefig('cross_sections.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -725,7 +1009,7 @@ def create_momentum_analysis():
              'NEd = qEd × L × cos(α)',
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
-    plt.savefig('output/figures/momentum_analysis.png',
+    plt.savefig('momentum_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -803,7 +1087,7 @@ def create_inertia_analysis():
              'where b = width, h = height',
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
-    plt.savefig('output/figures/inertia_analysis.png',
+    plt.savefig('inertia_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -899,7 +1183,7 @@ def create_uls_verification():
              'ULS 3: 1.35G + 1.05S + 0.9W',
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
-    plt.savefig('output/figures/uls_verification.png',
+    plt.savefig('uls_verification.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -978,7 +1262,7 @@ def create_strength_analysis():
              'γM = partial factor for material properties',
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
-    plt.savefig('output/figures/strength_analysis.png',
+    plt.savefig('strength_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -1072,7 +1356,7 @@ def create_layer_analysis():
              'U = 1/RT  [W/(m²K)]',
              fontsize=10, bbox=dict(facecolor='white', alpha=0.8))
     
-    plt.savefig('output/figures/layer_analysis.png',
+    plt.savefig('layer_analysis.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -1144,7 +1428,7 @@ def create_purlin_spacing_diagram():
     ax2.axis('off')
     ax2.set_title('Load Distribution on Purlins', pad=20)
     
-    plt.savefig('output/figures/purlin_spacing.png',
+    plt.savefig('purlin_spacing.png',
                 bbox_inches='tight',
                 dpi=300,
                 pad_inches=0.5,
@@ -1162,9 +1446,14 @@ if __name__ == "__main__":
     create_thermal_resistance_diagram()
     create_stress_analysis_diagram()
     create_connection_detail_diagram()
-    create_cross_section_analysis()
+    create_cross_sections_diagram()
     create_thermal_bridge_analysis()
     create_combined_load_analysis()
+    create_momentum_analysis()
+    create_inertia_analysis()
+    create_uls_verification()
+    create_strength_analysis()
+    create_layer_analysis()
     create_purlin_spacing_diagram()
     
     print("All technical diagrams generated successfully")
