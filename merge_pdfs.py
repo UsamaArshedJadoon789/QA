@@ -37,6 +37,13 @@ def merge_pdfs():
     
     section_found = {section: False for section in sections}
     
+    # Define figure captions
+    figure_captions = [
+        "Figure 3: Vertical projection (Scale 1:50) showing building elevations and structural configuration. The drawing illustrates the primary heights (h1=2.5m, h2=2.65m), roof angle (16°), and ground level (-1.4 m.a.s.l). Wall construction utilizes MAX 220 block with mineral wool insulation for optimal thermal performance.",
+        "Figure 4: Horizontal projection (Scale 1:50) detailing building layout and dimensions. The plan shows primary measurements: width (b=7.2m), lengths (L1=6.6m, L2=10.8m), and purlin spacing (s=1.1m). Structural grid and member placement are indicated for precise construction reference.",
+        "Figure 5: Construction details (Scale 1:10) illustrating critical structural connections and assemblies. Key components include C27 timber elements (columns 150×150mm, purlins 80×160mm, rafters 100×200mm) and wall assembly (MAX 220 block + 150mm mineral wool). Details show precise connection methods and thermal envelope integration for optimal performance."
+    ]
+    
     # Process first PDF with section markers
     for page_num, page in enumerate(reader1.pages):
         text = page.extract_text()
@@ -46,6 +53,31 @@ def merge_pdfs():
         can = canvas.Canvas(packet, pagesize=A4)
         can.setFont("Helvetica", 9)
         can.drawString(50, 800, "IEEE TRANSACTIONS ON CIVIL ENGINEERING")
+        
+        # Add figure caption if this is a diagram page (pages 8-10 for our new diagrams)
+        if page_num in [7, 8, 9]:  # 0-based indexing
+            caption_idx = page_num - 7
+            if caption_idx < len(figure_captions):
+                can.setFont("Helvetica", 10)
+                # Split caption into multiple lines if needed
+                caption = figure_captions[caption_idx]
+                words = caption.split()
+                lines = []
+                current_line = []
+                for word in words:
+                    current_line.append(word)
+                    if len(' '.join(current_line)) > 80:  # Max line length
+                        lines.append(' '.join(current_line[:-1]))
+                        current_line = [word]
+                if current_line:
+                    lines.append(' '.join(current_line))
+                
+                # Draw caption lines
+                y_pos = 100  # Start from bottom
+                for line in lines:
+                    can.drawString(50, y_pos, line)
+                    y_pos += 15  # Line spacing
+        
         can.save()
         packet.seek(0)
         header = PdfReader(packet)
