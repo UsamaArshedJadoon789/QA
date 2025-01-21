@@ -387,12 +387,11 @@ def create_report():
     story.append(PageBreak())
 
     # Introduction
-    story.append(Paragraph('1. Introduction', styles['Heading1']))
-    # Add introduction text
+    story.append(Paragraph('I. INTRODUCTION', styles['IEEESection']))
     story.append(Paragraph("""
     This comprehensive engineering report presents the detailed structural and thermal analysis 
     of Dataset 5, focusing on a wood-structured building with specific geometric and material 
-    requirements. The analysis encompasses:""", styles['BodyText']))
+    requirements. The analysis follows IEEE documentation standards and encompasses the following aspects:""", styles['BodyText']))
     
     # Add bullet points using ListFlowable with proper bullet configuration
     bullet_points = [
@@ -420,8 +419,8 @@ def create_report():
     story.append(Spacer(1, 12))
 
     # Project Scope
-    story.append(Paragraph('1.1 Project Scope', styles['Heading2']))
-    # Add section introduction
+    story.append(Paragraph('A. Project Scope', styles['IEEESubsection']))
+    # Enhanced IEEE-style section introduction
     story.append(Paragraph("The analysis covers the following key aspects:", styles['BodyText']))
     
     # Structural Design section
@@ -476,21 +475,21 @@ def create_report():
     
     # Add TOC entries with enhanced numbering
     story.append(Paragraph('1.0 Building Specifications', styles['TOC1']))
-    story.append(Paragraph('2.0 Material Properties', styles['TOC1']))
-    story.append(Paragraph('  2.1 Material Specifications', styles['TOC2']))
-    story.append(Paragraph('  2.2 Design Strength Analysis', styles['TOC2']))
-    story.append(Paragraph('3.0 Load Analysis', styles['TOC1']))
-    story.append(Paragraph('  3.1 Load Characteristics', styles['TOC2']))
-    story.append(Paragraph('  3.2 Load Calculations', styles['TOC2']))
-    story.append(Paragraph('4.0 Structural Analysis', styles['TOC1']))
-    story.append(Paragraph('  4.1 Analysis Methodology', styles['TOC2']))
-    story.append(Paragraph('  4.2 Stress Analysis', styles['TOC2']))
-    story.append(Paragraph('5.0 Thermal Analysis', styles['TOC1']))
-    story.append(Paragraph('  5.1 Thermal Resistance', styles['TOC2']))
-    story.append(Paragraph('  5.2 Thermal Bridge Analysis', styles['TOC2']))
-    story.append(Paragraph('6.0 Technical Drawings', styles['TOC1']))
-    story.append(Paragraph('7.0 Summary of Results', styles['TOC1']))
-    story.append(Paragraph('8.0 Conclusion', styles['TOC1']))
+    story.append(Paragraph('II. MATERIAL PROPERTIES', styles['TOC1']))
+    story.append(Paragraph('    A. Material Specifications', styles['TOC2']))
+    story.append(Paragraph('    B. Design Strength Analysis', styles['TOC2']))
+    story.append(Paragraph('III. LOAD ANALYSIS', styles['TOC1']))
+    story.append(Paragraph('    A. Load Characteristics', styles['TOC2']))
+    story.append(Paragraph('    B. Load Calculations', styles['TOC2']))
+    story.append(Paragraph('IV. STRUCTURAL ANALYSIS', styles['TOC1']))
+    story.append(Paragraph('    A. Analysis Methodology', styles['TOC2']))
+    story.append(Paragraph('    B. Stress Analysis', styles['TOC2']))
+    story.append(Paragraph('V. THERMAL ANALYSIS', styles['TOC1']))
+    story.append(Paragraph('    A. Thermal Resistance', styles['TOC2']))
+    story.append(Paragraph('    B. Thermal Bridge Analysis', styles['TOC2']))
+    story.append(Paragraph('VI. TECHNICAL DRAWINGS', styles['TOC1']))
+    story.append(Paragraph('VII. SUMMARY OF RESULTS', styles['TOC1']))
+    story.append(Paragraph('VIII. CONCLUSION', styles['TOC1']))
     story.append(PageBreak())
 
     # Building Specifications
@@ -542,14 +541,14 @@ def create_report():
     story.append(Spacer(1, 12))
     
     # Material Properties
-    story.append(Paragraph('II. Material Properties', styles['IEEESection']))
+    story.append(Paragraph('II. MATERIAL PROPERTIES', styles['IEEESection']))
     story.append(Paragraph('This section specifies the material properties and characteristics of all structural and thermal components used in the building construction.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
-    story.append(Paragraph('2.1 Material Specifications', styles['Heading2']))
+    story.append(Paragraph('A. Material Specifications', styles['IEEESubsection']))
     story.append(Spacer(1, 8))
     
-    story.append(Paragraph('2.2 Design Strength Analysis', styles['Heading2']))
+    story.append(Paragraph('B. Design Strength Analysis', styles['IEEESubsection']))
     materials = [
         ['Component', 'Material', 'Properties'],
         ['Walls', 'MAX 220 block', 'lambda = 0.45 W/(m.K)'],
@@ -577,11 +576,11 @@ def create_report():
     story.append(Spacer(1, 12))
     
     # Load Analysis
-    story.append(Paragraph('III. Load Analysis', styles['IEEESection']))
+    story.append(Paragraph('III. LOAD ANALYSIS', styles['IEEESection']))
     story.append(Paragraph('This section presents the comprehensive analysis of all loads acting on the structure, following the requirements of EN 1990 (Eurocode 0) for load combinations and safety factors.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
-    story.append(Paragraph('3.1 Load Characteristics', styles['Heading2']))
+    story.append(Paragraph('A. Load Characteristics', styles['IEEESubsection']))
     story.append(Spacer(1, 8))
     story.append(Paragraph("""
     The structural analysis considers the following characteristic loads according to EN 1990:
@@ -674,7 +673,7 @@ def create_report():
         story.append(Spacer(1, 12))
     
     # Structural Analysis
-    story.append(Paragraph('IV. Structural Analysis', styles['IEEESection']))
+    story.append(Paragraph('IV. STRUCTURAL ANALYSIS', styles['IEEESection']))
     story.append(Paragraph('This section details the structural analysis following Eurocode 5 (EN 1995-1-1) requirements for timber structures. The analysis encompasses load distribution, member sizing, and verification of structural integrity.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
@@ -1119,7 +1118,7 @@ def create_report():
         story.append(Paragraph(str(compression_data), styles['Equation']))
     
     # Thermal Analysis
-    story.append(Paragraph('V. Thermal Analysis', styles['IEEESection']))
+    story.append(Paragraph('V. THERMAL ANALYSIS', styles['IEEESection']))
     story.append(Paragraph('This section presents the thermal performance analysis of the building envelope according to EN ISO 6946, evaluating the thermal resistance and heat transfer characteristics of wall and roof assemblies.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
@@ -1134,17 +1133,17 @@ def create_report():
     """, styles['BodyText']))
     
     # Technical Drawings
-    story.append(Paragraph('VI. Technical Drawings', styles['IEEESection']))
+    story.append(Paragraph('VI. TECHNICAL DRAWINGS', styles['IEEESection']))
     story.append(Paragraph('This section presents the technical drawings of the building structure, including vertical and horizontal projections at 1:50 scale and detailed construction drawings at 1:10 scale.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
     # Summary of Results
-    story.append(Paragraph('7.0 Summary of Results', styles['Heading1']))
+    story.append(Paragraph('VII. SUMMARY OF RESULTS', styles['IEEESection']))
     story.append(Paragraph('This section summarizes the key findings from the structural and thermal analyses, presenting the verification results and compliance with relevant standards.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
     # Conclusion
-    story.append(Paragraph('8.0 Conclusion', styles['Heading1']))
+    story.append(Paragraph('VIII. CONCLUSION', styles['IEEESection']))
     story.append(Paragraph("""
     The structural and thermal analyses demonstrate that the building design meets all requirements specified in the relevant Eurocode standards:
     • All structural elements satisfy Ultimate Limit State (ULS) criteria
@@ -1293,14 +1292,39 @@ def create_report():
     story.append(Spacer(1, 12))
     
     story.append(Paragraph('5.1.1 Wall Assembly Results', styles['Heading2']))
-    story.append(Paragraph("""
-    Total thermal resistance calculation for wall assembly:
-    RT = Rsi + R1 + R2 + Rse
-    RT = 0.13 + 0.667 + 4.286 + 0.04 = 5.123 m²K/W
+    story.append(Paragraph("The total thermal resistance is calculated according to EN ISO 6946 Eq. (51):", styles['BodyText']))
     
-    Heat transfer coefficient (U-value):
-    U = 1/RT = 1/5.123 = 0.195 W/(m^2.K) < 0.20 W/(m^2.K) requirement ✓
-    """, styles['BodyText']))
+    equation_table = Table([
+        [Paragraph("RT = Rsi + R1 + R2 + Rse = 0.13 + 0.667 + 4.286 + 0.04 = 5.123 m²K/W", styles['Equation']),
+         Paragraph("(51)", styles['EquationNumber'])]
+    ], colWidths=[450, 50])
+    equation_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
+    ]))
+    story.append(equation_table)
+    story.append(Spacer(1, 12))
+    
+    story.append(Paragraph("The heat transfer coefficient (U-value) is then determined using Eq. (52):", styles['BodyText']))
+    equation_table = Table([
+        [Paragraph("U = 1/RT = 1/5.123 = 0.195 W/(m²K) < 0.20 W/(m²K) requirement ✓", styles['Equation']),
+         Paragraph("(52)", styles['EquationNumber'])]
+    ], colWidths=[450, 50])
+    equation_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
+    ]))
+    story.append(equation_table)
     
     story.append(Paragraph('5.2 Roof Assembly Analysis', styles['Heading2']))
     story.append(Paragraph("""
@@ -1336,14 +1360,39 @@ def create_report():
     story.append(Spacer(1, 12))
     
     story.append(Paragraph('5.2.1 Roof Assembly Results', styles['Heading2']))
-    story.append(Paragraph("""
-    Total thermal resistance calculation for roof assembly:
-    RT = Rsi + R1 + R2 + R3 + Rse
-    RT = 0.10 + 0.000012 + 0.16 + 5.714 + 0.04 = 6.014 m²K/W
+    story.append(Paragraph("The total thermal resistance for the roof assembly follows EN ISO 6946 Eq. (53):", styles['BodyText']))
     
-    Heat transfer coefficient (U-value):
-    U = 1/RT = 1/6.014 = 0.166 W/(m^2.K) < 0.18 W/(m^2.K) requirement ✓
-    """, styles['BodyText']))
+    equation_table = Table([
+        [Paragraph("RT = Rsi + R1 + R2 + R3 + Rse = 0.10 + 0.000012 + 0.16 + 5.714 + 0.04 = 6.014 m²K/W", styles['Equation']),
+         Paragraph("(53)", styles['EquationNumber'])]
+    ], colWidths=[450, 50])
+    equation_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
+    ]))
+    story.append(equation_table)
+    story.append(Spacer(1, 12))
+    
+    story.append(Paragraph("The corresponding heat transfer coefficient is calculated using Eq. (54):", styles['BodyText']))
+    equation_table = Table([
+        [Paragraph("U = 1/RT = 1/6.014 = 0.166 W/(m²K) < 0.18 W/(m²K) requirement ✓", styles['Equation']),
+         Paragraph("(54)", styles['EquationNumber'])]
+    ], colWidths=[450, 50])
+    equation_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
+        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 6),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
+    ]))
+    story.append(equation_table)
     
     # Add thermal diagram showing layer composition
     img = Image('output/figures/thermal_diagram.png', width=6*inch, height=4*inch)
