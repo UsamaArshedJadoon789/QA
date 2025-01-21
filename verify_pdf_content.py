@@ -9,16 +9,16 @@ def analyze_pdf_content(pdf_path):
     print("Performing comprehensive PDF verification...")
     doc = fitz.open(pdf_path)
     
-    # Enhanced section tracking with page numbers and multiple patterns
+    # Enhanced section tracking with page numbers
     required_sections = {
-        "Building Specifications": {"found": False, "page": None, "patterns": ["Building Specifications", "I. BUILDING SPECIFICATIONS"]},
-        "Material Properties": {"found": False, "page": None, "patterns": ["Material Properties", "II. MATERIAL PROPERTIES"]},
-        "Design Strength": {"found": False, "page": None, "patterns": ["Design Strength", "III. DESIGN STRENGTH"]},
-        "Load Analysis": {"found": False, "page": None, "patterns": ["Load Analysis", "III.2 Load Analysis"]},
-        "Structural Analysis": {"found": False, "page": None, "patterns": ["IV. STRUCTURAL ANALYSIS", "Structural Analysis"]},
-        "Thermal Analysis": {"found": False, "page": None, "patterns": ["V. THERMAL ANALYSIS", "Thermal Analysis"]},
-        "Cross-Section Analysis": {"found": False, "page": None, "patterns": ["Cross-Section Analysis", "4.2 Cross-Section Analysis"]},
-        "Ultimate Limit State": {"found": False, "page": None, "patterns": ["Ultimate Limit State", "4.3 Ultimate Limit State"]}
+        "Building Specifications": {"found": False, "page": None},
+        "Material Properties": {"found": False, "page": None},
+        "Design Strength": {"found": False, "page": None},
+        "Load Analysis": {"found": False, "page": None},
+        "Structural Analysis": {"found": False, "page": None},
+        "Thermal Analysis": {"found": False, "page": None},
+        "Cross-Section Analysis": {"found": False, "page": None},
+        "Ultimate Limit State": {"found": False, "page": None}
     }
     
     # Track required calculations with multiple possible matches
@@ -48,48 +48,19 @@ def analyze_pdf_content(pdf_path):
         # Check text content
         text = page.get_text()
         
-        # Check sections with page tracking and multiple patterns
-        for section, info in required_sections.items():
-            if not info["found"]:  # Only check if not already found
-                for pattern in info["patterns"]:
-                    if pattern in text or pattern.upper() in text:  # Case-insensitive check
-                        info["found"] = True
-                        info["page"] = page_num + 1
-                        print(f"\nFound section '{section}' on page {page_num + 1} (matched: {pattern})")
-                        break
+        # Check sections with page tracking
+        for section in required_sections:
+            if section in text:
+                required_sections[section]["found"] = True
+                required_sections[section]["page"] = page_num + 1
+                print(f"\nFound section '{section}' on page {page_num + 1}")
                 
-        # Verify margins and spacing using cropbox and mediabox
+        # Verify margins and spacing
         mediabox = page.mediabox
-        cropbox = page.cropbox
-        
-        # Calculate margins by analyzing content placement
-        # Get all content boxes (text and images)
-        content_areas = []
-        for block in page.get_text("dict")["blocks"]:
-            bbox = block.get("bbox", [])
-            if bbox:
-                content_areas.append(bbox)
-        
-        # Add image areas
-        for img in page.get_images():
-            for rect in page.get_image_rects(img[0]):
-                content_areas.append((rect.x0, rect.y0, rect.x1, rect.y1))
-        
-        if content_areas:
-            # Find content boundaries
-            content_left = min(area[0] for area in content_areas)
-            content_right = max(area[2] for area in content_areas)
-            content_bottom = min(area[1] for area in content_areas)
-            content_top = max(area[3] for area in content_areas)
-            
-            # Calculate margins relative to page size (A4: 595 x 842 points)
-            margin_left = content_left
-            margin_right = 595 - content_right
-            margin_bottom = content_bottom
-            margin_top = 842 - content_top
-        else:
-            # Default to 0 if no content found
-            margin_left = margin_right = margin_top = margin_bottom = 0
+        margin_left = mediabox[0]
+        margin_right = mediabox[2] - 595  # A4 width in points
+        margin_top = mediabox[3] - 842  # A4 height in points
+        margin_bottom = mediabox[1]
         
         print(f"\nPage {page_num + 1} margins:")
         print(f"Left: {margin_left:.1f} pts")

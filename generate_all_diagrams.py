@@ -1,13 +1,23 @@
 import os
 import matplotlib
 matplotlib.use('Agg')
-from create_technical_diagrams import *
-from generate_report import (
-    create_force_diagram,
-    save_high_dpi_image,
-    create_brace_diagram,
-    create_thermal_diagram,
-    create_section_diagram
+from create_technical_diagrams import (
+    create_load_distribution_diagram,
+    create_thermal_resistance_diagram,
+    create_stress_analysis_diagram,
+    create_vertical_projection,
+    create_horizontal_projection,
+    create_construction_details,
+    create_connection_detail_diagram,
+    create_thermal_bridge_analysis,
+    create_combined_load_analysis,
+    create_cross_sections_diagram,
+    create_momentum_analysis,
+    create_inertia_analysis,
+    create_uls_verification,
+    create_strength_analysis,
+    create_layer_analysis,
+    create_purlin_spacing_diagram
 )
 
 def generate_all_diagrams():
@@ -15,6 +25,8 @@ def generate_all_diagrams():
     print('Creating output directories...')
     os.makedirs('output/figures', exist_ok=True)
     os.makedirs('output/documentation', exist_ok=True)
+    os.makedirs('dist/drawings/projections', exist_ok=True)
+    os.makedirs('dist/drawings/details', exist_ok=True)
     
     # Store current directory
     original_dir = os.getcwd()
@@ -25,68 +37,34 @@ def generate_all_diagrams():
         os.chdir(figures_dir)
         print(f'\nChanged to directory: {figures_dir}')
         
-        print('\nGenerating floor plan...')
-        create_floor_plan()
+        # Generate all diagrams
+        diagrams = [
+            ('load distribution', create_load_distribution_diagram),
+            ('thermal resistance', create_thermal_resistance_diagram),
+            ('stress analysis', create_stress_analysis_diagram),
+            ('vertical projection', create_vertical_projection),
+            ('horizontal projection', create_horizontal_projection),
+            ('construction details', create_construction_details),
+            ('connection detail', create_connection_detail_diagram),
+            ('thermal bridge analysis', create_thermal_bridge_analysis),
+            ('combined load analysis', create_combined_load_analysis),
+            ('cross sections', create_cross_sections_diagram),
+            ('momentum analysis', create_momentum_analysis),
+            ('inertia analysis', create_inertia_analysis),
+            ('ULS verification', create_uls_verification),
+            ('strength analysis', create_strength_analysis),
+            ('layer analysis', create_layer_analysis),
+            ('purlin spacing', create_purlin_spacing_diagram)
+        ]
         
-        print('\nGenerating force diagram...')
-        create_force_diagram()
-        
-        print('\nGenerating load distribution diagram...')
-        create_load_distribution_diagram()
-        
-        print('\nGenerating thermal resistance diagram...')
-        create_thermal_resistance_diagram()
-        
-        print('\nGenerating stress analysis diagram...')
-        create_stress_analysis_diagram()
-        
-        print('\nGenerating vertical projection...')
-        create_vertical_projection()
-        
-        print('\nGenerating horizontal projection...')
-        create_horizontal_projection()
-        
-        print('\nGenerating construction details...')
-        create_construction_details()
-        
-        print('\nGenerating connection detail diagram...')
-        create_connection_detail_diagram()
-        
-        print('\nGenerating thermal bridge analysis...')
-        create_thermal_bridge_analysis()
-        
-        print('\nGenerating combined load analysis...')
-        create_combined_load_analysis()
-        
-        print('\nGenerating cross sections diagram...')
-        create_cross_sections_diagram()
-        
-        print('\nGenerating momentum analysis...')
-        create_momentum_analysis()
-        
-        print('\nGenerating inertia analysis...')
-        create_inertia_analysis()
-        
-        print('\nGenerating ULS verification...')
-        create_uls_verification()
-        
-        print('\nGenerating strength analysis...')
-        create_strength_analysis()
-        
-        print('\nGenerating layer analysis...')
-        create_layer_analysis()
-        
-        print('\nGenerating purlin spacing diagram...')
-        create_purlin_spacing_diagram()
-        
-        print('\nGenerating brace diagram...')
-        create_brace_diagram()
-        
-        print('\nGenerating thermal diagram...')
-        create_thermal_diagram()
-        
-        print('\nGenerating section diagram...')
-        create_section_diagram()
+        for name, func in diagrams:
+            try:
+                print(f'\nGenerating {name} diagram...')
+                func()
+                print(f'{name} diagram generated successfully.')
+            except Exception as e:
+                print(f'Error generating {name} diagram: {str(e)}')
+                raise
         
         print('\nAll diagrams generated successfully.')
     

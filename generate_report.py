@@ -51,21 +51,14 @@ def create_report():
     os.makedirs('output/documentation', exist_ok=True)
     
     # Initialize document
-    # Define page dimensions and margins
-    page_width, page_height = pagesizes.A4
-    margin_left = 72      # 1 inch = 72 points
-    margin_right = 72     # 1 inch
-    margin_top = 72       # 1 inch
-    margin_bottom = 144   # 2 inches (IEEE standard)
-    
     # Initialize document with IEEE margins and headers/footers
     doc = SimpleDocTemplate(
         'output/documentation/structural_analysis_report.pdf',
         pagesize=pagesizes.A4,
-        rightMargin=margin_right,
-        leftMargin=margin_left,
-        topMargin=margin_top,
-        bottomMargin=margin_bottom,
+        rightMargin=72,  # 1 inch = 72 points (IEEE standard)
+        leftMargin=72,   # 1 inch = 72 points
+        topMargin=72,    # 1 inch = 72 points
+        bottomMargin=72, # 1 inch = 72 points
         allowSplitting=True,
         showBoundary=0
     )
@@ -78,222 +71,135 @@ def create_report():
         canvas.restoreState()
     
     def footer(canvas, doc):
-        """Draw footer with proper margin enforcement"""
         canvas.saveState()
-        
-        # Set page number position (1 inch above bottom margin)
-        page_number_y = margin_bottom - 36  # 36 points = 0.5 inch
         canvas.setFont(normal_font, 9)
-        canvas.drawString(margin_left, page_number_y, f"Page {doc.page}")
-        
-        # Create clipping path for content area
-        canvas.saveState()
-        p = canvas.beginPath()
-        p.rect(
-            margin_left,
-            margin_bottom,
-            page_width - (margin_left + margin_right),
-            page_height - (margin_top + margin_bottom)
-        )
-        canvas.clipPath(p, stroke=0)
-        canvas.restoreState()
-        
+        canvas.drawString(72, 72, f"Page {doc.page}")  # 1 inch from bottom
         canvas.restoreState()
     
-    # Create page templates with proper frames and margin enforcement
-    def onPage(canvas, doc):
-        """Page template handler with margin enforcement"""
-        # Draw header and footer
-        header(canvas, doc)
-        footer(canvas, doc)
-        
-        # Enforce margins by drawing clipping boundary
-        canvas.saveState()
-        canvas.setStrokeColorRGB(1, 1, 1)  # White stroke
-        canvas.setFillColorRGB(1, 1, 1)    # White fill
-        
-        # Create clipping path for content area
-        p = canvas.beginPath()
-        p.rect(
-            doc.leftMargin,
-            doc.bottomMargin,
-            doc.width,
-            doc.height
-        )
-        canvas.clipPath(p, stroke=0)
-        canvas.restoreState()
-    
-    # Calculate content area dimensions based on A4 page size
-    page_width, page_height = pagesizes.A4
-    
-    # Calculate effective content area with IEEE margins
-    # Note: bottomMargin is 144 pts (2 inches) for IEEE format
-    content_width = page_width - (margin_left + margin_right)
-    content_height = page_height - (margin_top + margin_bottom)
-    
-    # Create frame for content area with absolute positioning and strict margins
-    frame = Frame(
-        x1=margin_left,
-        y1=margin_bottom,  # 144 pts (2 inches) from bottom
-        width=page_width - (2 * margin_left),  # Equal left/right margins
-        height=page_height - margin_top - margin_bottom,  # Account for header/footer
-        leftPadding=0,          # Remove padding to ensure exact margins
-        rightPadding=0,
-        topPadding=0,
-        bottomPadding=0,
-        id='normal',
-        showBoundary=0
-    )
-    
-    # Add margin enforcement to template
-    def enforceMargins(canvas, doc):
-        """Enforce margins by clipping content area"""
-        canvas.saveState()
-        # Create clipping path
-        p = canvas.beginPath()
-        p.moveTo(margin_left, margin_bottom)
-        p.lineTo(page_width - margin_left, margin_bottom)
-        p.lineTo(page_width - margin_left, page_height - margin_top)
-        p.lineTo(margin_left, page_height - margin_top)
-        p.close()
-        canvas.clipPath(p, stroke=0)
-        canvas.restoreState()
-    
-    # Create template with margin enforcement
-    template = PageTemplate(
-        id='default',
-        frames=[frame],
-        onPage=lambda canvas, doc: (header(canvas, doc), 
-                                  footer(canvas, doc),
-                                  enforceMargins(canvas, doc))
-    )
-    
-    # Add template to document
-    doc.addPageTemplates([template])
+    # Set document template with header and footer
+    doc.header = header
+    doc.footer = footer
     
     # Initialize styles
     styles = getSampleStyleSheet()
     
-    def update_or_add_style(name, parent_style, **attrs):
-        """Helper function to update existing style or add new one"""
-        if name in styles:
-            # Update existing style
-            style = styles[name]
-            for key, value in attrs.items():
-                setattr(style, key, value)
-        else:
-            # Add new style
-            styles.add(ParagraphStyle(
-                name=name,
-                parent=styles[parent_style],
-                **attrs
-            ))
-    
-    # Add bullet list style first
-    update_or_add_style('BulletList', 'Normal',
-        fontName='Helvetica',
-        fontSize=10,
-        leading=14,
-        leftIndent=36,
-        firstLineIndent=0,
-        spaceBefore=3,
-        spaceAfter=3,
-        bulletIndent=18,
-        bulletFontName='Symbol',
-        bulletFontSize=10,
-        bulletAnchor='start'
-    )
-    
     # Custom styles
     # IEEE Title styles
-    update_or_add_style('IEEETitle', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEETitle',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=14,
         spaceAfter=12,
         alignment=TA_CENTER,
         leading=16
-    )
+    ))
     
-    update_or_add_style('IEEEAuthor', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEEAuthor',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=12,
         spaceAfter=12,
         alignment=TA_CENTER,
         leading=14
-    )
+    ))
     
-    update_or_add_style('IEEEAffiliation', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEEAffiliation',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=10,
         spaceAfter=6,
         alignment=TA_CENTER,
         leading=12
-    )
+    ))
     
-    update_or_add_style('IEEEAbstractHeader', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEEAbstractHeader',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=10,
         spaceBefore=12,
         spaceAfter=6,
         alignment=TA_LEFT,
         leading=12
-    )
+    ))
     
-    update_or_add_style('IEEEAbstractText', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEEAbstractText',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=9,
         spaceBefore=6,
         spaceAfter=12,
         alignment=TA_JUSTIFY,
         leading=11
-    )
+    ))
     
-    update_or_add_style('IEEEKeywords', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEEKeywords',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=9,
         spaceBefore=6,
         spaceAfter=12,
         alignment=TA_JUSTIFY,
         leading=11
-    )
+    ))
     
-    update_or_add_style('Subtitle', 'Normal',
+    styles.add(ParagraphStyle(
+        name='Subtitle',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=18,
         spaceAfter=20,
         alignment=TA_CENTER
-    )
+    ))
     
-    update_or_add_style('TOC1', 'Normal',
+    styles.add(ParagraphStyle(
+        name='TOC1',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=12,
         spaceBefore=8,
         spaceAfter=4,
         leftIndent=0
-    )
+    ))
     
-    update_or_add_style('TOC2', 'Normal',
+    styles.add(ParagraphStyle(
+        name='TOC2',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=11,
         spaceBefore=4,
         spaceAfter=4,
         leftIndent=20
-    )
+    ))
     
-    # Update existing heading styles instead of adding new ones
-    styles['Heading1'].fontName = bold_font
-    styles['Heading1'].fontSize = 16
-    styles['Heading1'].spaceAfter = 20
-    styles['Heading1'].keepWithNext = True
+    styles.add(ParagraphStyle(
+        name='Heading1',
+        parent=styles['Heading1'],
+        fontName=bold_font,
+        fontSize=16,
+        spaceAfter=20,
+        keepWithNext=True
+    ))
     
-    styles['Heading2'].fontName = bold_font
-    styles['Heading2'].fontSize = 14
-    styles['Heading2'].spaceAfter = 15
-    styles['Heading2'].keepWithNext = True
-    styles['Heading2'].leftIndent = 20
+    styles.add(ParagraphStyle(
+        name='Heading2',
+        parent=styles['Heading2'],
+        fontName=bold_font,
+        fontSize=14,
+        spaceAfter=15,
+        keepWithNext=True,
+        leftIndent=20
+    ))
     
     # Add IEEE subsubsection style
-    update_or_add_style('IEEESubsubsection', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEESubsubsection',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=10,
         spaceAfter=8,
@@ -301,9 +207,11 @@ def create_report():
         keepWithNext=True,
         leftIndent=30,
         leading=12
-    )
+    ))
     
-    update_or_add_style('BodyText', 'Normal',
+    styles.add(ParagraphStyle(
+        name='BodyText',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=10,
         leading=14,
@@ -313,27 +221,32 @@ def create_report():
         allowWidows=2,
         allowOrphans=2,
         splitLongWords=True
-    )
+    ))
     
-    # Enhanced equation style with numbering support
-    update_or_add_style('Equation', 'Normal',
+    # Enhanced equation style with improved spacing and alignment
+    styles.add(ParagraphStyle(
+        name='Equation',
+        parent=styles['Normal'],
         fontName=normal_font,
         fontSize=11,
         alignment=TA_CENTER,
-        spaceAfter=12,
-        spaceBefore=12,
+        spaceAfter=18,
+        spaceBefore=18,
         allowWidows=2,
         allowOrphans=2,
-        leftIndent=30,
-        rightIndent=30,
-        leading=16,
+        leftIndent=36,
+        rightIndent=36,
+        leading=18,
         borderWidth=0.5,
         borderColor=colors.grey,
-        borderPadding=10,
-        backColor=colors.white
-    )
+        borderPadding=12,
+        backColor=colors.white,
+        keepWithNext=True
+    ))
     
-    update_or_add_style('EquationNumber', 'Normal',
+    styles.add(ParagraphStyle(
+        name='EquationNumber',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=11,
         alignment=TA_RIGHT,
@@ -341,9 +254,11 @@ def create_report():
         spaceAfter=12,
         spaceBefore=12,
         textColor=colors.HexColor('#404040')
-    )
+    ))
     
-    update_or_add_style('EquationDescription', 'BodyText',
+    styles.add(ParagraphStyle(
+        name='EquationDescription',
+        parent=styles['BodyText'],
         fontName=normal_font,
         fontSize=11,
         alignment=TA_LEFT,
@@ -354,31 +269,25 @@ def create_report():
         leading=14,
         borderPadding=10,
         backColor=colors.white
-    )
+    ))
     
-    # Add IEEE styles for figures
-    update_or_add_style('IEEEFigureTitle', 'Normal',
-        fontName=bold_font,
-        fontSize=9,
-        alignment=TA_CENTER,
-        spaceBefore=12,
-        spaceAfter=6,
-        leading=11
-    )
-    
-    # Add figure title style
-    update_or_add_style('FigureTitle', 'Normal',
+    # Add IEEE styles for figures with enhanced spacing
+    styles.add(ParagraphStyle(
+        name='IEEEFigureTitle',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=10,
         alignment=TA_CENTER,
-        spaceBefore=12,
-        spaceAfter=6,
-        leading=12,
+        spaceBefore=18,
+        spaceAfter=12,
+        leading=14,
         keepWithNext=True
-    )
+    ))
     
     # Add IEEE style for subsections
-    update_or_add_style('IEEESubsection', 'Normal',
+    styles.add(ParagraphStyle(
+        name='IEEESubsection',
+        parent=styles['Normal'],
         fontName=bold_font,
         fontSize=10,
         alignment=TA_LEFT,
@@ -386,9 +295,11 @@ def create_report():
         spaceAfter=6,
         leading=12,
         leftIndent=20
-    )
+    ))
     
-    update_or_add_style('FigureCaption', 'BodyText',
+    styles.add(ParagraphStyle(
+        name='FigureCaption',
+        parent=styles['BodyText'],
         fontName=normal_font,
         fontSize=10,
         alignment=TA_JUSTIFY,
@@ -396,57 +307,7 @@ def create_report():
         rightIndent=30,
         spaceBefore=6,
         spaceAfter=12
-    )
-    
-    # Add IEEE section style
-    update_or_add_style('IEEESection', 'Normal',
-        fontName=bold_font,
-        fontSize=12,
-        alignment=TA_LEFT,
-        spaceBefore=12,
-        spaceAfter=6,
-        leading=14,
-        keepWithNext=True
-    )
-    
-    # Add IEEE table styles
-    update_or_add_style('IEEETableCaption', 'Normal',
-        fontName=bold_font,
-        fontSize=10,
-        alignment=TA_LEFT,
-        spaceBefore=6,
-        spaceAfter=6,
-        leading=12,
-        keepWithNext=True
-    )
-    
-    update_or_add_style('IEEETableHeader', 'Normal',
-        fontName=bold_font,
-        fontSize=10,
-        alignment=TA_CENTER,
-        spaceBefore=6,
-        spaceAfter=6,
-        leading=12,
-        backColor=colors.lightgrey
-    )
-    
-    update_or_add_style('IEEETableCell', 'Normal',
-        fontName=normal_font,
-        fontSize=10,
-        alignment=TA_LEFT,
-        spaceBefore=4,
-        spaceAfter=4,
-        leading=12
-    )
-    
-    update_or_add_style('IEEETableText', 'Normal',
-        fontName=normal_font,
-        fontSize=10,
-        alignment=TA_LEFT,
-        spaceBefore=6,
-        spaceAfter=6,
-        leading=12
-    )
+    ))
     
     # Initialize calculations
     calcs = WoodStructureCalculations()
@@ -478,30 +339,17 @@ def create_report():
     story.append(PageBreak())
 
     # Introduction
-    story.append(Paragraph('I. INTRODUCTION', styles['IEEESection']))
+    story.append(Paragraph('1. Introduction', styles['Heading1']))
     story.append(Paragraph("""
     This comprehensive engineering report presents the detailed structural and thermal analysis 
     of Dataset 5, focusing on a wood-structured building with specific geometric and material 
-    requirements. The analysis follows IEEE documentation standards and encompasses the following aspects:""", styles['BodyText']))
-    
-    # Add bullet points using ListFlowable with proper bullet configuration
-    bullet_points = [
-        "Complete structural analysis according to Eurocode standards",
-        "Thermal performance evaluation of building envelope",
-        "Detailed technical drawings and construction specifications",
-        "Verification of all design criteria and safety requirements"
-    ]
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in bullet_points],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
-    
-    # Add remaining text
-    story.append(Paragraph("""
+    requirements. The analysis encompasses:
+
+    • Complete structural analysis according to Eurocode standards
+    • Thermal performance evaluation of building envelope
+    • Detailed technical drawings and construction specifications
+    • Verification of all design criteria and safety requirements
+
     The building features a timber roof structure (C27 class) supported by wooden columns, 
     with walls constructed using MAX 220 blocks and mineral wool insulation. All calculations 
     and verifications follow relevant Eurocode standards, ensuring compliance with current 
@@ -510,73 +358,25 @@ def create_report():
     story.append(Spacer(1, 12))
 
     # Project Scope
-    story.append(Paragraph('A. Project Scope', styles['IEEESubsection']))
-    # Enhanced IEEE-style section introduction
-    story.append(Paragraph("The analysis covers the following key aspects:", styles['BodyText']))
-    
-    # Structural Design section
-    story.append(Paragraph("1. Structural Design:", styles['BodyText']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Wood structure of the roof (rafters and purlins)",
-            "Wood column design and verification",
-            "Connection details and specifications"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
-    
-    # Thermal Analysis section with IEEE-style heading
-    story.append(Paragraph('V. THERMAL ANALYSIS', styles['IEEESection']))
-    story.append(Paragraph("""This section presents a comprehensive thermal analysis of the building envelope, 
-    focusing on thermal resistance calculations, thermal bridge evaluation, and condensation risk assessment 
-    according to EN ISO 6946 and EN ISO 10211.""", styles['BodyText']))
-    
-    story.append(Paragraph('A. Thermal Resistance Analysis', styles['IEEESubsection']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Wall and roof assembly thermal resistance calculations",
-            "Layer-by-layer thermal performance evaluation",
-            "Total thermal resistance and U-value verification"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
-    
-    story.append(Paragraph('B. Thermal Bridge Assessment', styles['IEEESubsection']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Critical junction analysis and heat flow patterns",
-            "Temperature factor and condensation risk evaluation",
-            "Thermal bridge mitigation strategies"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
-    
-    # Technical Documentation section
-    story.append(Paragraph("3. Technical Documentation:", styles['BodyText']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Vertical and horizontal projections (1:50 scale)",
-            "Construction details (1:10 scale)",
-            "Material specifications and assembly instructions"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
+    story.append(Paragraph('1.1 Project Scope', styles['Heading2']))
+    story.append(Paragraph("""
+    The analysis covers the following key aspects:
+
+    1. Structural Design:
+       • Wood structure of the roof (rafters and purlins)
+       • Wood column design and verification
+       • Connection details and specifications
+
+    2. Thermal Analysis:
+       • Wall and roof assembly thermal resistance
+       • Thermal bridge evaluation at critical junctions
+       • Condensation risk assessment
+
+    3. Technical Documentation:
+       • Vertical and horizontal projections (1:50 scale)
+       • Construction details (1:10 scale)
+       • Material specifications and assembly instructions
+    """, styles['BodyText']))
     story.append(PageBreak())
 
     # Table of Contents
@@ -585,21 +385,21 @@ def create_report():
     
     # Add TOC entries with enhanced numbering
     story.append(Paragraph('1.0 Building Specifications', styles['TOC1']))
-    story.append(Paragraph('II. MATERIAL PROPERTIES', styles['TOC1']))
-    story.append(Paragraph('    A. Material Specifications', styles['TOC2']))
-    story.append(Paragraph('    B. Design Strength Analysis', styles['TOC2']))
-    story.append(Paragraph('III. LOAD ANALYSIS', styles['TOC1']))
-    story.append(Paragraph('    A. Load Characteristics', styles['TOC2']))
-    story.append(Paragraph('    B. Load Calculations', styles['TOC2']))
-    story.append(Paragraph('IV. STRUCTURAL ANALYSIS', styles['TOC1']))
-    story.append(Paragraph('    A. Analysis Methodology', styles['TOC2']))
-    story.append(Paragraph('    B. Stress Analysis', styles['TOC2']))
-    story.append(Paragraph('V. THERMAL ANALYSIS', styles['TOC1']))
-    story.append(Paragraph('    A. Thermal Resistance', styles['TOC2']))
-    story.append(Paragraph('    B. Thermal Bridge Analysis', styles['TOC2']))
-    story.append(Paragraph('VI. TECHNICAL DRAWINGS', styles['TOC1']))
-    story.append(Paragraph('VII. SUMMARY OF RESULTS', styles['TOC1']))
-    story.append(Paragraph('VIII. CONCLUSION', styles['TOC1']))
+    story.append(Paragraph('2.0 Material Properties', styles['TOC1']))
+    story.append(Paragraph('  2.1 Material Specifications', styles['TOC2']))
+    story.append(Paragraph('  2.2 Design Strength Analysis', styles['TOC2']))
+    story.append(Paragraph('3.0 Load Analysis', styles['TOC1']))
+    story.append(Paragraph('  3.1 Load Characteristics', styles['TOC2']))
+    story.append(Paragraph('  3.2 Load Calculations', styles['TOC2']))
+    story.append(Paragraph('4.0 Structural Analysis', styles['TOC1']))
+    story.append(Paragraph('  4.1 Analysis Methodology', styles['TOC2']))
+    story.append(Paragraph('  4.2 Stress Analysis', styles['TOC2']))
+    story.append(Paragraph('5.0 Thermal Analysis', styles['TOC1']))
+    story.append(Paragraph('  5.1 Thermal Resistance', styles['TOC2']))
+    story.append(Paragraph('  5.2 Thermal Bridge Analysis', styles['TOC2']))
+    story.append(Paragraph('6.0 Technical Drawings', styles['TOC1']))
+    story.append(Paragraph('7.0 Summary of Results', styles['TOC1']))
+    story.append(Paragraph('8.0 Conclusion', styles['TOC1']))
     story.append(PageBreak())
 
     # Building Specifications
@@ -627,6 +427,8 @@ def create_report():
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), bold_font),
         ('FONTSIZE', (0, 0), (-1, -1), 11),
+        ('TOPPADDING', (0, 0), (-1, 0), 12),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         
         # Cell style
         ('BACKGROUND', (0, 1), (-1, -1), colors.white),
@@ -651,19 +453,19 @@ def create_report():
     story.append(Spacer(1, 12))
     
     # Material Properties
-    story.append(Paragraph('II. MATERIAL PROPERTIES', styles['IEEESection']))
+    story.append(Paragraph('II. Material Properties', styles['IEEESection']))
     story.append(Paragraph('This section specifies the material properties and characteristics of all structural and thermal components used in the building construction.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
-    story.append(Paragraph('A. Material Specifications', styles['IEEESubsection']))
+    story.append(Paragraph('2.1 Material Specifications', styles['Heading2']))
     story.append(Spacer(1, 8))
     
-    story.append(Paragraph('B. Design Strength Analysis', styles['IEEESubsection']))
+    story.append(Paragraph('2.2 Design Strength Analysis', styles['Heading2']))
     materials = [
         ['Component', 'Material', 'Properties'],
-        ['Walls', 'MAX 220 block', 'lambda = 0.45 W/(m.K)'],
-        ['Thermal insulation', 'Mineral wool', 'lambda = 0.04 W/(m.K)'],
-        ['Roofing', 'Steel tile 0.6 mm', 'lambda = 50 W/(m.K)'],
+        ['Walls', 'MAX 220 block', 'λ = 0.45 W/(m·K)'],
+        ['Thermal insulation', 'Mineral wool', 'λ = 0.04 W/(m·K)'],
+        ['Roofing', 'Steel tile 0.6 mm', 'λ = 50 W/(m·K)'],
         ['Timber', 'C27 class', 'fm,k = 27 MPa\nE0,mean = 11500 MPa\nρk = 370 kg/m³']
     ]
     
@@ -686,11 +488,11 @@ def create_report():
     story.append(Spacer(1, 12))
     
     # Load Analysis
-    story.append(Paragraph('III. LOAD ANALYSIS', styles['IEEESection']))
+    story.append(Paragraph('III. Load Analysis', styles['IEEESection']))
     story.append(Paragraph('This section presents the comprehensive analysis of all loads acting on the structure, following the requirements of EN 1990 (Eurocode 0) for load combinations and safety factors.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
-    story.append(Paragraph('A. Load Characteristics', styles['IEEESubsection']))
+    story.append(Paragraph('3.1 Load Characteristics', styles['Heading2']))
     story.append(Spacer(1, 8))
     story.append(Paragraph("""
     The structural analysis considers the following characteristic loads according to EN 1990:
@@ -724,49 +526,43 @@ def create_report():
     
     load_table = Table(load_data, colWidths=[120, 120, 120])
     load_table.setStyle(TableStyle([
-        ('GRID', (0, 0), (-1, -1), 1, colors.black),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BOX', (0, 0), (-1, -1), 1.5, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#E8E8E8')),
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('FONTNAME', (0, 0), (-1, 0), bold_font),
         ('FONTSIZE', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.black),
-        ('TOPPADDING', (0, 0), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 12),
     ]))
     story.append(load_table)
-    story.append(Paragraph("TABLE III. Characteristic and Design Load Values", styles['IEEETableCaption']))
     story.append(Spacer(1, 12))
+    story.append(Paragraph("TABLE III. Characteristic and Design Load Values", styles['IEEETableCaption']))
+    story.append(Spacer(1, 18))
     
     for desc, eq_data in loads['calculations'].items():
-        # Handle both dictionary and string formats for backward compatibility
-        if isinstance(eq_data, dict):
-            equation = eq_data.get('equation', '')
-            number = eq_data.get('number', '')
-            if 'description' in eq_data:
-                story.append(Paragraph(eq_data['description'], styles['EquationDescription']))
-        else:
-            # Legacy string format handling
-            eq_parts = eq_data.rsplit('(', 1)
-            if len(eq_parts) == 2:
-                equation = eq_parts[0].strip()
-                number = '(' + eq_parts[1].strip()
-            else:
-                equation = eq_data
-                number = ''
+        # Add equation description
+        if 'description' in eq_data:
+            story.append(Paragraph(eq_data['description'], styles['EquationDescription']))
         
         # Create enhanced equation table with borders and proper spacing
         equation_table = Table([
-            [Paragraph(equation, styles['Equation']), 
-             Paragraph(number, styles['EquationNumber'])]
+            [Paragraph(eq_data['equation'], styles['Equation']), 
+             Paragraph(eq_data['number'], styles['EquationNumber'])]
         ], colWidths=[480, 70])
         equation_table.setStyle(TableStyle([
-            # Alignment
+            # Enhanced equation table style
             ('ALIGN', (0, 0), (0, 0), 'CENTER'),
             ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 12),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 12),
+            ('TOPPADDING', (0, 0), (-1, -1), 8),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
             
             # Spacing
             ('TOPPADDING', (0, 0), (-1, -1), 12),
@@ -783,26 +579,19 @@ def create_report():
         story.append(Spacer(1, 12))
     
     # Structural Analysis
-    story.append(Paragraph('IV. STRUCTURAL ANALYSIS', styles['IEEESection']))
+    story.append(Paragraph('IV. Structural Analysis', styles['IEEESection']))
     story.append(Paragraph('This section details the structural analysis following Eurocode 5 (EN 1995-1-1) requirements for timber structures. The analysis encompasses load distribution, member sizing, and verification of structural integrity.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
     story.append(Paragraph('A. Analysis Methodology', styles['IEEESubsection']))
     story.append(Spacer(1, 8))
-    story.append(Paragraph("The structural analysis follows the principles of EN 1995-1-1, considering:", styles['BodyText']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Material properties of C27 timber",
-            "Specified loading conditions and combinations",
-            "Ultimate and serviceability limit states",
-            "Long-term behavior and durability requirements"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
+    story.append(Paragraph("""
+    The structural analysis follows the principles of EN 1995-1-1, considering:
+    • Material properties of C27 timber
+    • Specified loading conditions and combinations
+    • Ultimate and serviceability limit states
+    • Long-term behavior and durability requirements
+    """, styles['BodyText']))
     
     # Momentum and Forces
     story.append(Paragraph('4.1 Momentum and Force Analysis', styles['Heading2']))
@@ -878,81 +667,53 @@ def create_report():
     story.append(Paragraph('1) Load Combinations', styles['IEEESubsubsection']))
     story.append(Paragraph("""
     The structural analysis incorporates multiple load combination scenarios to ensure 
-    comprehensive evaluation of safety margins [2]. The critical design combinations are:""", styles['BodyText']))
+    comprehensive evaluation of safety margins [2]. The critical design combinations are:
     
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Primary Design Case (ULS1):\n1.35G + 1.5S\nEvaluates maximum gravity and snow loading conditions",
-            "Wind-Dominant Case (ULS2):\n1.35G + 1.5W\nAssesses structure under peak wind conditions",
-            "Combined Environmental Case (ULS3):\n1.35G + 1.05S + 0.9W\nExamines simultaneous action of multiple environmental loads"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
+    • Primary Design Case (ULS1):
+      1.35G + 1.5S
+      Evaluates maximum gravity and snow loading conditions
     
-    story.append(Paragraph("""
+    • Wind-Dominant Case (ULS2):
+      1.35G + 1.5W
+      Assesses structure under peak wind conditions
+    
+    • Combined Environmental Case (ULS3):
+      1.35G + 1.05S + 0.9W
+      Examines simultaneous action of multiple environmental loads
+    
     Where G represents permanent structural loads, S accounts for snow accumulation effects,
     and W incorporates wind pressure impacts. These combinations ensure thorough evaluation
-    of all critical loading scenarios.""", styles['BodyText']))
+    of all critical loading scenarios.
+    """, styles['BodyText']))
     
     story.append(Paragraph('2) Maximum Bending Moment', styles['IEEESubsubsection']))
     story.append(Paragraph("""
     The maximum bending moment occurs at the mid-span of the rafter and is calculated as:
     """, styles['BodyText']))
-    
-    # Handle moment calculation data
-    moment_data = forces['calculations']['moment']
-    if isinstance(moment_data, dict):
-        story.append(Paragraph(moment_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(moment_data), styles['Equation']))
+    story.append(Paragraph(forces['calculations']['moment'], styles['Equation']))
     
     story.append(Paragraph('3) Bending Movement Analysis', styles['IEEESubsubsection']))
-    story.append(Paragraph("The bending movement analysis considers:", styles['BodyText']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Primary bending due to vertical loads",
-            "Secondary bending from eccentricities",
-            "Additional moments from geometric imperfections"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
+    story.append(Paragraph("""
+    The bending movement analysis considers:
+    1. Primary bending due to vertical loads
+    2. Secondary bending from eccentricities
+    3. Additional moments from geometric imperfections
     
-    story.append(Paragraph("\nStep-by-step calculation:", styles['BodyText']))
-    story.append(ListFlowable(
-        [Paragraph(point, styles['BodyText']) for point in [
-            "Calculate distributed load: w = g + s + ψw",
-            "Determine effective span: Lef = L × β",
-            "Compute maximum moment: M = w × L²/8",
-            "Apply modification factors for:\n   • Load duration (kmod)\n   • Service class (kdef)\n   • System strength (ksys)"
-        ]],
-        bulletType='bullet',
-        bulletDedent=12,
-        leftIndent=35,
-        bulletFontSize=10,
-        bulletOffsetY=2
-    ))
+    Step-by-step calculation:
+    1. Calculate distributed load: w = g + s + ψw
+    2. Determine effective span: Lef = L × β
+    3. Compute maximum moment: M = w × L²/8
+    4. Apply modification factors for:
+       - Load duration (kmod)
+       - Service class (kdef)
+       - System strength (ksys)
+    """, styles['BodyText']))
     
     story.append(Paragraph('4.1.4 Axial Force Analysis', styles['Heading2']))
     story.append(Paragraph("""
     The axial force analysis considers the roof angle and load distribution:
     """, styles['BodyText']))
-    
-    # Handle axial force calculation data
-    axial_data = forces['calculations']['axial']
-    if isinstance(axial_data, dict):
-        if 'description' in axial_data:
-            story.append(Paragraph(axial_data['description'], styles['EquationDescription']))
-        story.append(Paragraph(axial_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(axial_data), styles['Equation']))
+    story.append(Paragraph(forces['calculations']['axial'], styles['Equation']))
     
     # Add combined force diagram
     # Add Column Buckling Analysis
@@ -964,33 +725,7 @@ def create_report():
     # Get buckling analysis results
     buckling = calcs.analyze_column_buckling()
     
-    # Add detailed buckling analysis equations
-    for section_name, eq_data in buckling['calculations'].items():
-        if 'description' in eq_data:
-            story.append(Paragraph(eq_data['description'], styles['EquationDescription']))
-        
-        equation_table = Table([
-            [Paragraph(eq_data['equation'], styles['Equation']), 
-             Paragraph(eq_data['number'], styles['EquationNumber'])]
-        ], colWidths=[450, 50])
-        equation_table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-            ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-            ('LEFTPADDING', (0, 0), (-1, -1), 6),
-            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-            ('TOPPADDING', (0, 0), (-1, -1), 6),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-            ('BACKGROUND', (0, 0), (-1, -1), colors.white)
-        ]))
-        story.append(equation_table)
-        story.append(Spacer(1, 12))
-    
-    # Add summary of results
     story.append(Paragraph("""
-    Summary of Buckling Analysis Results:
-    
     1. Slenderness Analysis:
        • Slenderness ratio (λ) = {:.2f}
        • Relative slenderness (λrel) = {:.2f}
@@ -1104,18 +839,11 @@ def create_report():
     """, styles['BodyText']))
     # Create table for inertia equation
     inertia_data = section['calculations']['inertia']
-    if isinstance(inertia_data, dict):
-        if 'description' in inertia_data:
-            story.append(Paragraph(inertia_data['description'], styles['EquationDescription']))
-        equation = inertia_data.get('equation', '')
-        number = inertia_data.get('number', '')
-    else:
-        equation = str(inertia_data)
-        number = ''
-    
+    if 'description' in inertia_data:
+        story.append(Paragraph(inertia_data['description'], styles['EquationDescription']))
     equation_table = Table([
-        [Paragraph(equation, styles['Equation']), 
-         Paragraph(number, styles['EquationNumber'])]
+        [Paragraph(inertia_data['equation'], styles['Equation']), 
+         Paragraph(inertia_data['number'], styles['EquationNumber'])]
     ], colWidths=[450, 50])
     equation_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (0, 0), 'CENTER'),
@@ -1164,13 +892,7 @@ def create_report():
     I = second moment of area [mm⁴]
     A = cross-sectional area [mm²]
     """, styles['BodyText']))
-    area_data = section['calculations']['area']
-    if isinstance(area_data, dict):
-        if 'description' in area_data:
-            story.append(Paragraph(area_data['description'], styles['EquationDescription']))
-        story.append(Paragraph(area_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(area_data), styles['Equation']))
+    story.append(Paragraph(section['calculations']['area'], styles['Equation']))
     
     story.append(Paragraph('4.2.2 Cross-Section Load Analysis', styles['Heading2']))
     story.append(Paragraph("""
@@ -1208,61 +930,15 @@ def create_report():
     story.append(Paragraph("""
     The bending and compressive stresses are calculated as follows:
     """, styles['BodyText']))
-    
-    # Handle bending calculation
-    bending_data = section['calculations']['bending']
-    if isinstance(bending_data, dict):
-        if 'description' in bending_data:
-            story.append(Paragraph(bending_data['description'], styles['EquationDescription']))
-        story.append(Paragraph(bending_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(bending_data), styles['Equation']))
-    
-    # Handle compression calculation
-    compression_data = section['calculations']['compression']
-    if isinstance(compression_data, dict):
-        if 'description' in compression_data:
-            story.append(Paragraph(compression_data['description'], styles['EquationDescription']))
-        story.append(Paragraph(compression_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(compression_data), styles['Equation']))
+    story.append(Paragraph(section['calculations']['bending'], styles['Equation']))
+    story.append(Paragraph(section['calculations']['compression'], styles['Equation']))
     
     # Thermal Analysis
-    story.append(Paragraph('V. THERMAL ANALYSIS', styles['IEEESection']))
-    story.append(Paragraph("""
-    This section presents a comprehensive thermal performance analysis of the building envelope 
-    according to EN ISO 6946 [5]. The analysis employs advanced numerical methods to evaluate 
-    heat transfer characteristics, thermal bridging effects, and condensation risks. The 
-    methodology follows the harmonized calculation procedures specified in EN ISO 6946:2017 
-    for building components and elements.
-    
-    The thermal analysis considers both steady-state and dynamic thermal behavior, accounting 
-    for the complex interactions between different material layers and their thermal properties. 
-    Special attention is given to thermal bridges at critical junctions, where localized heat 
-    loss can significantly impact overall thermal performance [6].
-    """, styles['BodyText']))
+    story.append(Paragraph('V. Thermal Analysis', styles['IEEESection']))
+    story.append(Paragraph('This section presents the thermal performance analysis of the building envelope according to EN ISO 6946, evaluating the thermal resistance and heat transfer characteristics of wall and roof assemblies.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
     story.append(Paragraph('A. Thermal Resistance Calculation', styles['IEEESubsection']))
-    story.append(Paragraph("""
-    The thermal resistance calculation follows the detailed methodology outlined in EN ISO 6946:2017 
-    Section 6. This approach considers the following key aspects:
-    
-    1) Surface Heat Transfer: The analysis accounts for both internal (Rsi) and external (Rse) 
-    surface resistances, which vary depending on heat flow direction and surface conditions. These 
-    values are critical for accurate temperature gradient calculations across the building envelope.
-    
-    2) Material Properties: Each material layer's thermal conductivity (λ) is evaluated under 
-    design conditions, considering temperature and moisture dependencies as specified in 
-    EN ISO 10456:2007 [7]. The mineral wool insulation, with λ = 0.035 W/(m·K), provides the 
-    primary thermal barrier, while the C27 timber structure (λ = 0.13 W/(m·K)) contributes to 
-    both structural and thermal performance.
-    
-    3) Layer Configuration: The analysis examines the effectiveness of the multi-layer assembly, 
-    particularly focusing on the interaction between the load-bearing timber elements and the 
-    thermal insulation layer. This configuration must balance structural requirements with 
-    thermal performance objectives.
-    """, styles['BodyText']))
     story.append(Spacer(1, 8))
     story.append(Paragraph("""
     The thermal resistance analysis considers:
@@ -1273,17 +949,17 @@ def create_report():
     """, styles['BodyText']))
     
     # Technical Drawings
-    story.append(Paragraph('VI. TECHNICAL DRAWINGS', styles['IEEESection']))
+    story.append(Paragraph('VI. Technical Drawings', styles['IEEESection']))
     story.append(Paragraph('This section presents the technical drawings of the building structure, including vertical and horizontal projections at 1:50 scale and detailed construction drawings at 1:10 scale.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
     # Summary of Results
-    story.append(Paragraph('VII. SUMMARY OF RESULTS', styles['IEEESection']))
+    story.append(Paragraph('7.0 Summary of Results', styles['Heading1']))
     story.append(Paragraph('This section summarizes the key findings from the structural and thermal analyses, presenting the verification results and compliance with relevant standards.', styles['BodyText']))
     story.append(Spacer(1, 12))
     
     # Conclusion
-    story.append(Paragraph('VIII. CONCLUSION', styles['IEEESection']))
+    story.append(Paragraph('8.0 Conclusion', styles['Heading1']))
     story.append(Paragraph("""
     The structural and thermal analyses demonstrate that the building design meets all requirements specified in the relevant Eurocode standards:
     • All structural elements satisfy Ultimate Limit State (ULS) criteria
@@ -1297,7 +973,7 @@ def create_report():
     story.append(Paragraph('Figure 4: Cross-Section Analysis and Stress Distribution', styles['FigureTitle']))
     story.append(Paragraph("""
     Detailed analysis of structural member cross-sections showing:
-    • Dimensional properties of rafters (100x200mm) and purlins (80x160mm)
+    • Dimensional properties of rafters (100×200mm) and purlins (80×160mm)
     • Stress distribution patterns across critical sections
     • Material properties of C27 timber (fm,k = 27 MPa, E0,mean = 11500 MPa)
     • Verification points for combined stress and stability checks
@@ -1320,36 +996,20 @@ def create_report():
     For members subjected to combined bending and compression, the following conditions
     must be satisfied according to EN 1995-1-1 §6.2.4:
     """, styles['BodyText']))
-    
-    # Handle combined stress calculation
-    combined_data = section['calculations']['combined']
-    if isinstance(combined_data, dict):
-        if 'description' in combined_data:
-            story.append(Paragraph(combined_data['description'], styles['EquationDescription']))
-        story.append(Paragraph(combined_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(combined_data), styles['Equation']))
+    story.append(Paragraph(section['calculations']['combined'], styles['Equation']))
     
     story.append(Paragraph('4.3.2 Stability Verification', styles['Heading2']))
     story.append(Paragraph("""
     The stability verification considers lateral torsional buckling according to
     EN 1995-1-1 §6.3.3:
     """, styles['BodyText']))
-    
-    # Handle stability calculation
-    stability_data = section['calculations']['stability']
-    if isinstance(stability_data, dict):
-        if 'description' in stability_data:
-            story.append(Paragraph(stability_data['description'], styles['EquationDescription']))
-        story.append(Paragraph(stability_data['equation'], styles['Equation']))
-    else:
-        story.append(Paragraph(str(stability_data), styles['Equation']))
+    story.append(Paragraph(section['calculations']['stability'], styles['Equation']))
     
     # Add detailed verification results
     story.append(Paragraph('4.3.3 Verification Results', styles['Heading2']))
     story.append(Paragraph(f"""
     The verification results show:
-    1. Combined stress ratio: {section['utilization_ratios']['combined']:.2f} ≤ 1.0
+    1. Combined stress ratio: {section['utilization_ratios']['combined_stress']:.2f} ≤ 1.0
     2. Stability ratio: {section['utilization_ratios']['stability']:.2f} ≤ 1.0
     
     Both conditions are satisfied, confirming the structural safety of the timber members.
@@ -1373,7 +1033,7 @@ def create_report():
     story.append(Paragraph("""
     The angle brace is designed with:
     - 45° inclination for optimal load transfer
-    - Cross-section: 100x100mm C27 timber
+    - Cross-section: 100×100mm C27 timber
     - End connections: Steel plates with M12 bolts
     """, styles['BodyText']))
     
@@ -1388,15 +1048,15 @@ def create_report():
     EN 1995-1-1 requirements.
     """, styles['BodyText']))
     
-    # Thermal Performance Results
+    # Thermal Analysis
     story.append(Paragraph('7.2 Thermal Performance Results', styles['Heading1']))
-    story.append(Paragraph('7.2.1 Detailed Analysis Results', styles['Heading2']))
+    story.append(Paragraph('7.2.1 Thermal Analysis', styles['Heading2']))
     thermal = calcs.calculate_thermal_resistance()
     story.append(Paragraph("""
     The thermal performance evaluation employs advanced analytical methods [5] to determine
-    heat transfer characteristics through the building envelope, as described in Section V. 
-    This section presents the quantitative results of the analysis, demonstrating compliance
-    with thermal performance requirements.
+    heat transfer characteristics through the building envelope. This comprehensive approach
+    integrates material properties, layer configurations, and environmental conditions to
+    establish accurate thermal resistance values and heat transfer coefficients.
     """, styles['BodyText']))
     
     story.append(Paragraph('5.1 Wall Assembly Analysis', styles['Heading2']))
@@ -1407,10 +1067,10 @@ def create_report():
     # Wall assembly table
     wall_layers = [
         ['Layer', 'Thickness', 'Conductivity', 'Resistance'],
-        ['Internal surface (Rsi)', '-', '-', '0.13 m^2.K/W'],
-        ['MAX 220 block', '220 mm', '0.33 W/(m.K)', '0.667 m^2.K/W'],
-        ['Mineral wool', '150 mm', '0.035 W/(m.K)', '4.286 m^2.K/W'],
-        ['External surface (Rse)', '-', '-', '0.04 m^2.K/W']
+        ['Internal surface (Rsi)', '-', '-', '0.13 m²K/W'],
+        ['MAX 220 block', '220 mm', '0.33 W/(m·K)', '0.667 m²K/W'],
+        ['Mineral wool', '150 mm', '0.035 W/(m·K)', '4.286 m²K/W'],
+        ['External surface (Rse)', '-', '-', '0.04 m²K/W']
     ]
     
     wall_table = Table(wall_layers, colWidths=[100, 80, 100, 100])
@@ -1432,39 +1092,14 @@ def create_report():
     story.append(Spacer(1, 12))
     
     story.append(Paragraph('5.1.1 Wall Assembly Results', styles['Heading2']))
-    story.append(Paragraph("The total thermal resistance is calculated according to EN ISO 6946 Eq. (41):", styles['BodyText']))
+    story.append(Paragraph("""
+    Total thermal resistance calculation for wall assembly:
+    RT = Rsi + R1 + R2 + Rse
+    RT = 0.13 + 0.667 + 4.286 + 0.04 = 5.123 m²K/W
     
-    equation_table = Table([
-        [Paragraph("RT = Rsi + R1 + R2 + Rse = 0.13 + 0.667 + 4.286 + 0.04 = 5.123 m²K/W", styles['Equation']),
-         Paragraph("(41)", styles['EquationNumber'])]
-    ], colWidths=[450, 50])
-    equation_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
-    ]))
-    story.append(equation_table)
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("The heat transfer coefficient (U-value) is then determined using Eq. (42):", styles['BodyText']))
-    equation_table = Table([
-        [Paragraph("U = 1/RT = 1/5.123 = 0.195 W/(m²K) < 0.20 W/(m²K) requirement ✓", styles['Equation']),
-         Paragraph("(42)", styles['EquationNumber'])]
-    ], colWidths=[450, 50])
-    equation_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
-    ]))
-    story.append(equation_table)
+    Heat transfer coefficient (U-value):
+    U = 1/RT = 1/5.123 = 0.195 W/(m²K) < 0.20 W/(m²K) requirement ✓
+    """, styles['BodyText']))
     
     story.append(Paragraph('5.2 Roof Assembly Analysis', styles['Heading2']))
     story.append(Paragraph("""
@@ -1474,11 +1109,11 @@ def create_report():
     # Roof assembly table
     roof_layers = [
         ['Layer', 'Thickness', 'Conductivity', 'Resistance'],
-        ['Internal surface (Rsi)', '-', '-', '0.10 m^2.K/W'],
-        ['Steel tile', '0.6 mm', '50 W/(m.K)', '0.000012 m^2.K/W'],
-        ['Ventilated air gap', '-', '-', '0.16 m^2.K/W'],
-        ['Mineral wool', '200 mm', '0.035 W/(m.K)', '5.714 m^2.K/W'],
-        ['External surface (Rse)', '-', '-', '0.04 m^2.K/W']
+        ['Internal surface (Rsi)', '-', '-', '0.10 m²K/W'],
+        ['Steel tile', '0.6 mm', '50 W/(m·K)', '0.000012 m²K/W'],
+        ['Ventilated air gap', '-', '-', '0.16 m²K/W'],
+        ['Mineral wool', '200 mm', '0.035 W/(m·K)', '5.714 m²K/W'],
+        ['External surface (Rse)', '-', '-', '0.04 m²K/W']
     ]
     
     roof_table = Table(roof_layers, colWidths=[100, 80, 100, 100])
@@ -1500,39 +1135,14 @@ def create_report():
     story.append(Spacer(1, 12))
     
     story.append(Paragraph('5.2.1 Roof Assembly Results', styles['Heading2']))
-    story.append(Paragraph("The total thermal resistance for the roof assembly follows EN ISO 6946 Eq. (53):", styles['BodyText']))
+    story.append(Paragraph("""
+    Total thermal resistance calculation for roof assembly:
+    RT = Rsi + R1 + R2 + R3 + Rse
+    RT = 0.10 + 0.000012 + 0.16 + 5.714 + 0.04 = 6.014 m²K/W
     
-    equation_table = Table([
-        [Paragraph("RT = Rsi + R1 + R2 + R3 + Rse = 0.10 + 0.000012 + 0.16 + 5.714 + 0.04 = 6.014 m²K/W", styles['Equation']),
-         Paragraph("(53)", styles['EquationNumber'])]
-    ], colWidths=[450, 50])
-    equation_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
-    ]))
-    story.append(equation_table)
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("The corresponding heat transfer coefficient is calculated using Eq. (54):", styles['BodyText']))
-    equation_table = Table([
-        [Paragraph("U = 1/RT = 1/6.014 = 0.166 W/(m²K) < 0.18 W/(m²K) requirement ✓", styles['Equation']),
-         Paragraph("(54)", styles['EquationNumber'])]
-    ], colWidths=[450, 50])
-    equation_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (0, 0), 'CENTER'),
-        ('ALIGN', (1, 0), (1, 0), 'RIGHT'),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('BACKGROUND', (0, 0), (-1, -1), colors.white)
-    ]))
-    story.append(equation_table)
+    Heat transfer coefficient (U-value):
+    U = 1/RT = 1/6.014 = 0.166 W/(m²K) < 0.18 W/(m²K) requirement ✓
+    """, styles['BodyText']))
     
     # Add thermal diagram showing layer composition
     img = Image('output/figures/thermal_diagram.png', width=6*inch, height=4*inch)
@@ -1541,36 +1151,25 @@ def create_report():
     story.append(Spacer(1, 12))
     
     # Thermal Bridge Analysis
-    story.append(Paragraph('B. Thermal Bridge Analysis', styles['IEEESubsection']))
+    story.append(Paragraph('5.3 Thermal Bridge Analysis', styles['Heading2']))
     story.append(Paragraph("""
-    The thermal bridge analysis, conducted according to EN ISO 10211:2017 [8], employs finite 
-    element modeling to evaluate critical junctions in the building envelope. This detailed 
-    analysis is essential as thermal bridges can account for up to 30% of the total heat loss 
-    in well-insulated buildings [9].
-
-    The analysis focuses on three critical areas:
-
-    1) Wall-Roof Junction: This junction exhibits a linear thermal transmittance (ψ) of 
-    0.08 W/(m·K), which is within acceptable limits for timber-frame construction. The 
-    temperature factor fRsi of 0.924 exceeds the minimum requirement of 0.75, ensuring 
-    adequate protection against surface condensation. The critical surface temperature 
-    of 11.8°C remains above the dew point under design conditions.
-
-    2) Wall-Floor Junction: Advanced thermal modeling reveals a linear thermal transmittance 
-    of 0.06 W/(m·K). This relatively low value is achieved through careful detailing and 
-    the implementation of a thermal break, effectively minimizing the impact of this 
-    junction on overall thermal performance.
-
-    3) Corner Junction: The analysis demonstrates a linear thermal transmittance of 
-    0.05 W/(m·K), achieved through strategic reinforcement of insulation at corners. This 
-    detail is particularly important as corner junctions typically represent areas of 
-    increased heat loss in building envelopes.
-
-    As illustrated in Fig. 9, the temperature distribution modeling reveals complex heat 
-    flow patterns at these junctions. The analysis employs advanced numerical methods to 
-    calculate both two-dimensional and three-dimensional heat flow effects, providing a 
-    comprehensive understanding of thermal bridge behavior under various environmental 
-    conditions.
+    The thermal bridge analysis evaluates critical junctions in the building envelope:
+    
+    1. Wall-Roof Junction:
+       - Linear thermal transmittance (ψ) = 0.08 W/(m·K)
+       - Temperature factor fRsi = 0.924
+       - Critical surface temperature = 11.8°C
+    
+    2. Wall-Floor Junction:
+       - Linear thermal transmittance (ψ) = 0.06 W/(m·K)
+       - Enhanced detail with thermal break
+    
+    3. Corner Junction:
+       - Linear thermal transmittance (ψ) = 0.05 W/(m·K)
+       - Reinforced insulation at corners
+    
+    The analysis includes temperature distribution modeling, heat flux analysis,
+    and condensation risk assessment at these critical points.
     """, styles['BodyText']))
     
     # Add thermal bridge diagram
@@ -1580,10 +1179,10 @@ def create_report():
     • Temperature distribution at wall-roof and wall-floor junctions
     • Heat flow paths through critical connection points
     • Condensation risk assessment with temperature factors
-    - Linear thermal transmittance (psi) values for each junction
+    • Linear thermal transmittance (ψ) values for each junction
     Analysis performed according to EN ISO 10211 and EN ISO 14683 standards.
     """, styles['FigureCaption']))
-    img = prepare_image_for_pdf('output/figures/thermal_bridge_analysis.png')
+    img = prepare_image_for_pdf('output/figures/thermal_bridge_analysis.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -1592,52 +1191,8 @@ def create_report():
     story.append(img_container)
     story.append(Spacer(1, 12))
     
-    story.append(Paragraph('C. Condensation Risk Analysis', styles['IEEESubsection']))
-    story.append(Paragraph("""
-    The condensation risk analysis employs advanced numerical modeling techniques to evaluate 
-    both surface and interstitial condensation risks. The analysis follows EN ISO 13788:2012 [12] 
-    methodology and reveals several key findings:
-
-    1) Surface Condensation: The temperature factor analysis demonstrates that all internal 
-    surface temperatures remain well above the critical dew point temperature. The minimum 
-    calculated temperature factor fRsi of 0.924 significantly exceeds the critical value of 
-    0.75 required by EN ISO 13788, providing a robust safety margin against surface condensation.
-
-    2) Interstitial Condensation: The Glaser method analysis, conducted according to 
-    EN ISO 13788 Section 6, confirms that no interstitial condensation occurs within the 
-    building envelope under design conditions. The vapor pressure gradient remains below 
-    the saturation curve throughout all material layers.
-
-    3) Dynamic Moisture Response: The hygrothermal simulation reveals excellent moisture 
-    management characteristics, with the ventilated air gap in the roof assembly providing 
-    effective moisture removal. The calculated moisture accumulation index of 0.82 indicates 
-    good drying potential and long-term durability of the construction [13].
-    """, styles['BodyText']))
-    
-    story.append(Paragraph('D. Dynamic Thermal Performance', styles['IEEESubsection']))
-    story.append(Paragraph("""
-    The dynamic thermal performance analysis, conducted using numerical simulation methods 
-    according to EN ISO 13786:2017 [14], reveals important characteristics of the building 
-    envelope's response to varying environmental conditions:
-
-    1) Thermal Mass Effects: The MAX 220 block walls provide significant thermal mass, with 
-    a calculated heat capacity of 165 kJ/(m²·K). This thermal inertia helps stabilize internal 
-    temperatures and reduces peak heating and cooling loads by approximately 22% compared to 
-    lightweight construction alternatives.
-
-    2) Time Lag and Decrement Factor: The multi-layer construction creates an effective thermal 
-    time lag of 8.4 hours, with a decrement factor of 0.42. These characteristics help optimize 
-    energy efficiency by dampening external temperature fluctuations and shifting peak heat 
-    transfer to more favorable times.
-
-    3) Periodic Thermal Transmittance: The calculated periodic thermal transmittance (Yie) of 
-    0.084 W/(m²·K) is well below the recommended maximum of 0.10 W/(m²·K), indicating excellent 
-    dynamic thermal performance and enhanced occupant comfort [15].
-    """, styles['BodyText']))
-    story.append(Spacer(1, 12))
-    
     # Technical Drawings
-    story.append(Paragraph('VI. TECHNICAL DRAWINGS', styles['IEEESection']))
+    story.append(Paragraph('7.3 Technical Drawings', styles['Heading1']))
     story.append(Paragraph('7.3.1 Drawing Specifications', styles['Heading2']))
     story.append(Paragraph("""
     The following technical drawings show the building geometry and construction details:
@@ -1650,10 +1205,10 @@ def create_report():
     • Primary heights (h1=2.5m, h2=2.65m) and roof angle (16°)
     • Ground level (-1.4 m.a.s.l) and foundation details
     • Wall construction with MAX 220 block and mineral wool insulation
-    - Rafter and purlin positions with C27 timber members
+    • Rafter and purlin positions with C27 timber members
     Drawing complies with EN ISO 4157-2 standards for building drawings.
     """, styles['FigureCaption']))
-    img = prepare_image_for_pdf('output/figures/vertical_projection.png')
+    img = prepare_image_for_pdf('output/figures/vertical_projection.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -1668,10 +1223,10 @@ def create_report():
     • Overall width (7.2m) and lengths (L1=6.6m, L2=10.8m)
     • Purlin spacing (1.1m) and structural grid
     • Column positions and wall thicknesses
-    - Rafter arrangement and spacing details
+    • Rafter arrangement and spacing details
     Drawing complies with EN ISO 4157-1 standards for building drawings.
     """, styles['FigureCaption']))
-    img = prepare_image_for_pdf('output/figures/horizontal_projection.png')
+    img = prepare_image_for_pdf('output/figures/horizontal_projection.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -1690,12 +1245,12 @@ def create_report():
     story.append(Paragraph("""
     Detailed illustrations of critical structural connections:
     • Rafter-purlin connections with M12 grade 8.8 bolts
-    • Column-foundation details with 200x200x10mm base plates
+    • Column-foundation details with 200×200×10mm base plates
     • Wall-column connections and bracing arrangements
-    - Timber-to-timber and timber-to-steel connection specifications
+    • Timber-to-timber and timber-to-steel connection specifications
     All connections designed according to EN 1995-1-1:2004 (Eurocode 5).
     """, styles['FigureCaption']))
-    img = prepare_image_for_pdf('output/figures/connection_detail.png')
+    img = prepare_image_for_pdf('output/figures/connection_detail.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -1862,10 +1417,10 @@ def create_thermal_diagram():
     
     # Enhanced layer properties with thermal conductivity values
     layers = [
-        ('Steel Tile (0.6mm)\nlambda = 50 W/(m.K)', 0.0006, '#A0A0A0'),
-        ('Air Gap (20mm)\nlambda = 0.024 W/(m.K)', 0.02, '#E0F3FF'),
-        ('Mineral Wool (200mm)\nlambda = 0.04 W/(m.K)', 0.2, '#FFE5B4'),
-        ('Timber Structure (C27)\nlambda = 0.13 W/(m.K)', 0.1, '#8B4513')
+        ('Steel Tile (0.6mm)\nλ = 50 W/(m·K)', 0.0006, '#A0A0A0'),
+        ('Air Gap (20mm)\nλ = 0.024 W/(m·K)', 0.02, '#E0F3FF'),
+        ('Mineral Wool (200mm)\nλ = 0.04 W/(m·K)', 0.2, '#FFE5B4'),
+        ('Timber Structure (C27)\nλ = 0.13 W/(m·K)', 0.1, '#8B4513')
     ]
     
     # Create enhanced layer visualization
@@ -2011,24 +1566,38 @@ def create_brace_diagram():
     save_high_dpi_image(plt.gcf(), 'brace_diagram.png')
     plt.close()
 
-def prepare_image_for_pdf(image_path):
-    """Prepare image for PDF embedding with IEEE size constraints
+def prepare_image_for_pdf(image_path, temp_files, temp_dirs):
+    """Prepare image for PDF embedding with very conservative dimensions
     
     Args:
         image_path: Path to input image
+        temp_files: List to track temporary files
+        temp_dirs: List to track temporary directories
     """
+    # Set extremely conservative maximum dimensions to prevent overflow
+    max_width = 100  # ~1.4 inches
+    max_height = 140  # ~1.9 inches
+    
+    # Override dimensions if they're not provided
+    if max_width is None:
+        max_width = 100
+    if max_height is None:
+        max_height = 140
     print(f"\nPreparing image for PDF: {image_path}")
     
-    # IEEE size constraints (in points, 72 points = 1 inch)
-    max_width = 360  # 5 inches
-    max_height = 480 # 6.67 inches
+    # Create output directory if it doesn't exist
+    try:
+        os.makedirs('output/figures', exist_ok=True)
+    except Exception as e:
+        print(f"Error creating output directory: {e}")
+        return None
+    
+    # Set DPI for high quality output
     dpi = 300
     
+    # Open and process image with error handling
     try:
-        # Create output directory
-        os.makedirs('output/figures', exist_ok=True)
-        
-        # Open and process image
+        # Open image
         pil_img = PILImage.open(image_path)
         
         # Convert to RGB if needed
@@ -2038,11 +1607,15 @@ def prepare_image_for_pdf(image_path):
         # Get image dimensions
         w_px, h_px = pil_img.size
         
-        # Calculate initial size in points
+        # Calculate initial size in points (72 points = 1 inch)
         w_points = float(w_px) / dpi * 72
         h_points = float(h_px) / dpi * 72
         
-        # Scale to fit IEEE page constraints while maintaining aspect ratio
+        # Calculate initial size in points (72 points = 1 inch)
+        w_points = float(w_px) / dpi * 72
+        h_points = float(h_px) / dpi * 72
+        
+        # Scale to fit within max dimensions while maintaining aspect ratio
         width_scale = max_width / w_points if w_points > max_width else 1
         height_scale = max_height / h_points if h_points > max_height else 1
         scale = min(width_scale, height_scale)
@@ -2050,33 +1623,79 @@ def prepare_image_for_pdf(image_path):
         if scale < 1:
             w_points *= scale
             h_points *= scale
-            print(f"Scaling image by factor {scale:.2f} to fit IEEE constraints")
+            print(f"Scaling image by factor {scale:.2f} to fit page margins")
         
-        # Set physical size metadata
-        pnginfo = PngImagePlugin.PngInfo()
-        pnginfo.add_text('dpi', f'{dpi},{dpi}')
-        ppm = int(dpi / 0.0254)  # pixels per meter
-        phys_data = struct.pack('>IIB', ppm, ppm, 1)
-        pnginfo.add(b'pHYs', phys_data)
-        
-        # Save with high quality settings in place
-        pil_img.save(image_path, 'PNG', dpi=(dpi, dpi), pnginfo=pnginfo, quality=100)
-        
-        # Create reportlab Image with IEEE constraints
+        # Create reportlab Image with scaled dimensions
         img = Image(image_path, width=w_points, height=h_points)
         img.hAlign = 'CENTER'
         img._restrictSize(w_points, h_points)
         img.keepWithNext = False
-        img._doNotClip = False
-        img.spaceBefore = 6
-        img.spaceAfter = 6
+        img._doNotClip = False   # Allow clipping if necessary
+        img.spaceBefore = 12     # Add some spacing
+        img.spaceAfter = 12      # Add some spacing
         
-        print(f"Final image size: {w_points:.1f}x{h_points:.1f} points ({w_points/72:.1f}x{h_points/72:.1f} inches)")
+        print(f"Final image dimensions: {w_points:.1f}x{h_points:.1f} points")
         return img
         
     except Exception as e:
         print(f"Error processing image {image_path}: {e}")
         return None
+    
+    # Calculate initial size in points (72 points = 1 inch)
+    w_points = float(w_px) / dpi * 72
+    h_points = float(h_px) / dpi * 72
+    
+    # Default max dimensions if not provided (A4 page with margins)
+    if max_width is None:
+        max_width = 300  # Further reduced width for better fit
+    if max_height is None:
+        max_height = 400  # Further reduced height for better fit
+    
+    # Scale to fit within page margins while maintaining aspect ratio
+    width_scale = max_width / w_points if w_points > max_width else 1
+    height_scale = max_height / h_points if h_points > max_height else 1
+    scale = min(width_scale, height_scale)
+    
+    if scale < 1:
+        w_points *= scale
+        h_points *= scale
+        print(f"Scaling image by factor {scale:.2f} to fit page margins")
+    
+    # Create temporary file with proper DPI
+    temp_dir = tempfile.mkdtemp()
+    temp_dirs.append(temp_dir)
+    temp_path = os.path.join(temp_dir, 'temp_image.png')
+    temp_files.append(temp_path)
+    
+    # Create PNG info with physical size metadata
+    pnginfo = PngImagePlugin.PngInfo()
+    pnginfo.add_text('dpi', f'{dpi},{dpi}')
+    # Convert DPI to pixels per meter (1 inch = 0.0254 meters)
+    ppm = int(dpi / 0.0254)  # pixels per meter
+    # Pack pHYs data as big-endian
+    phys_data = struct.pack('>IIB', ppm, ppm, 1)
+    pnginfo.add(b'pHYs', phys_data)
+    
+    # Force DPI in image object
+    pil_img.info['dpi'] = (dpi, dpi)
+    
+    # Save with explicit DPI info and physical size metadata
+    pil_img.save(temp_path, 'PNG', dpi=(dpi, dpi), pnginfo=pnginfo, quality=100)
+    
+    # Create reportlab Image with explicit dimensions and enhanced frame handling
+    img = Image(temp_path, width=w_points, height=h_points)
+    img.hAlign = 'CENTER'  # Center align the image
+    img._restrictSize(w_points, h_points)  # Ensure image doesn't exceed frame
+    img.keepWithNext = False  # Allow page breaks after image
+    img._doNotClip = False   # Allow clipping if necessary
+    img.spaceBefore = 0      # Let container handle spacing
+    img.spaceAfter = 0       # Let container handle spacing
+    
+    print(f"Image dimensions: {w_px}x{h_px} pixels")
+    print(f"Image size in points: {w_points:.2f}x{h_points:.2f}")
+    print(f"Effective DPI: {dpi}")
+    
+    return img
 
 def generate_pdf_report():
     """Generate comprehensive PDF report with calculations"""
@@ -2112,7 +1731,7 @@ def generate_pdf_report():
         
         return result
 
-    def add_figure_with_caption(image_path, caption_text, story):
+    def add_figure_with_caption(image_path, caption_text, story, temp_files, temp_dirs):
         """Helper function to add figure with caption and spacing following IEEE format"""
         try:
             # Split caption into smaller chunks
@@ -2122,7 +1741,11 @@ def generate_pdf_report():
             story.append(Spacer(1, 12))
             
             # Prepare scaled image with conservative dimensions
-            figure = prepare_image_for_pdf(image_path)
+            figure = prepare_image_for_pdf(
+                image_path, 
+                temp_files, 
+                temp_dirs
+            )
             
             if figure is None:
                 print(f"Warning: Could not prepare image {image_path}")
@@ -2156,135 +1779,9 @@ def generate_pdf_report():
     # Enhanced configuration for high-quality output
     from reportlab.lib.pagesizes import A4
     from reportlab.lib.units import inch, mm
-    from reportlab.lib import colors
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.lib.enums import TA_JUSTIFY
     
-    # Get sample stylesheet and define all styles at once
-    styles = getSampleStyleSheet()
-    
-    # Configure base styles for IEEE compliance
-    styles['Normal'].fontSize = 10
-    styles['Normal'].leading = 14
-    styles['Normal'].spaceBefore = 4
-    styles['Normal'].spaceAfter = 4
-    styles['Normal'].allowWidows = 0
-    styles['Normal'].allowOrphans = 0
-    styles['Normal'].splitLongWords = 1
-    styles['Normal'].allowSplitting = 1
-    
-    # Adjust heading styles for better flow
-    styles['Heading1'].keepWithNext = False
-    styles['Heading2'].keepWithNext = False
-    styles['Heading3'].keepWithNext = False
-    
-    # Add all custom styles
-    styles.add(ParagraphStyle(
-        name='BulletList',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=10,
-        leading=14,
-        leftIndent=36,
-        bulletIndent=18,
-        firstLineIndent=0,
-        spaceBefore=3,
-        spaceAfter=3,
-        bulletFontName='Helvetica',
-        bulletFontSize=10,
-        bulletAnchor='start',
-        bulletText='•'
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='IEEETitle',
-        parent=styles['Heading1'],
-        fontSize=14,
-        leading=16,
-        alignment=1,  # Center
-        spaceAfter=30
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='IEEESection',
-        parent=styles['Heading1'],
-        fontSize=12,
-        leading=14,
-        spaceBefore=24,
-        spaceAfter=12,
-        keepWithNext=True
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='IEEESubsection',
-        parent=styles['Heading2'],
-        fontSize=10,
-        leading=12,
-        spaceBefore=12,
-        spaceAfter=6,
-        keepWithNext=True
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='IEEEBody',
-        parent=styles['Normal'],
-        fontSize=10,
-        leading=12,
-        spaceBefore=6,
-        spaceAfter=6
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='IEEEFigureCaption',
-        parent=styles['Normal'],
-        fontName='Helvetica-Bold',
-        fontSize=9,
-        leading=11,
-        alignment=1,  # Center alignment
-        spaceAfter=6,
-        spaceBefore=6
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='IEEEFigureDescription',
-        parent=styles['Normal'],
-        fontName='Helvetica',
-        fontSize=9,
-        leading=11,
-        alignment=TA_JUSTIFY,
-        spaceAfter=12,
-        spaceBefore=0,
-        leftIndent=30,
-        rightIndent=30
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='Caption',
-        parent=styles['Normal'],
-        fontSize=10,
-        leading=12,
-        spaceBefore=6,
-        spaceAfter=20,
-        alignment=1,  # Center alignment
-        textColor=colors.darkgray,
-        fontName='Helvetica-Oblique'
-    ))
-    
-    styles.add(ParagraphStyle(
-        name='Equation',
-        parent=styles['Normal'],
-        fontSize=10,
-        leading=14,
-        leftIndent=36,
-        rightIndent=36,
-        spaceBefore=6,
-        spaceAfter=6,
-        alignment=1,  # Center alignment
-        fontName='Helvetica'
-    ))
-    
-    # Define page margins (1 inch = 72 points per IEEE standards)
-    margin = 72  # 1 inch in points
+    # Define page margins (25mm per IEEE standards)
+    margin = 25 * mm  # 25mm in points
     
     # Get page dimensions
     width, height = A4
@@ -2293,33 +1790,52 @@ def generate_pdf_report():
     def onFirstPage(canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
-        canvas.drawString(72, 792, "IEEE TRANSACTIONS ON CIVIL ENGINEERING, VOL. X, NO. X, JANUARY 2025")  # 11 inches from bottom
-        canvas.drawString(72, 144, str(doc.page))  # 2 inches from bottom to maintain margin
+        canvas.drawString(25*mm, 297-15*mm, "IEEE TRANSACTIONS ON CIVIL ENGINEERING, VOL. X, NO. X, JANUARY 2025")
+        canvas.drawString(25*mm, 15*mm, str(doc.page))
         canvas.restoreState()
 
     def onLaterPages(canvas, doc):
         canvas.saveState()
         canvas.setFont('Helvetica', 9)
-        canvas.drawString(72, 792, "IEEE TRANSACTIONS ON CIVIL ENGINEERING, VOL. X, NO. X, JANUARY 2025")  # 11 inches from bottom
-        canvas.drawString(72, 144, str(doc.page))  # 2 inches from bottom to maintain margin
+        canvas.drawString(25*mm, 297-15*mm, "IEEE TRANSACTIONS ON CIVIL ENGINEERING, VOL. X, NO. X, JANUARY 2025")
+        canvas.drawString(25*mm, 15*mm, str(doc.page))
         canvas.restoreState()
 
-    # Create document with IEEE margins and strict template
+    # Configure frame for content with IEEE specifications and improved content flow
+    frame_width = width - 2*margin - 48  # More conservative width
+    frame_height = height - 2*margin - 72  # More conservative height
+    
+    # Use single column layout with very conservative margins
+    main_frame = Frame(
+        margin + 24,  # Extra left margin
+        margin + 24,  # Extra bottom margin
+        frame_width - 48,  # Reduced width for safety
+        frame_height - 48,  # Reduced height for safety
+        id='normal',
+        showBoundary=0,
+        topPadding=24,
+        bottomPadding=24,
+        leftPadding=24,
+        rightPadding=24
+    )
+    
+    # Create document with strict IEEE margins and enhanced content flow
+    # Create output directory
+    os.makedirs('output/documentation', exist_ok=True)
+    
+    # Use correct output path
+    output_path = 'output/documentation/structural_analysis_report.pdf'
+    
     doc = SimpleDocTemplate(
-        "output/documentation/structural_analysis_report.pdf",
+        output_path,
         pagesize=A4,
-        rightMargin=72,    # 1 inch margin
-        leftMargin=72,     # 1 inch margin
-        topMargin=72,      # 1 inch top margin
-        bottomMargin=144,  # 2 inch bottom margin
-        title="Structural Analysis Report - Dataset 5",
-        author="Warsaw University of Technology",
-        subject="Civil Engineering Analysis",
-        keywords="structural analysis, thermal analysis, wood construction",
-        creator="ReportLab PDF Library",
+        rightMargin=25*mm,  # IEEE standard 25mm margin
+        leftMargin=25*mm,   # IEEE standard 25mm margin
+        topMargin=25*mm,    # IEEE standard 25mm margin
+        bottomMargin=25*mm, # IEEE standard 25mm margin
         initialFontSize=11,
         defaultImageDPI=300,
-        pageCompression=1,
+        pageCompression=0,
         invariant=1,
         displayDocTitle=1,
         cropMarks=False,
@@ -2330,48 +1846,9 @@ def generate_pdf_report():
         allowWidows=0,
         allowOrphans=0,
         breakLongWords=1,
-        keepTogether=0,
-        enforceFirstPageSpace=1)
+        keepTogether=0)
 
-    # Calculate frame dimensions based on page size and margins
-    frame_width = A4[0] - (72 * 2)       # Page width minus 2-inch margins
-    frame_height = A4[1] - (72 * 3)      # Page height minus 3-inch margins (2-inch bottom)
-    
-    # Create frames for consistent layout
-    frame = Frame(
-        doc.leftMargin,                  # x position
-        doc.bottomMargin,                # y position
-        frame_width,                     # width
-        frame_height,                    # height
-        leftPadding=0,
-        rightPadding=0,
-        topPadding=6,
-        bottomPadding=6,
-        id='normal'
-    )
-    
-    # Create page templates with proper frame
-    template = PageTemplate(
-        id='default',
-        frames=[frame],
-        onPage=onFirstPage if doc.pageTemplates == [] else onLaterPages
-    )
-    doc.addPageTemplates([template])
-    
-    # Create frame with exact 1-inch margins
-    main_frame = Frame(
-        72,                # Left margin: 1 inch
-        72,                # Bottom margin: 1 inch
-        frame_width,       # Width with 1-inch margins
-        frame_height,      # Height with 1-inch margins
-        leftPadding=0,     # No additional padding needed
-        rightPadding=0,
-        topPadding=0,
-        bottomPadding=0,
-        id='normal'
-    )
-    
-    # Create page templates with frame
+    # Create page templates with single column layout
     first_page_template = PageTemplate(
         id='First',
         frames=[main_frame],
@@ -2419,7 +1896,7 @@ def generate_pdf_report():
     uls = calc.verify_ULS()
     
     print("\nGenerating diagrams...")
-    # Initialize document content and temporary file tracking
+    # Initialize document content
     story = []
     temp_files = []
     temp_dirs = []
@@ -2430,8 +1907,39 @@ def generate_pdf_report():
     create_section_diagram()
     create_brace_diagram()
     
+    # Initialize document content once
+    story = []
+    temp_files = []
+    temp_dirs = []
+    
     print("\nProcessing diagrams...")
-    # Use previously defined styles
+    # Define IEEE styles
+    styles = getSampleStyleSheet()
+    
+    # Add IEEE figure caption and description styles
+    styles.add(ParagraphStyle(
+        name='IEEEFigureCaption',
+        parent=styles['Normal'],
+        fontName='Helvetica-Bold',
+        fontSize=9,
+        leading=11,
+        alignment=1,  # Center alignment
+        spaceAfter=6,
+        spaceBefore=6
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='IEEEFigureDescription',
+        parent=styles['Normal'],
+        fontName='Helvetica',
+        fontSize=9,
+        leading=11,
+        alignment=TA_JUSTIFY,
+        spaceAfter=12,
+        spaceBefore=0,
+        leftIndent=30,
+        rightIndent=30
+    ))
     
     # Add diagrams to report with enhanced error handling and IEEE formatting
     diagram_files = [
@@ -2458,7 +1966,7 @@ def generate_pdf_report():
                 story.append(Spacer(1, 12))
                 
                 # Create figure with proper IEEE formatting
-                img = prepare_image_for_pdf(diagram_path)
+                img = prepare_image_for_pdf(diagram_path, temp_files, temp_dirs)
                 if img:
                     # Add figure with IEEE formatting and proper spacing
                     story.append(Spacer(1, 12))  # Space before figure
@@ -2480,7 +1988,70 @@ def generate_pdf_report():
     
     print("\nAll diagrams processed. Moving to technical content...")
     
-    # Use previously defined styles
+    # Define and configure styles
+    styles = getSampleStyleSheet()
+    
+    # Configure base styles for IEEE compliance
+    styles['Normal'].spaceBefore = 12
+    styles['Normal'].spaceAfter = 12
+    styles['Normal'].allowWidows = 0
+    styles['Normal'].allowOrphans = 0
+    styles['Normal'].splitLongWords = 1
+    styles['Normal'].leading = 14  # 1.2x font size for IEEE spacing
+    styles['Normal'].allowSplitting = 1  # Allow content to split across pages
+    
+    # Adjust heading styles for better flow
+    styles['Heading1'].keepWithNext = False
+    styles['Heading2'].keepWithNext = False
+    styles['Heading3'].keepWithNext = False
+    
+    # IEEE-specific styles
+    styles.add(ParagraphStyle(
+        name='IEEETitle',
+        parent=styles['Heading1'],
+        fontSize=14,
+        leading=16,
+        alignment=1,  # Center
+        spaceAfter=30
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='IEEEAuthor',
+        parent=styles['Normal'],
+        fontSize=12,
+        leading=14,
+        alignment=1,
+        spaceAfter=24
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='IEEESection',
+        parent=styles['Heading1'],
+        fontSize=12,
+        leading=14,
+        spaceBefore=24,
+        spaceAfter=12,
+        keepWithNext=True
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='IEEESubsection',
+        parent=styles['Heading2'],
+        fontSize=10,
+        leading=12,
+        spaceBefore=12,
+        spaceAfter=6,
+        keepWithNext=True
+    ))
+    
+    styles.add(ParagraphStyle(
+        name='IEEEBody',
+        parent=styles['Normal'],
+        fontSize=10,
+        leading=12,
+        spaceBefore=6,
+        spaceAfter=6
+    ))
     
     title_style = styles['IEEETitle']
     heading_style = styles['IEEESection']
@@ -2540,8 +2111,8 @@ def generate_pdf_report():
     # Add load distribution diagram
     add_figure_with_caption(
         'output/figures/load_distribution.png',
-        "Fig. 1. Load distribution showing snow load (0.56 kN/m^2) and wind pressure (0.483 kN/m^2)",
-        story
+        "Fig. 1. Load distribution showing snow load (0.56 kN/m²) and wind pressure (0.483 kN/m²)",
+        story, temp_files, temp_dirs
     )
 
     # 2.2 Combined Load Analysis
@@ -2551,55 +2122,10 @@ def generate_pdf_report():
     add_figure_with_caption(
         'output/figures/combined_load_analysis.png',
         "Fig. 2. Combined load effects and ULS load combinations analysis",
-        story
+        story, temp_files, temp_dirs
     )
     
-    # V. Thermal Analysis
-    story.append(Paragraph("V. THERMAL ANALYSIS", styles['IEEESection']))
-    story.append(Spacer(1, 12))
-    
-    # 5.1 Layer Properties
-    story.append(Paragraph("A. Layer Properties", styles['IEEESubsection']))
-    story.append(Paragraph("""The thermal analysis follows EN ISO 6946:2017 requirements for building components and elements. 
-    The building envelope consists of the following layers with their respective thermal properties:""", styles['BodyText']))
-    
-    # Add bullet points for layer properties
-    for bullet_point in [
-        "MAX 220 block wall: λ = 0.33 W/(m·K)",
-        "Mineral wool insulation: λ = 0.035 W/(m·K)",
-        "C27 timber elements: λ = 0.13 W/(m·K)",
-        "Steel tile roofing: λ = 50 W/(m·K)"
-    ]:
-        para = Paragraph(bullet_point, styles['BulletList'])
-        para.bulletText = '•'
-        story.append(para)
-    
-    # 3.2 Thermal Resistance Calculation
-    story.append(Paragraph("B. Thermal Resistance Calculation", styles['IEEESubsection']))
-    story.append(Paragraph("""The total thermal resistance is calculated according to EN ISO 6946:2017 Section 6.2,
-    considering both the material layers and surface resistances. The calculation follows equation (44):""", styles['BodyText']))
-    
-    # Add thermal resistance equation
-    story.append(Paragraph("R = Rsi + Σ(d/λ) + Rse", styles['Equation']))
-    story.append(Paragraph("where:", styles['BodyText']))
-    
-    for bullet_point in [
-        "R = total thermal resistance [m²K/W]",
-        "Rsi = internal surface resistance (0.10 m²K/W)",
-        "d = layer thickness [m]",
-        "λ = thermal conductivity [W/(m·K)]",
-        "Rse = external surface resistance (0.04 m²K/W)"
-    ]:
-        para = Paragraph(bullet_point, styles['BulletList'])
-        para.bulletText = '•'
-        story.append(para)
-    
-    # Add thermal analysis diagram
-    add_figure_with_caption(
-        'output/figures/thermal_bridge_analysis.png',
-        "Fig. 3. Thermal resistance analysis showing heat flow paths and temperature distribution",
-        story
-    )
+    # The thermal analysis section has been moved and consolidated with section 5
     
     # 4. Structural Details
     story.append(Paragraph("IV. Structural Details", styles['IEEESection']))
@@ -2612,7 +2138,7 @@ def generate_pdf_report():
     add_figure_with_caption(
         'output/figures/stress_analysis.png',
         "Fig. 5. Bending moment diagram and stress distribution analysis",
-        story
+        story, temp_files, temp_dirs
     )
     
     # 4.2 Connection Details
@@ -2621,42 +2147,19 @@ def generate_pdf_report():
     add_figure_with_caption(
         'output/figures/connection_detail.png',
         "Fig. 6. Rafter-purlin connection detail with dimensions",
-        story
+        story, temp_files, temp_dirs
     )
     
-    # 4.3 Floor Plan
-    story.append(Paragraph("C. Floor Plan Analysis", styles['IEEESubsection']))
-    story.append(Paragraph("""The floor plan, illustrated in Fig. 8, provides a comprehensive view of the building layout 
-at 1:50 scale. This drawing details the spatial organization and structural arrangement, including:""", styles['BodyText']))
-    
-    # Add bullet points with proper formatting
-    for bullet_point in [
-        "Overall dimensions: 7.2m x 6.6m primary structure",
-        "Purlin spacing: 1.1m intervals for optimal load distribution",
-        "Column locations and structural grid alignment",
-        "Key structural elements and their relationships"
-    ]:
-        para = Paragraph(bullet_point, styles['BulletList'])
-        para.bulletText = '•'
-        story.append(para)
-    
-    # Add floor plan with proper IEEE formatting
-    add_figure_with_caption(
-        'output/figures/floor_plan.png',
-        "Fig. 8. Floor plan showing structural layout and dimensions (Scale 1:50)",
-        story
-    )
-    
-    # 4.4 Cross-Section Analysis
+    # 4.3 Cross-Section Analysis
     story.append(Paragraph("III. Cross-Section Analysis", styles['IEEESection']))
     story.append(Paragraph("A. Cross-Section Properties", styles['IEEESubsection']))
     story.append(Paragraph("""The cross-sectional analysis presented in Fig. 7 follows the requirements specified in EN 1995-1-1 [1] and [3]. 
     This comprehensive analysis ensures adequate member sizing and structural capacity through detailed evaluation of:
     
     1. Section Properties:
-       - Area: 10,000 mm² (100mm x 100mm)
-       - Moment of Inertia: 8.33 x 10^6 mm^4
-       - Section Modulus: 166.67 x 10^3 mm^3
+       - Area: 10,000 mm² (100mm × 100mm)
+       - Moment of Inertia: 8.33 × 10⁶ mm⁴
+       - Section Modulus: 166.67 × 10³ mm³
     
     2. Material Properties (C27 Timber):
        - Characteristic Bending Strength: 27 N/mm²
@@ -2670,24 +2173,16 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     add_figure_with_caption(
         'output/figures/cross_sections.png',
         "Fig. 7. Cross-sectional analysis of structural members",
-        story
+        story, temp_files, temp_dirs
     )
     
     print("All diagrams integrated successfully.")
     
-    # Configure document margins according to IEEE standards (1 inch = 72 points)
-    doc.leftMargin = 72      # 1 inch left margin
-    doc.rightMargin = 72     # 1 inch right margin
-    doc.topMargin = 72       # 1 inch top margin
-    doc.bottomMargin = 144   # 2 inches bottom margin to match footer placement
-    
-    # Configure page layout with strict margin enforcement
-    doc.enforceFirstPageSpace = True
-    doc.allowSplitting = True
-    doc.showBoundary = 0
-    doc.displayDocTitle = True
-    doc.compression = True
-    doc.invariant = True     # Enforce consistent layout
+    # Configure document margins according to IEEE standards (25mm)
+    doc.leftMargin = 25 * mm    # 25mm left margin
+    doc.rightMargin = 25 * mm   # 25mm right margin
+    doc.topMargin = 25 * mm     # 25mm top margin
+    doc.bottomMargin = 25 * mm  # 25mm bottom margin
     
     # Configure page layout with minimal spacing
     doc.pagesize = A4
@@ -2956,21 +2451,21 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     story.append(Paragraph("""
     A comprehensive load analysis methodology [3,4] has been implemented to evaluate all significant forces 
     acting on the structure. This systematic approach ensures thorough consideration of both permanent 
-    and environmental loads.""", normal_style))
-    
-    story.append(Paragraph("Permanent Load Analysis (G):", subheading_style))
-    story.append(Paragraph("""The evaluation of fixed structural elements yields:
+    and environmental loads:
+
+    Permanent Load Analysis (G):
+    The evaluation of fixed structural elements yields:
     • Roofing component: gk,tile = 0.047 kN/m² (steel tile system)
     • Supporting framework: gk,struct = 0.15 kN/m² (structural elements)
-    • Combined permanent load: gk,total = 0.197 kN/m² (aggregate effect)""", normal_style))
+    • Combined permanent load: gk,total = 0.197 kN/m² (aggregate effect)
+
+    Environmental Load Assessment - Snow (S):
+    The characteristic snow load analysis [3] integrates multiple environmental and geometric factors:
     
-    story.append(Paragraph("Environmental Load Assessment - Snow (S):", subheading_style))
-    story.append(Paragraph("""The characteristic snow load analysis [3] integrates multiple environmental and geometric factors.""", normal_style))
-    
-    story.append(Paragraph("<b>s = µ1 × Ce × Ct × sk</b> [kN/m²]    (51)", equation_style))
-    
-    story.append(Paragraph("""This relationship incorporates the following parameters:""", normal_style))
-    story.append(Paragraph("""• Roof geometry factor (µ1):
+    s = µ1 × Ce × Ct × sk [kN/m²]    (4)
+
+    This relationship incorporates:
+    • Roof geometry factor (µ1):
       - Calculated value: 0.8 for 16° pitch
       - Derived from geometric analysis of slope effects
     
@@ -2984,110 +2479,93 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     
     • Regional snow load (sk):
       - Location-specific value: 0.7 kN/m²
-      - Based on Warsaw region (Zone 2) data""", normal_style))
+      - Based on Warsaw region (Zone 2) data
 
-    story.append(Paragraph("Step-by-step Calculation:", subheading_style))
-    story.append(Paragraph("""1. Determine µ1 based on roof angle:
-       • α = 16° → µ1 = 0.8
-    
+    Step-by-step calculation:
+    1. Determine µ1 based on roof angle:
+       α = 16° → µ1 = 0.8
     2. Verify exposure conditions:
-       • Normal topography → Ce = 1.0
-    
+       Normal topography → Ce = 1.0
     3. Check thermal conditions:
-       • Standard roof insulation → Ct = 1.0
-    
+       Standard roof insulation → Ct = 1.0
     4. Look up ground snow load:
-       • Warsaw (Zone 2) → sk = 0.7 kN/m²
-    
-    5. Calculate roof snow load:""", normal_style))
-    
-    story.append(Paragraph("<b>s = 0.8 × 1.0 × 1.0 × 0.7 = 0.56 kN/m^2</b>    (52)", equation_style))
+       Warsaw (Zone 2) → sk = 0.7 kN/m²
+    5. Calculate roof snow load:
+       s = 0.8 × 1.0 × 1.0 × 0.7 = 0.56 kN/m²    (5)
+    """, normal_style))
     
     # Add force diagram with proper centering and DPI
-    img = prepare_image_for_pdf('force_diagram.png')
+    img = prepare_image_for_pdf('force_diagram.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     story.append(img_container)
-    story.append(Paragraph("Load Analysis According to Eurocode 1 (EN 1991-1):", subheading_style))
-    
-    story.append(Paragraph("1. Characteristic Load Calculations", subheading_style))
-    
-    story.append(Paragraph("1.1 Dead Loads (G):", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Roofing Components:", normal_style)),
-        ListItem(Paragraph("Steel tile (0.6mm): gk,tile = 0.047 kN/m²    (53)", normal_style)),
-        ListItem(Paragraph("Supporting structure: gk,struct = 0.15 kN/m²   (54)", normal_style)),
-        ListItem(Paragraph("Total dead load: gk,total = 0.197 kN/m²       (55)", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    
-    story.append(Paragraph("1.2 Snow Load (S):", normal_style))
-    story.append(Paragraph("<b>s = µ1 x Ce x Ct x sk</b>    (56)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("µ1 = 0.8 (roof pitch coefficient for α = 16°)", normal_style)),
-        ListItem(Paragraph("Ce = 1.0 (exposure coefficient for normal topography)", normal_style)),
-        ListItem(Paragraph("Ct = 1.0 (thermal coefficient)", normal_style)),
-        ListItem(Paragraph("sk = 0.7 kN/m² (characteristic snow load on ground)", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    story.append(Paragraph("<b>s = 0.8 x 1.0 x 1.0 x 0.7 = 0.56 kN/m²</b>    (57)", equation_style))
-    
-    story.append(Paragraph("1.3 Wind Load (W):", normal_style))
-    story.append(Paragraph("<b>qp(z) = ce(z) x qb</b>    (58)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("ce(z) = 2.1 (exposure coefficient at height z)", normal_style)),
-        ListItem(Paragraph("qb = 0.23 kN/m² (basic wind pressure)", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    story.append(Paragraph("<b>qp(z) = 2.1 x 0.23 = 0.483 kN/m²</b>    (59)", equation_style))
+    story.append(Paragraph("""
+    Load Analysis According to Eurocode 1 (EN 1991-1):
 
-    story.append(Paragraph("2. Design Load Combinations (EN 1990)", subheading_style))
-    story.append(Paragraph("2.1 Ultimate Limit State Combinations:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("ULS-1: <b>qd = 1.35 × Gk + 1.5 × Sk</b>    (60)", normal_style)),
-        ListItem(Paragraph("ULS-2: <b>qd = 1.35 × Gk + 1.5 × Wk</b>    (61)", normal_style)),
-        ListItem(Paragraph("ULS-3: <b>qd = 1.35 × Gk + 1.05 × Sk + 0.9 × Wk</b>    (62)", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    
-    story.append(Paragraph("3. Momentum and Force Analysis", subheading_style))
-    story.append(Paragraph("3.1 Rafter Momentum Calculations:", normal_style))
-    story.append(Paragraph("Maximum bending moment (MEd):", normal_style))
-    story.append(Paragraph("<b>MEd = (qd × s × l²) / 8</b>    (63)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("qd = 1.343 kN/m² (design load)", normal_style)),
-        ListItem(Paragraph("s = 1.1 m (rafter spacing)", normal_style)),
-        ListItem(Paragraph("l = 5.62 m (effective span)", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    story.append(Paragraph("<b>MEd = (1.343 × 1.1 × 5.62²) / 8 = 5.84 kNm</b>    (64)", equation_style))
+    1. Characteristic Load Calculations:
 
-    story.append(Paragraph("3.2 Purlin Momentum:", normal_style))
-    story.append(Paragraph("Maximum bending moment:", normal_style))
-    story.append(Paragraph("<b>MEd,p = (qd × l²) / 8</b>    (65)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("l = 2.4 m (purlin span)", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    story.append(Paragraph("<b>MEd,p = (1.343 × 2.4²) / 8 = 0.97 kNm</b>    (66)", equation_style))
-    
-    story.append(Paragraph("4. Cross-Section Load Analysis", subheading_style))
-    story.append(Paragraph("4.1 Distributed Load on Rafters:", normal_style))
-    story.append(Paragraph("<b>wd = qd × s = 1.343 × 1.1 = 1.477 kN/m</b>    (67)", equation_style))
-    
-    story.append(Paragraph("4.2 Axial Force in Rafters:", normal_style))
-    story.append(Paragraph("<b>NEd = wd × l × sin(α) / 2</b>    (68)", equation_style))
-    story.append(Paragraph("<b>NEd = 1.477 × 5.62 × sin(16°) / 2 = 2.34 kN</b>    (69)", equation_style))
-    
-    story.append(Paragraph("These calculations form the basis for subsequent structural verifications and member sizing.", normal_style))
-    story.append(Paragraph("The analysis demonstrates compliance with Eurocode requirements for:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Structural integrity and stability", normal_style)),
-        ListItem(Paragraph("Load-bearing capacity verification", normal_style)),
-        ListItem(Paragraph("Member sizing optimization", normal_style)),
-        ListItem(Paragraph("Connection design parameters", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
+    1.1 Dead Loads (G):
+    • Roofing Components:
+      - Steel tile (0.6mm): gk,tile = 0.047 kN/m²    (Equation 2)
+      - Supporting structure: gk,struct = 0.15 kN/m²   (Equation 3)
+      - Total dead load: gk,total = 0.197 kN/m²       (Equation 4)
+
+    1.2 Snow Load (S):
+    s = µ1 × Ce × Ct × sk    (Equation 5)
+    Where:
+    • µ1 = 0.8 (roof pitch coefficient for α = 16°)
+    • Ce = 1.0 (exposure coefficient for normal topography)
+    • Ct = 1.0 (thermal coefficient)
+    • sk = 0.7 kN/m² (characteristic snow load on ground)
+    Therefore:
+    s = 0.8 × 1.0 × 1.0 × 0.7 = 0.56 kN/m²
+
+    1.3 Wind Load (W):
+    qp(z) = ce(z) × qb    (Equation 6)
+    Where:
+    • ce(z) = 2.1 (exposure coefficient at height z)
+    • qb = 0.23 kN/m² (basic wind pressure)
+    Therefore:
+    qp(z) = 2.1 × 0.23 = 0.483 kN/m²
+
+    2. Design Load Combinations (EN 1990):
+    2.1 Ultimate Limit State Combinations:
+    • ULS-1: qd = 1.35 × Gk + 1.5 × Sk
+    • ULS-2: qd = 1.35 × Gk + 1.5 × Wk
+    • ULS-3: qd = 1.35 × Gk + 1.05 × Sk + 0.9 × Wk
+
+    3. Momentum and Force Analysis:
+    3.1 Rafter Momentum Calculations:
+    Maximum bending moment (MEd):
+    MEd = (qd × s × l²) / 8    (Equation 7)
+    Where:
+    • qd = 1.343 kN/m² (design load)
+    • s = 1.1 m (rafter spacing)
+    • l = 5.62 m (effective span)
+    Therefore:
+    MEd = (1.343 × 1.1 × 5.62²) / 8 = 5.84 kNm
+
+    3.2 Purlin Momentum:
+    Maximum bending moment:
+    MEd,p = (qd × l²) / 8    (Equation 8)
+    Where:
+    • l = 2.4 m (purlin span)
+    Therefore:
+    MEd,p = (1.343 × 2.4²) / 8 = 0.97 kNm
+
+    4. Cross-Section Load Analysis:
+    4.1 Distributed Load on Rafters:
+    wd = qd × s = 1.343 × 1.1 = 1.477 kN/m
+
+    4.2 Axial Force in Rafters:
+    NEd = wd × l × sin(α) / 2    (Equation 9)
+    NEd = 1.477 × 5.62 × sin(16°) / 2 = 2.34 kN
+
+    These calculations form the basis for subsequent structural verifications and member sizing.
+    """, normal_style))
     
     # Calculate total characteristic load from previous analysis
     characteristic_dead_load = 0.197  # kN/m² (from previous calculation)
@@ -3122,17 +2600,19 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     
     # Structural Analysis
     story.append(Paragraph("7.1.4 Ultimate Limit State Analysis", styles['Heading2']))
-    story.append(Paragraph("Rafter Analysis:", normal_style))
-    story.append(Paragraph("Maximum bending moment:", normal_style))
-    story.append(Paragraph("<b>M = (q x l²) / 8</b>    (7)", equation_style))
-    story.append(Paragraph("Axial force:", normal_style))
-    story.append(Paragraph("<b>N = q x l / (2 x tan(α))</b>    (8)", equation_style))
-    story.append(Paragraph("where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("q = design load per meter", normal_style)),
-        ListItem(Paragraph("l = rafter length", normal_style)),
-        ListItem(Paragraph("α = roof angle (16°)", normal_style))
-    ], bulletType='bullet', start=''))
+    story.append(Paragraph("""
+    Rafter Analysis:
+    Maximum bending moment:
+    M = (q × l²) / 8    (7)
+    
+    Axial force:
+    N = q × l / (2 × tan(α))    (8)
+    
+    where:
+    q = design load per meter
+    l = rafter length
+    α = roof angle (16°)
+    """, equation_style))
     
     rafter_results = [
         ["Parameter", "Value", "Unit"],
@@ -3161,126 +2641,105 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     story.append(Paragraph("7.2 Thermal Performance Results", heading_style))
     story.append(Paragraph("7.2.1 Thermal Resistance Analysis", subheading_style))
     # Add thermal diagram with proper centering and DPI
-    img = prepare_image_for_pdf('thermal_diagram.png')
+    img = prepare_image_for_pdf('thermal_diagram.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     story.append(img_container)
-    story.append(Paragraph("Detailed thermal analysis according to EN ISO 6946 and EN ISO 13788:", styles['IEEESection']))
-    story.append(Spacer(1, 12))
+    story.append(Paragraph("""
+    Detailed thermal analysis according to EN ISO 6946 and EN ISO 13788:
+
+    1. Layer-by-Layer Thermal Resistance Calculation:
+
+    1.1 Basic Thermal Resistance Formula:
+    R = d / λ    (Equation 10)
+    Where:
+    • R = thermal resistance [m²·K/W]
+    • d = material thickness [m]
+    • λ = thermal conductivity [W/(m·K)]
+
+    1.2 Layer Analysis:
     
-    story.append(Paragraph("1. Layer-by-Layer Thermal Resistance Calculation:", styles['Heading2']))
-    story.append(Spacer(1, 6))
+    External Wall Assembly:
+    a) External surface resistance (Rse):
+       - Value: 0.04 m²·K/W
+       - Based on EN ISO 6946 Table 1
     
-    story.append(Paragraph("1.1 Basic Thermal Resistance Formula:", styles['IEEESubsection']))
-    story.append(Paragraph("<b>R = d / λ</b>    (70)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("R = thermal resistance [m²·K/W]", normal_style)),
-        ListItem(Paragraph("d = material thickness [m]", normal_style)),
-        ListItem(Paragraph("λ = thermal conductivity [W/(m·K)]", normal_style))
-    ], bulletType='bullet', start=''))
-    story.append(Spacer(1, 6))
+    b) MAX 220 block:
+       - Thickness (d) = 0.220 m
+       - Conductivity (λ) = 0.45 W/(m·K)
+       - R = 0.220 / 0.45 = 0.489 m²·K/W
     
-    story.append(Paragraph("1.2 Layer Analysis:", styles['IEEESubsection']))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("External Wall Assembly:", normal_style))
+    c) Mineral wool insulation:
+       - Thickness (d) = 0.150 m
+       - Conductivity (λ) = 0.04 W/(m·K)
+       - R = 0.150 / 0.04 = 3.750 m²·K/W
     
-    story.append(ListFlowable([
-        ListItem(Paragraph("External surface resistance (Rse):", normal_style)),
-        ListItem(Paragraph("Value: 0.04 m²·K/W", normal_style)),
-        ListItem(Paragraph("Based on EN ISO 6946 Table 1", normal_style)),
-        
-        ListItem(Paragraph("MAX 220 block:", normal_style)),
-        ListItem(Paragraph("Thickness (d) = 0.220 m", normal_style)),
-        ListItem(Paragraph("Conductivity (λ) = 0.45 W/(m·K)", normal_style)),
-        ListItem(Paragraph("R = 0.220 / 0.45 = 0.489 m²·K/W", normal_style)),
-        
-        ListItem(Paragraph("Mineral wool insulation:", normal_style)),
-        ListItem(Paragraph("Thickness (d) = 0.150 m", normal_style)),
-        ListItem(Paragraph("Conductivity (λ) = 0.04 W/(m·K)", normal_style)),
-        ListItem(Paragraph("R = 0.150 / 0.04 = 3.750 m²·K/W", normal_style)),
-        
-        ListItem(Paragraph("Internal surface resistance (Rsi):", normal_style)),
-        ListItem(Paragraph("Value: 0.13 m²·K/W", normal_style)),
-        ListItem(Paragraph("Based on EN ISO 6946 Table 1", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
+    d) Internal surface resistance (Rsi):
+       - Value: 0.13 m²·K/W
+       - Based on EN ISO 6946 Table 1
+
+    1.3 Total Thermal Resistance:
+    RT = Rsi + R1 + R2 + ... + Rn + Rse    (Equation 11)
+    RT = 0.13 + 0.489 + 3.750 + 0.04 = 4.409 m²·K/W
+
+    2. Heat Transfer Coefficient (U-value):
+    U = 1 / RT    (Equation 12)
+    U = 1 / 4.409 = 0.227 W/(m²·K)
+
+    3. Condensation Risk Analysis:
+    3.1 Temperature Factor (fRsi):
+    fRsi = (Tsi - Te) / (Ti - Te)    (Equation 13)
+    Where:
+    • Tsi = internal surface temperature [°C]
+    • Ti = internal air temperature (20°C)
+    • Te = external air temperature (-15°C)
+
+    3.2 Critical Temperature Analysis:
+    • Design internal temperature: 20°C
+    • Design external temperature: -15°C
+    • Internal relative humidity: 50%
+    • Calculated temperature factor: 0.924
+    • Critical surface temperature: 11.8°C
+
+    4. Advanced Thermal Bridge Assessment:
     
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("1.3 Total Thermal Resistance:", styles['IEEESubsection']))
-    story.append(Paragraph("<b>RT = Rsi + R1 + R2 + ... + Rn + Rse</b>    (71)", equation_style))
-    story.append(Paragraph("<b>RT = 0.13 + 0.489 + 3.750 + 0.04 = 4.409 m²·K/W</b>", equation_style))
+    4.1 Junction Performance Analysis:
+    The evaluation of thermal bridging effects [6] employs sophisticated heat flow analysis
+    at critical building junctions. The linear thermal transmittance (ψ-value) quantifies
+    additional heat loss through these thermal bridges:
+
+    ψ = L2D - Σ(Ui × li)    (Equation 14)
+
+    This relationship integrates:
+    • Two-dimensional heat flow coefficient (L2D)
+    • Component-specific thermal transmittance (Ui)
+    • Geometric influence factors (li)
+
+    4.2 Critical Junction Performance Results:
+    Detailed analysis reveals the following thermal bridge characteristics:
+    • Roof-wall interface: ψ = 0.08 W/(m·K)
+      - Optimized through careful detailing
+      - Meets enhanced thermal performance targets
     
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("2. Heat Transfer Coefficient (U-value):", styles['IEEESubsection']))
-    story.append(Paragraph("<b>U = 1 / RT</b>    (72)", equation_style))
-    story.append(Paragraph("<b>U = 1 / 4.409 = 0.227 W/(m²·K)</b>", equation_style))
+    • Foundation-wall connection: ψ = 0.06 W/(m·K)
+      - Incorporates thermal break elements
+      - Minimizes ground-coupled heat loss
     
-    story.append(Spacer(1, 12))
-    story.append(Paragraph("3. Condensation Risk Analysis:", styles['Heading2']))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("3.1 Temperature Factor (fRsi):", styles['IEEESubsection']))
-    story.append(Paragraph("<b>fRsi = (Tsi - Te) / (Ti - Te)</b>    (73)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Tsi = internal surface temperature [deg C]", normal_style)),
-        ListItem(Paragraph("Ti = internal air temperature (20 deg C)", normal_style)),
-        ListItem(Paragraph("Te = external air temperature (-15 deg C)", normal_style))
-    ], bulletType='bullet', start=''))
-    
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("3.2 Critical Temperature Analysis:", styles['IEEESubsection']))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Design internal temperature: 20 deg C", normal_style)),
-        ListItem(Paragraph("Design external temperature: -15 deg C", normal_style)),
-        ListItem(Paragraph("Internal relative humidity: 50%", normal_style)),
-        ListItem(Paragraph("Calculated temperature factor: 0.924", normal_style)),
-        ListItem(Paragraph("Critical surface temperature: 11.8 deg C", normal_style))
-    ], bulletType='bullet', start=''))
-    
-    story.append(Spacer(1, 12))
-    story.append(Paragraph("4. Advanced Thermal Bridge Assessment:", styles['Heading2']))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("4.1 Junction Performance Analysis:", styles['IEEESubsection']))
-    story.append(Paragraph("The evaluation of thermal bridging effects [6] employs sophisticated heat flow analysis at critical building junctions. The linear thermal transmittance (ψ-value) quantifies additional heat loss through these thermal bridges:", normal_style))
-    
-    story.append(Paragraph("<b>ψ = L2D - Σ(Ui × li)</b>    (74)", equation_style))
-    
-    story.append(Paragraph("This relationship integrates:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Two-dimensional heat flow coefficient (L2D)", normal_style)),
-        ListItem(Paragraph("Component-specific thermal transmittance (Ui)", normal_style)),
-        ListItem(Paragraph("Geometric influence factors (li)", normal_style))
-    ], bulletType='bullet', start=''))
-    
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("4.2 Critical Junction Performance Results:", styles['IEEESubsection']))
-    story.append(Paragraph("Detailed analysis reveals the following thermal bridge characteristics:", normal_style))
-    
-    story.append(ListFlowable([
-        ListItem(Paragraph("Roof-wall interface: psi = 0.08 W/(m.K)", normal_style)),
-        ListItem(Paragraph("Optimized through careful detailing", normal_style)),
-        ListItem(Paragraph("Meets enhanced thermal performance targets", normal_style)),
-        
-        ListItem(Paragraph("Foundation-wall connection: psi = 0.06 W/(m.K)", normal_style)),
-        ListItem(Paragraph("Incorporates thermal break elements", normal_style)),
-        ListItem(Paragraph("Minimizes ground-coupled heat loss", normal_style)),
-        
-        ListItem(Paragraph("Building corner assemblies: psi = 0.05 W/(m.K)", normal_style)),
-        ListItem(Paragraph("Enhanced corner insulation strategy", normal_style)),
-        ListItem(Paragraph("Reduces three-dimensional heat flow effects", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    
-    story.append(Paragraph("These results demonstrate superior thermal performance, exceeding minimum requirements while effectively managing condensation risk through all seasonal conditions [6].", normal_style))
+    • Building corner assemblies: ψ = 0.05 W/(m·K)
+      - Enhanced corner insulation strategy
+      - Reduces three-dimensional heat flow effects
+
+    These results demonstrate superior thermal performance, exceeding minimum requirements
+    while effectively managing condensation risk through all seasonal conditions [6].
+    """, normal_style))
     
     thermal_results = [
         ["Parameter", "Value", "Unit"],
-        ["Total thermal resistance", f"{thermal['R_total']:.2f}", "m^2.K/W"],
-        ["U-value", f"{thermal['U_value']:.2f}", "W/(m^2.K)"]
+        ["Total thermal resistance", f"{thermal['R_total']:.2f}", "m²·K/W"],
+        ["U-value", f"{thermal['U_value']:.2f}", "W/m²·K"]
     ]
     
     thermal_table = Table(thermal_results)
@@ -3302,193 +2761,146 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     # Cross-Section Analysis
     story.append(Paragraph("4. Comprehensive Structural Analysis", heading_style))
     story.append(Paragraph("4.1 Building Stress Analysis", subheading_style))
-    story.append(Paragraph("Detailed stress analysis according to Eurocode 5 (EN 1995-1-1):", normal_style))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("1. Advanced Flexural Analysis:", styles['Heading2']))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("1.1 Comprehensive Bending Assessment:", styles['IEEESubsection']))
-    story.append(Paragraph("The analysis employs fundamental principles of mechanics [1] to evaluate flexural behavior under design loads. The bending stress distribution follows the relationship:", normal_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>sigma_m,d = MEd / W</b>    (Equation 15)", equation_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("This formulation incorporates:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Design moment (MEd): Accounts for all relevant load combinations", normal_style)),
-        ListItem(Paragraph("Section modulus (W): Geometric property defining flexural resistance", normal_style))
-    ], bulletType='bullet', start=''))
-    
-    story.append(Paragraph("For the optimized rafter section (100x200mm):", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Section modulus calculation:", normal_style)),
-        ListItem(Paragraph("<b>W = (b x h²) / 6 = (100 x 200²) / 6 = 666,667 mm³</b>", equation_style)),
-        ListItem(Paragraph("Reflects efficient material utilization", normal_style)),
-        ListItem(Paragraph("Optimizes depth-to-width ratio", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    
-    story.append(ListFlowable([
-        ListItem(Paragraph("Design stress evaluation:", normal_style)),
-        ListItem(Paragraph("<b>σm,d = (5.84 x 10⁶) / 666,667 = 8.76 N/mm²</b>", equation_style)),
-        ListItem(Paragraph("Within material capacity limits", normal_style)),
-        ListItem(Paragraph("Provides adequate safety margin", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("1.2 Multi-Axial Force Integration:", styles['IEEESubsection']))
-    story.append(Paragraph("The analysis extends to combined loading effects through the relationship:", normal_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>sigma_c,0,d = NEd / A</b>    (Equation 16)", equation_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("Key parameters:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Design axial force (NEd): Incorporates load factors", normal_style)),
-        ListItem(Paragraph("Cross-sectional area (A): Optimized for force transfer", normal_style))
-    ], bulletType='bullet', start=''))
-    
-    story.append(Paragraph("Section properties:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Effective area:", normal_style)),
-        ListItem(Paragraph("<b>A = b x h = 100 x 200 = 20,000 mm²</b>", equation_style)),
-        ListItem(Paragraph("Maximizes material efficiency", normal_style)),
-        ListItem(Paragraph("Ensures adequate compression capacity", normal_style)),
-        
-        ListItem(Paragraph("Resulting stress:", normal_style)),
-        ListItem(Paragraph("<b>σc,0,d = 2,340 / 20,000 = 0.117 N/mm²</b>", equation_style)),
-        ListItem(Paragraph("Well within material limits", normal_style)),
-        ListItem(Paragraph("Allows for additional loading capacity", normal_style))
-    ], bulletType='bullet', bulletDedent=12, leftIndent=35, bulletFontSize=10, bulletOffsetY=2))
+    story.append(Paragraph("""
+    Detailed stress analysis according to Eurocode 5 (EN 1995-1-1):
 
-    story.append(Paragraph("2. Comprehensive Limit State Analysis:", styles['Heading2']))
-    story.append(Spacer(1, 12))
+    1. Advanced Flexural Analysis:
     
-    story.append(Paragraph("2.1 Multi-Axial Stress Interaction:", styles['IEEESubsection']))
-    story.append(Paragraph("The analysis implements advanced stress interaction criteria [1] to evaluate combined loading effects. The verification employs a quadratic interaction formula that accounts for material behavior under complex stress states:", normal_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>(sigma_c,0,d / fc,0,d)^2 + sigma_m,d / fm,d <= 1</b>    (Equation 17)", equation_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("Design strength parameters:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Compressive capacity: fc,0,d = 13.54 N/mm²", normal_style)),
-        ListItem(Paragraph("Derived from characteristic strength", normal_style), bulletType='-'),
-        ListItem(Paragraph("Includes material safety factors", normal_style), bulletType='-'),
-        
-        ListItem(Paragraph("Flexural resistance: fm,d = 16.62 N/mm²", normal_style)),
-        ListItem(Paragraph("Accounts for size effects", normal_style), bulletType='-'),
-        ListItem(Paragraph("Incorporates load duration influence", normal_style), bulletType='-')
-    ], bulletType='bullet', start=''))
-    
-    story.append(Paragraph("<b>Analysis yields: (0.117 / 13.54)² + 8.76 / 16.62 = 0.535 ≤ 1.0</b>", equation_style))
-    story.append(Paragraph("This demonstrates adequate reserve capacity under combined loading.", normal_style))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("2.2 Enhanced Stability Assessment:", styles['IEEESubsection']))
-    story.append(Paragraph("The stability analysis incorporates second-order effects and material nonlinearity [1]:", normal_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>kc,y x sigma_c,0,d / fc,0,d + km x sigma_m,d / fm,d <= 1</b>    (Equation 18)", equation_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("Key parameters:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Stability coefficient: kc,y = 0.893", normal_style)),
-        ListItem(Paragraph("Accounts for member slenderness", normal_style), bulletType='-'),
-        ListItem(Paragraph("Includes imperfection effects", normal_style), bulletType='-'),
-        
-        ListItem(Paragraph("Moment distribution factor: km = 0.7", normal_style)),
-        ListItem(Paragraph("Reflects bending moment variation", normal_style), bulletType='-'),
-        ListItem(Paragraph("Optimizes design efficiency", normal_style), bulletType='-')
-    ], bulletType='bullet', start=''))
-    
-    story.append(Paragraph("<b>Verification yields: 0.893 x 0.117 / 13.54 + 0.7 x 8.76 / 16.62 = 0.376 ≤ 1.0</b>", equation_style))
-    story.append(Paragraph("This confirms robust structural stability with significant safety margin.", normal_style))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("3. Advanced Section Properties Analysis:", styles['Heading2']))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("3.1 Enhanced Geometric Characterization:", styles['IEEESubsection']))
-    story.append(Paragraph("The section's resistance to deformation [1] is quantified through its moment of inertia:", normal_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>I = (b x h³) / 12</b>    (Equation 19)", equation_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>Analysis yields: I = (100 x 200³) / 12 = 66.67 x 10⁶ mm⁴</b>", equation_style))
-    story.append(Paragraph("This value demonstrates:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Optimal depth utilization", normal_style)),
-        ListItem(Paragraph("Enhanced flexural resistance", normal_style)),
-        ListItem(Paragraph("Efficient material distribution", normal_style))
-    ], bulletType='bullet', start=''))
+    1.1 Comprehensive Bending Assessment:
+    The analysis employs fundamental principles of mechanics [1] to evaluate flexural behavior
+    under design loads. The bending stress distribution follows the relationship:
 
-    story.append(Paragraph("3.2 Advanced Stability Parameters:", styles['IEEESubsection']))
-    story.append(Paragraph("The section's stability characteristics are evaluated through:", normal_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>i = sqrt(I/A)</b>    (Equation 20)", equation_style))
-    story.append(Spacer(1, 6))
-    
-    story.append(Paragraph("<b>Calculated value: i = sqrt(66.67 x 10^6 / 20,000) = 57.74 mm</b>", equation_style))
-    story.append(Paragraph("This parameter:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Quantifies geometric efficiency", normal_style)),
-        ListItem(Paragraph("Influences buckling behavior", normal_style)),
-        ListItem(Paragraph("Optimizes material usage", normal_style))
-    ], bulletType='bullet', start=''))
+    σm,d = MEd / W    (Equation 15)
 
-    story.append(Paragraph("3.3 Comprehensive Stability Assessment:", styles['IEEESubsection']))
-    story.append(Paragraph("The member's susceptibility to buckling is evaluated through:", normal_style))
-    story.append(Spacer(1, 6))
+    This formulation incorporates:
+    • Design moment (MEd): Accounts for all relevant load combinations
+    • Section modulus (W): Geometric property defining flexural resistance
     
-    story.append(Paragraph("<b>λ = Lcr / i</b>    (Equation 21)", equation_style))
-    story.append(Spacer(1, 6))
+    For the optimized rafter section (100×200mm):
+    • Section modulus calculation:
+      W = (b × h²) / 6 = (100 × 200²) / 6 = 666,667 mm³
+      - Reflects efficient material utilization
+      - Optimizes depth-to-width ratio
     
-    story.append(Paragraph("Critical parameters:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Effective length: Lcr = 5,620 mm", normal_style)),
-        ListItem(Paragraph("Accounts for support conditions", normal_style), bulletType='-'),
-        ListItem(Paragraph("Reflects actual behavior", normal_style), bulletType='-')
-    ], bulletType='bullet', start=''))
+    • Design stress evaluation:
+      σm,d = (5.84 × 10⁶) / 666,667 = 8.76 N/mm²
+      - Within material capacity limits
+      - Provides adequate safety margin
+
+    1.2 Multi-Axial Force Integration:
+    The analysis extends to combined loading effects through the relationship:
+
+    σc,0,d = NEd / A    (Equation 16)
+
+    Key parameters:
+    • Design axial force (NEd): Incorporates load factors
+    • Cross-sectional area (A): Optimized for force transfer
     
-    story.append(Paragraph("<b>Analysis yields: λ = 5,620 / 57.74 = 97.33</b>", equation_style))
-    story.append(Paragraph("This result indicates:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("Adequate stability reserves", normal_style)),
-        ListItem(Paragraph("Efficient structural configuration", normal_style)),
-        ListItem(Paragraph("Compliance with design limits [1]", normal_style))
-    ], bulletType='bullet', start=''))
+    Section properties:
+    • Effective area: A = b × h = 100 × 200 = 20,000 mm²
+      - Maximizes material efficiency
+      - Ensures adequate compression capacity
     
-    story.append(Paragraph("4. Angle Brace Analysis:", styles['Heading2']))
-    story.append(Spacer(1, 12))
+    • Resulting stress: σc,0,d = 2,340 / 20,000 = 0.117 N/mm²
+      - Well within material limits
+      - Allows for additional loading capacity
+
+    2. Comprehensive Limit State Analysis:
     
-    story.append(Paragraph("4.1 Axial Force in Brace:", styles['IEEESubsection']))
-    story.append(Paragraph("<b>NBr,Ed = NEd / sin(θ)</b>    (Equation 22)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("θ = brace angle = 45°", normal_style))
-    ], bulletType='bullet', start=''))
-    story.append(Paragraph("<b>NBr,Ed = 2,340 / sin(45°) = 3,309 N</b>", equation_style))
+    2.1 Multi-Axial Stress Interaction:
+    The analysis implements advanced stress interaction criteria [1] to evaluate combined
+    loading effects. The verification employs a quadratic interaction formula that 
+    accounts for material behavior under complex stress states:
+
+    (σc,0,d / fc,0,d)² + σm,d / fm,d ≤ 1    (Equation 17)
     
-    story.append(Paragraph("4.2 Brace Connection Design:", styles['IEEESubsection']))
-    story.append(Paragraph("Design shear force per bolt:", normal_style))
-    story.append(Paragraph("<b>Fv,Ed = NBr,Ed / n</b>    (Equation 23)", equation_style))
-    story.append(Paragraph("Where:", normal_style))
-    story.append(ListFlowable([
-        ListItem(Paragraph("n = number of bolts = 2", normal_style))
-    ], bulletType='bullet', start=''))
-    story.append(Paragraph("<b>Fv,Ed = 3,309 / 2 = 1,655 N</b>", equation_style))
+    Design strength parameters:
+    • Compressive capacity: fc,0,d = 13.54 N/mm²
+      - Derived from characteristic strength
+      - Includes material safety factors
+    • Flexural resistance: fm,d = 16.62 N/mm²
+      - Accounts for size effects
+      - Incorporates load duration influence
     
-    story.append(Paragraph("These calculations verify the structural adequacy of all components under design loads.", normal_style))
+    Analysis yields: (0.117 / 13.54)² + 8.76 / 16.62 = 0.535 ≤ 1.0
+    This demonstrates adequate reserve capacity under combined loading.
+
+    2.2 Enhanced Stability Assessment:
+    The stability analysis incorporates second-order effects and material nonlinearity [1]:
+
+    kc,y × σc,0,d / fc,0,d + km × σm,d / fm,d ≤ 1    (Equation 18)
+    
+    Key parameters:
+    • Stability coefficient: kc,y = 0.893
+      - Accounts for member slenderness
+      - Includes imperfection effects
+    • Moment distribution factor: km = 0.7
+      - Reflects bending moment variation
+      - Optimizes design efficiency
+    
+    Verification yields: 0.893 × 0.117 / 13.54 + 0.7 × 8.76 / 16.62 = 0.376 ≤ 1.0
+    This confirms robust structural stability with significant safety margin.
+
+    3. Advanced Section Properties Analysis:
+    
+    3.1 Enhanced Geometric Characterization:
+    The section's resistance to deformation [1] is quantified through its moment of inertia:
+
+    I = (b × h³) / 12    (Equation 19)
+
+    Analysis yields: I = (100 × 200³) / 12 = 66.67 × 10⁶ mm⁴
+    This value demonstrates:
+    • Optimal depth utilization
+    • Enhanced flexural resistance
+    • Efficient material distribution
+
+    3.2 Advanced Stability Parameters:
+    The section's stability characteristics are evaluated through:
+
+    i = √(I/A)    (Equation 20)
+
+    Calculated value: i = √(66.67 × 10⁶ / 20,000) = 57.74 mm
+    This parameter:
+    • Quantifies geometric efficiency
+    • Influences buckling behavior
+    • Optimizes material usage
+
+    3.3 Comprehensive Stability Assessment:
+    The member's susceptibility to buckling is evaluated through:
+
+    λ = Lcr / i    (Equation 21)
+
+    Critical parameters:
+    • Effective length: Lcr = 5,620 mm
+      - Accounts for support conditions
+      - Reflects actual behavior
+    
+    Analysis yields: λ = 5,620 / 57.74 = 97.33
+    This result indicates:
+    • Adequate stability reserves
+    • Efficient structural configuration
+    • Compliance with design limits [1]
+
+    4. Angle Brace Analysis:
+    
+    4.1 Axial Force in Brace:
+    NBr,Ed = NEd / sin(θ)    (Equation 22)
+    Where:
+    • θ = brace angle = 45°
+    NBr,Ed = 2,340 / sin(45°) = 3,309 N
+
+    4.2 Brace Connection Design:
+    Design shear force per bolt:
+    Fv,Ed = NBr,Ed / n    (Equation 23)
+    Where:
+    • n = number of bolts = 2
+    Fv,Ed = 3,309 / 2 = 1,655 N
+
+    These calculations verify the structural adequacy of all components under design loads.
+    """, normal_style))
     
     # Add section diagram with proper DPI
-    story.append(prepare_image_for_pdf('section_diagram.png'))
+    story.append(prepare_image_for_pdf('section_diagram.png', temp_files, temp_dirs))
     
     # Section Properties
     story.append(Paragraph("4.2 Section Properties", heading_style))
@@ -3520,8 +2932,11 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     
     # Stress Analysis
     story.append(Paragraph("7.1.5 Stress Analysis", styles['Heading2']))
-    story.append(Paragraph("The stress analysis considers normal stresses due to bending and axial forces, as well as shear stresses.", normal_style))
-    story.append(Paragraph("The combined stress state is evaluated using the von Mises criterion to account for multiaxial loading conditions.", normal_style))
+    story.append(Paragraph("""
+    The stress analysis considers normal stresses due to bending and axial forces,
+    as well as shear stresses. The combined stress state is evaluated using the
+    von Mises criterion to account for multiaxial loading conditions.
+    """, normal_style))
     
     # Calculate stress values from previous analysis
     normal_stress = 8.76  # N/mm² (from previous calculation)
@@ -3550,11 +2965,14 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     
     # Cross-Section Analysis
     story.append(Paragraph("7.1.3 Cross-Section Analysis", heading_style))
-    story.append(Paragraph("Analysis of structural member cross-sections according to EN 1995-1-1, including geometric properties and stress distributions for all primary elements.", normal_style))
+    story.append(Paragraph("""
+    Analysis of structural member cross-sections according to EN 1995-1-1, including
+    geometric properties and stress distributions for all primary elements.
+    """, normal_style))
     story.append(Spacer(1, 12))
 
     # Add cross-section diagram with proper DPI and centering
-    img = prepare_image_for_pdf('section_diagram.png')
+    img = prepare_image_for_pdf('section_diagram.png', temp_files, temp_dirs)
     img_container = Table([[img]], colWidths=[450])
     img_container.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -3566,8 +2984,11 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     # Get angle brace analysis results
     brace = calc.analyze_angle_brace()
     
-    story.append(Paragraph("Analysis of the angle brace connection includes evaluation of axial forces, buckling resistance, and connection capacity.", normal_style))
-    story.append(Paragraph("The brace is designed to transfer horizontal forces from the roof structure to the supporting elements.", normal_style))
+    story.append(Paragraph("""
+    Analysis of the angle brace connection includes evaluation of axial forces,
+    buckling resistance, and connection capacity. The brace is designed to transfer
+    horizontal forces from the roof structure to the supporting elements.
+    """, normal_style))
     
     brace_results = [
         ["Parameter", "Value", "Unit"],
@@ -3596,24 +3017,32 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     # Momentum Analysis
     story.append(Paragraph("7.1.1 Load and Momentum Analysis", heading_style))
     story.append(Paragraph("Cross Section Load Analysis", subheading_style))
-    story.append(Paragraph("Design loads per EN 1990:", styles['BodyText']))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("gk = 0.297 kN/m^2 [dead load]", equation_style))
-    story.append(Paragraph("sk = 0.56 kN/m^2 [snow load]", equation_style))
-    story.append(Paragraph("wk = 0.483 kN/m^2 [wind load]                                    (34)", equation_style))
+    story.append(Paragraph("""
+    Design loads per EN 1990:
+    
+    gk = 0.297 kN/m² (dead load)
+    sk = 0.56 kN/m² (snow load)
+    wk = 0.483 kN/m² (wind load)                                    (34)
+    """, equation_style))
     
     story.append(Paragraph("Momentum and Bending Movement", subheading_style))
-    story.append(Paragraph("For rafter [100x200mm]:", equation_style))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("MEd = (Ed x s x l^2)/8", equation_style))
-    story.append(Paragraph("= (1.401 x 1.1 x 5.62^2)/8", equation_style))
-    story.append(Paragraph("= 6.12 kNm                                                      (35)", equation_style))
-    story.append(Spacer(1, 12))
-    story.append(Paragraph("For purlin [80x160mm]:", equation_style))
-    story.append(Spacer(1, 6))
-    story.append(Paragraph("MEd = (w x l^2)/8", equation_style))
-    story.append(Paragraph("= (1.541 x 1.8^2)/8", equation_style))
-    story.append(Paragraph("= 0.623 kNm                                                     (36)", equation_style))
+    story.append(Paragraph("""
+    For rafter (100×200mm):
+    
+    MEd = Ed × s × l²
+         8
+    = 1.401 × 1.1 × 5.62²
+            8
+    = 6.12 kNm                                                      (35)
+    
+    For purlin (80×160mm):
+    
+    MEd = w × l²
+         8
+    = 1.541 × 1.8²
+          8
+    = 0.623 kNm                                                     (36)
+    """, equation_style))
     
     momentum_results = [
         ["Component", "Value", "Unit"],
@@ -3641,22 +3070,22 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     
     # ULS Verification
     story.append(Paragraph("2.1.6 Ultimate Limit State (ULS) Verification", subheading_style))
-    story.append(Paragraph("Purlin Design [80x160mm C27]:", verification_style))
-    story.append(Paragraph("- Design load: w = 1.541 kN/m    (12)", verification_style))
-    story.append(Paragraph("- Maximum moment: Mmax = 0.623 kNm", verification_style))
-    story.append(Paragraph("- Bending stress: sigma_m,d = 1.83 N/mm^2 < fm,d = 16.62 N/mm^2 [check]", verification_style))
-    story.append(Paragraph("- Verification ratio: eta = sigma_m,d/fm,d = 0.11 < 1.0 [check]", verification_style))
-    story.append(Spacer(1, 6))
+    story.append(Paragraph("""
+    • Purlin Design (80×160mm C27):
+      • Design load: w = 1.541 kN/m    (12)
+      • Maximum moment: Mmax = 0.623 kNm
+      • Bending stress: σm,d = 1.83 N/mm² < fm,d = 16.62 N/mm² ✓
+      • Verification ratio: η = σm,d/fm,d = 0.11 < 1.0 ✓
     
-    story.append(Paragraph("Rafter Design [100x200mm C27]:", verification_style))
-    story.append(Paragraph("- Design load: Ed = 1.401 kN/m^2", verification_style))
-    story.append(Paragraph("- Maximum moment: Mmax = 6.12 kNm", verification_style))
-    story.append(Paragraph("- Bending stress: sigma_m,d = 9.18 N/mm^2 < fm,d = 16.62 N/mm^2 [check]", verification_style))
-    story.append(Spacer(1, 6))
+    • Rafter Design (100×200mm C27):
+      • Design load: Ed = 1.401 kN/m²
+      • Maximum moment: Mmax = 6.12 kNm
+      • Bending stress: σm,d = 9.18 N/mm² < fm,d = 16.62 N/mm² ✓
     
-    story.append(Paragraph("Angle Brace Analysis [60x100mm]:", verification_style))
-    story.append(Paragraph("- Axial force: N = 2.71 kN", verification_style))
-    story.append(Paragraph("- Tensile stress: sigma_t,0,d = 0.452 N/mm^2 < ft,0,d = 9.85 N/mm^2 [check]", verification_style))
+    • Angle Brace Analysis (60×100mm):
+      • Axial force: N = 2.71 kN
+      • Tensile stress: σt,0,d = 0.452 N/mm² < ft,0,d = 9.85 N/mm² ✓
+    """, verification_style))
     
     uls_results = [
         ["Parameter", "Value", "Unit"],
@@ -3681,30 +3110,31 @@ at 1:50 scale. This drawing details the spatial organization and structural arra
     # Conclusion
     story.append(PageBreak())
     story.append(Paragraph('8. Conclusion', styles['Heading1']))
-    story.append(Paragraph("The structural elements and thermal assemblies meet all required performance criteria according to relevant Eurocode standards:", styles['BodyText']))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("1. Structural Performance:", styles['BodyText']))
-    story.append(Paragraph("   - All ULS verifications passed with adequate safety margins", styles['BodyText']))
-    story.append(Paragraph("   - Cross-section properties ensure efficient load distribution", styles['BodyText']))
-    story.append(Paragraph("   - Connection details meet strength and stability requirements", styles['BodyText']))
-    story.append(Paragraph("   - Timber elements sized appropriately for applied loads", styles['BodyText']))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("2. Thermal Performance:", styles['BodyText']))
-    story.append(Paragraph("   - Wall assembly: U-value = 0.195 W/(m2.K) < 0.20 W/(m2.K) requirement", styles['BodyText']))
-    story.append(Paragraph("   - Roof assembly: U-value = 0.166 W/(m2.K) < 0.18 W/(m2.K) requirement", styles['BodyText']))
-    story.append(Paragraph("   - Thermal bridges analyzed and mitigated at critical junctions", styles['BodyText']))
-    story.append(Paragraph("   - Condensation risk assessment shows no risk of interstitial condensation", styles['BodyText']))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("3. Construction Details:", styles['BodyText']))
-    story.append(Paragraph("   - All connections and details follow standard specifications", styles['BodyText']))
-    story.append(Paragraph("   - Material selections meet both structural and thermal requirements", styles['BodyText']))
-    story.append(Paragraph("   - Assembly sequences defined for proper construction execution", styles['BodyText']))
-    story.append(Spacer(1, 12))
-    
-    story.append(Paragraph("The design successfully integrates structural stability with thermal efficiency, creating a building that is both safe and energy-efficient. All calculations and verifications are documented and traceable to relevant Eurocode standards.", styles['BodyText']))
+    story.append(Paragraph("""
+    All structural elements and thermal assemblies meet the required performance criteria 
+    according to relevant Eurocode standards:
+
+    1. Structural Performance:
+       • All ULS verifications passed with adequate safety margins
+       • Cross-section properties ensure efficient load distribution
+       • Connection details meet strength and stability requirements
+       • Timber elements sized appropriately for applied loads
+
+    2. Thermal Performance:
+       • Wall assembly: U-value = 0.195 W/(m²K) < 0.20 W/(m²K) requirement
+       • Roof assembly: U-value = 0.166 W/(m²K) < 0.18 W/(m²K) requirement
+       • Thermal bridges analyzed and mitigated at critical junctions
+       • Condensation risk assessment shows no risk of interstitial condensation
+
+    3. Construction Details:
+       • All connections and details follow standard specifications
+       • Material selections meet both structural and thermal requirements
+       • Assembly sequences defined for proper construction execution
+
+    The design successfully integrates structural stability with thermal efficiency, 
+    creating a building that is both safe and energy-efficient. All calculations and 
+    verifications are documented and traceable to relevant Eurocode standards.
+    """, styles['BodyText']))
     story.append(Spacer(1, 24))
 
     # Add References Section
@@ -3748,17 +3178,8 @@ if __name__ == "__main__":
     temp_dirs = []
     try:
         print("\nStarting report generation process...")
-        
-        # First create the report content and structure
-        print("\nGenerating report content...")
-        create_report()
-        
-        # Then generate the final PDF with all content
-        print("\nGenerating PDF with IEEE formatting...")
         generate_pdf_report()
-        
         print("\nReport generation completed successfully.")
-        
     except Exception as e:
         print(f"\nError during report generation: {str(e)}")
         raise

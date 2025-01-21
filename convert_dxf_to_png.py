@@ -159,7 +159,8 @@ def dxf_to_png(dxf_path, png_path, scale=1.0):
                     radius = entity.dxf.radius
                     start_angle = math.radians(entity.dxf.start_angle)
                     end_angle = math.radians(entity.dxf.end_angle)
-                    cx, cy = transform_point(center[0], center[1])
+                    cx = int((center[0] - bounds[0]) * scale) + margin
+                    cy = height - (int((center[1] - bounds[1]) * scale) + margin)
                     r = int(radius * scale)
                     bbox = [cx-r, cy-r, cx+r, cy+r]
                     draw.arc(bbox, -math.degrees(end_angle), -math.degrees(start_angle), fill="black", width=2)
@@ -171,8 +172,10 @@ def dxf_to_png(dxf_path, png_path, scale=1.0):
                         for line in entity.geometry.lines:
                             start = line.start
                             end = line.end
-                            x1, y1 = transform_point(start[0], start[1])
-                            x2, y2 = transform_point(end[0], end[1])
+                            x1 = int((start[0] - bounds[0]) * scale) + margin
+                            y1 = height - (int((start[1] - bounds[1]) * scale) + margin)
+                            x2 = int((end[0] - bounds[0]) * scale) + margin
+                            y2 = height - (int((end[1] - bounds[1]) * scale) + margin)
                             draw.line([(x1, y1), (x2, y2)], fill="black", width=2)
                             elements_drawn += 1
                     
@@ -216,36 +219,52 @@ def dxf_to_png(dxf_path, png_path, scale=1.0):
         return False
 
 def main():
-    import argparse
+    # Create all required output directories
+    os.makedirs("output/figures", exist_ok=True)
     
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description='Convert DXF files to PNG with high DPI')
-    parser.add_argument('--input', required=True, help='Input DXF file path')
-    parser.add_argument('--output', required=True, help='Output PNG file path')
-    parser.add_argument('--dpi', type=int, default=300, help='Output DPI (default: 300)')
-    parser.add_argument('--scale', type=float, default=0.8, help='Scale factor (default: 0.8)')
-    args = parser.parse_args()
+    # Verify input files exist
+    input_files = [
+        "dist/drawings/projections/vertical_projection.dxf",
+        "dist/drawings/projections/horizontal_projection.dxf",
+        "dist/drawings/details/connection_details.dxf"
+    ]
     
-    # Create output directory if it doesn't exist
-    os.makedirs(os.path.dirname(args.output), exist_ok=True)
-    
-    # Verify input file exists
-    if not os.path.exists(args.input):
-        print(f"\nError: Input file not found: {args.input}")
-        return False
+    for file in input_files:
+        if not os.path.exists(file):
+            print(f"\nError: Input file not found: {file}")
+            return False
     
     try:
-        # Convert drawing with proper scaling for high quality output
-        print(f"\nConverting {os.path.basename(args.input)}...")
-        success = dxf_to_png(args.input, args.output, scale=args.scale)
+        # Convert drawings with proper scaling for high quality output
+        print("\nConverting vertical projection...")
+        dxf_to_png("dist/drawings/projections/vertical_projection.dxf", 
+                   "output/figures/vertical_projection.png", scale=0.8)
         
-        if success and os.path.exists(args.output):
-            print(f"\nSuccessfully generated: {args.output}")
-            return True
-        else:
-            print(f"\nError: Failed to generate output file: {args.output}")
-            return False
-            
+        print("\nConverting horizontal projection...")
+        dxf_to_png("dist/drawings/projections/horizontal_projection.dxf",
+                   "output/figures/horizontal_projection.png", scale=0.8)
+        
+        print("\nConverting construction details...")
+        dxf_to_png("dist/drawings/details/connection_details.dxf",
+                   "output/figures/construction_details.png", scale=0.8)
+        
+        # Verify output files were created
+        output_files = [
+            "output/figures/vertical_projection.png",
+            "output/figures/horizontal_projection.png",
+            "output/figures/construction_details.png"
+        ]
+        
+        for file in output_files:
+            if not os.path.exists(file):
+                print(f"\nError: Failed to generate output file: {file}")
+                return False
+            else:
+                print(f"\nSuccessfully generated: {file}")
+        
+        print("\nAll drawings converted successfully.")
+        return True
+        
     except Exception as e:
         print(f"\nError during conversion: {str(e)}")
         return False

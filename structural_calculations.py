@@ -42,17 +42,17 @@ class WoodStructureCalculations:
         # Document calculations with equation numbers
         calculations = {
             'fm_d': {
-                'equation': f"fm,d = (kmod × fm,k) / γM = ({self.kmod} × {self.fm_k}) / {self.gamma_M} = {self.fm_d:.2f} N/mm²",
+                'equation': f"fₘ,ᵈ = (kₘₒᵈ × fₘ,ₖ) / γₘ = ({self.kmod:.2f} × {self.fm_k:.1f}) / {self.gamma_M:.2f} = {self.fm_d:.2f} N/mm²",
                 'number': "(34)",
                 'description': "Design bending strength according to EN 1995-1-1 §6.1.6, where:\nkmod = modification factor for duration of load and moisture\nfm,k = characteristic bending strength\nγM = partial factor for material properties"
             },
             'ft_0_d': {
-                'equation': f"ft,0,d = (kmod × ft,0,k) / γM = ({self.kmod} × {self.ft_0_k}) / {self.gamma_M} = {self.ft_0_d:.2f} N/mm²",
+                'equation': f"fₜ,₀,ᵈ = (kₘₒᵈ × fₜ,₀,ₖ) / γₘ = ({self.kmod:.2f} × {self.ft_0_k:.1f}) / {self.gamma_M:.2f} = {self.ft_0_d:.2f} N/mm²",
                 'number': "(35)",
                 'description': "Design tensile strength parallel to grain according to EN 1995-1-1 §6.1.2, where:\nkmod = modification factor for duration of load and moisture\nft,0,k = characteristic tensile strength parallel to grain\nγM = partial factor for material properties"
             },
             'fc_0_d': {
-                'equation': f"fc,0,d = (kmod × fc,0,k) / γM = ({self.kmod} × {self.fc_0_k}) / {self.gamma_M} = {self.fc_0_d:.2f} N/mm²",
+                'equation': f"fᶜ,₀,ᵈ = (kₘₒᵈ × fᶜ,₀,ₖ) / γₘ = ({self.kmod:.2f} × {self.fc_0_k:.1f}) / {self.gamma_M:.2f} = {self.fc_0_d:.2f} N/mm²",
                 'number': "(36)",
                 'description': "Design compressive strength parallel to grain according to EN 1995-1-1 §6.1.4, where:\nkmod = modification factor for duration of load and moisture\nfc,0,k = characteristic compressive strength parallel to grain\nγM = partial factor for material properties"
             }
@@ -96,9 +96,9 @@ class WoodStructureCalculations:
         
         # Document calculations with equation numbers
         calculations = {
-            'dead_loads': f"gk = {self.gk_tile:.3f} + {self.gk_struct:.3f} = {self.gk_total:.3f} kN/m² (4)",
-            'snow_load': f"s = µ1 × Ce × Ct × sk = {self.mu1} × {self.Ce} × {self.Ct} × {self.sk} = {self.snow_load:.3f} kN/m² (5)",
-            'wind_load': f"qp = ce × qb = {self.ce} × {self.qb:.3f} = {self.wind_load:.3f} kN/m² (6)",
+            'dead_loads': f"gk = {self.gk_tile:.3f} + {self.gk_struct:.3f} = {self.gk_total:.3f} kN/m²  (4)",
+            'snow_load': f"s = µ₁ × Cₑ × Cₜ × sₖ = {self.mu1:.2f} × {self.Ce:.1f} × {self.Ct:.1f} × {self.sk:.2f} = {self.snow_load:.3f} kN/m²  (5)",
+            'wind_load': f"qₚ = cₑ × qᵦ = {self.ce:.2f} × {self.qb:.3f} = {self.wind_load:.3f} kN/m²  (6)",
             'design_load': f"Ed = max({self.Ed1:.3f}, {self.Ed2:.3f}) = {self.design_load:.3f} kN/m² (7)"
         }
         
@@ -140,8 +140,8 @@ class WoodStructureCalculations:
                 'description': "Rafter length calculation according to EN 1995-1-1, where:\nL = effective rafter length\nb = building width\nα = roof angle"
             },
             'loads': {
-                'equation': f"q∥ = Ed×cos(α) = {self.design_load:.3f}×cos({self.angle}°) = {q_parallel:.3f} kN/m\n" + 
-                          f"q⊥ = Ed×sin(α) = {self.design_load:.3f}×sin({self.angle}°) = {q_perpendicular:.3f} kN/m",
+                'equation': f"q∥ = Ed × cos(α) = {self.design_load:.3f} × cos({self.angle}°) = {q_parallel:.3f} kN/m\n" + 
+                          f"q⊥ = Ed × sin(α) = {self.design_load:.3f} × sin({self.angle}°) = {q_perpendicular:.3f} kN/m",
                 'number': "(38)",
                 'description': "Load decomposition according to EN 1995-1-1 §6.2.3, where:\nq∥ = load component parallel to rafter\nq⊥ = load component perpendicular to rafter\nEd = design load"
             },
@@ -190,10 +190,10 @@ class WoodStructureCalculations:
         
         # Document calculations with equation numbers
         calculations = {
-            'tributary': f"b = {self.spacing:.3f} m (12)",
-            'load': f"qEd = Ed × b = {self.design_load:.3f} × {trib_width:.3f} = {q_purlin:.3f} kN/m (13)",
-            'moment': f"MEd = (qEd × L²)/8 = ({q_purlin:.3f} × {span:.3f}²)/8 = {M_max_purlin:.3f} kNm (14)",
-            'shear': f"VEd = (qEd × L)/2 = ({q_purlin:.3f} × {span:.3f})/2 = {V_max:.3f} kN (15)"
+            'tributary': f"b = {self.spacing:.3f} m  (12)",
+            'load': f"qₑd = Ed × b = {self.design_load:.3f} × {trib_width:.3f} = {q_purlin:.3f} kN/m  (13)",
+            'moment': f"Mₑd = (qₑd × L²)/8 = ({q_purlin:.3f} × {span:.3f}²)/8 = {M_max_purlin:.3f} kN·m  (14)",
+            'shear': f"Vₑd = (qₑd × L)/2 = ({q_purlin:.3f} × {span:.3f})/2 = {V_max:.3f} kN  (15)"
         }
         
         return {
@@ -282,21 +282,21 @@ class WoodStructureCalculations:
         # Document calculations with equation numbers
         calculations = {
             'surface': {
-                'equation': f"Rsi = {R_si} m²K/W, Rse = {R_se} m²K/W",
+                'equation': f"Rₛᵢ = {R_si:.2f} m²·K/W, Rₛₑ = {R_se:.2f} m²·K/W",
                 'number': "(44)",
                 'description': "Surface heat transfer resistances according to EN ISO 6946 §5.2, where:\nRsi = internal surface resistance\nRse = external surface resistance"
             },
             'conductivity': {
-                'equation': f"λ1 = {lambda_mineral_wool} W/(m·K) (mineral wool)\n" +
-                          f"λ2 = {lambda_wood} W/(m·K) (timber)\n" +
-                          f"λ3 = {lambda_steel} W/(m·K) (steel)",
+                'equation': f"λₘᵢₙ = {lambda_mineral_wool:.3f} W/(m·K)  [mineral wool]\n" +
+                          f"λₜᵢₘ = {lambda_wood:.3f} W/(m·K)  [timber]\n" +
+                          f"λₛₜₗ = {lambda_steel:.1f} W/(m·K)  [steel]",
                 'number': "(45)",
-                'description': "Thermal conductivity values according to EN ISO 10456, where:\nλ1 = thermal conductivity of mineral wool\nλ2 = thermal conductivity of timber\nλ3 = thermal conductivity of steel"
+                'description': "Thermal conductivity values according to EN ISO 10456, where:\nλₘᵢₙ = thermal conductivity of mineral wool\nλₜᵢₘ = thermal conductivity of timber\nλₛₜₗ = thermal conductivity of steel"
             },
             'resistance': {
-                'equation': f"R1 = {d_insulation}/{lambda_mineral_wool} = {R_insulation:.3f} m²K/W (insulation)\n" +
-                          f"R2 = {d_wood}/{lambda_wood} = {R_wood:.3f} m²K/W (timber)\n" +
-                          f"R3 = {d_steel}/{lambda_steel} = {R_steel:.6f} m²K/W (steel)",
+                'equation': f"Rᵢₙₛ = {d_insulation:.3f}/{lambda_mineral_wool:.3f} = {R_insulation:.3f} m²·K/W  [insulation]\n" +
+                          f"Rₜᵢₘ = {d_wood:.3f}/{lambda_wood:.3f} = {R_wood:.3f} m²·K/W  [timber]\n" +
+                          f"Rₛₜₗ = {d_steel:.4f}/{lambda_steel:.1f} = {R_steel:.6f} m²·K/W  [steel]",
                 'number': "(46)",
                 'description': "Layer thermal resistance calculations according to EN ISO 6946 §6.1, where:\nR = d/λ\nd = layer thickness\nλ = thermal conductivity"
             }
@@ -402,38 +402,23 @@ class WoodStructureCalculations:
         
         # Document calculations with equation numbers
         calculations = {
-            'area': {
-                'equation': f"A = b × h = {section_width:.3f} × {section_height:.3f} = {props['area']:.6f} m²",
-                'number': "(45)",
-                'description': "Cross-sectional area calculation according to EN 1995-1-1, where:\nA = cross-sectional area\nb = section width\nh = section height"
-            },
-            'inertia': {
-                'equation': f"I = (b × h³)/12 = ({section_width:.3f} × {section_height:.3f}³)/12 = {props['moment_of_inertia']:.6f} m⁴",
-                'number': "(46)",
-                'description': "Second moment of area calculation according to EN 1995-1-1, where:\nI = moment of inertia\nb = section width\nh = section height"
-            },
-            'modulus': {
-                'equation': f"W = I/(h/2) = {props['moment_of_inertia']:.6f}/({section_height/2:.3f}) = {props['section_modulus']:.6f} m³",
-                'number': "(46a)",
-                'description': "Section modulus calculation according to EN 1995-1-1, where:\nW = section modulus\nI = moment of inertia\nh = section height"
-            },
             'bending': {
-                'equation': f"σm,d = MEd/W = {M_d:.0f}/{props['section_modulus']*1e6:.0f} = {sigma_m:.2f} MPa",
+                'equation': f"σₘ,ᵈ = Mₑᵈ/W = {M_d:.0f}/{props['section_modulus']*1e6:.0f} = {sigma_m:.2f} N/mm²",
                 'number': "(47)",
                 'description': "Design bending stress calculation according to EN 1995-1-1 §6.1.6, where:\nσm,d = design bending stress\nMEd = design bending moment\nW = section modulus"
             },
             'compression': {
-                'equation': f"σc,d = NEd/A = {N_d:.0f}/{props['area']*1e6:.0f} = {sigma_c:.2f} MPa",
+                'equation': f"σᶜ,ᵈ = Nₑᵈ/A = {N_d:.0f}/{props['area']*1e6:.0f} = {sigma_c:.2f} N/mm²",
                 'number': "(48)",
                 'description': "Design compressive stress calculation according to EN 1995-1-1 §6.1.4, where:\nσc,d = design compressive stress\nNEd = design axial force\nA = cross-sectional area"
             },
             'combined': {
-                'equation': f"σm,d/fm,d + σc,d/fc,0,d = {sigma_m:.2f}/{self.fm_d:.2f} + {sigma_c:.2f}/{self.fc_0_d:.2f} = {combined_ratio:.2f} ≤ 1.0",
+                'equation': f"σₘ,ᵈ/fₘ,ᵈ + σᶜ,ᵈ/fᶜ,₀,ᵈ = {sigma_m:.2f}/{self.fm_d:.2f} + {sigma_c:.2f}/{self.fc_0_d:.2f} = {combined_ratio:.2f} ≤ 1.0",
                 'number': "(49)",
                 'description': "Combined stress verification according to EN 1995-1-1 §6.2.4, where:\nσm,d = design bending stress\nfm,d = design bending strength\nσc,d = design compressive stress\nfc,0,d = design compressive strength"
             },
             'stability': {
-                'equation': f"σm,d/(kcrit×fm,d) + σc,d/fc,0,d = {sigma_m:.2f}/({kcrit:.1f}×{self.fm_d:.2f}) + {sigma_c:.2f}/{self.fc_0_d:.2f} = {stability_ratio:.2f} ≤ 1.0",
+                'equation': f"σₘ,ᵈ/(kᶜᵣᵢₜ×fₘ,ᵈ) + σᶜ,ᵈ/fᶜ,₀,ᵈ = {sigma_m:.2f}/({kcrit:.1f}×{self.fm_d:.2f}) + {sigma_c:.2f}/{self.fc_0_d:.2f} = {stability_ratio:.2f} ≤ 1.0",
                 'number': "(50)",
                 'description': "Stability verification according to EN 1995-1-1 §6.3.3, where:\nσm,d = design bending stress\nkcrit = lateral torsional buckling factor\nfm,d = design bending strength\nσc,d = design compressive stress\nfc,0,d = design compressive strength"
             }
@@ -463,8 +448,7 @@ class WoodStructureCalculations:
                 'formula': '(σm,d / fm,d) + (σc,d / fc,0,d) ≤ 1.0',
                 'result': combined_ratio <= 1.0,
                 'value': combined_ratio
-            },
-            'calculations': calculations  # Add calculations dictionary to return value
+            }
         }
 
     def analyze_angle_brace(self, brace_length=2.0, brace_width=0.1, brace_height=0.15):
@@ -589,10 +573,6 @@ class WoodStructureCalculations:
         section_depth : float
             Depth of column cross-section in meters [m]
             
-        Note:
-        -----
-        This method automatically calculates design strength values if not already done.
-            
         Analysis Steps (EN 1995-1-1:2004 Section 6.3.2):
         ----------------------------------------------
         1. Calculate section properties
@@ -606,13 +586,6 @@ class WoodStructureCalculations:
         dict
             Dictionary containing analysis results and verification
         """
-        # Calculate design strength values if not already done
-        if not hasattr(self, 'fc_0_d'):
-            strength_results = self.calculate_design_strength()
-            self.fm_d = strength_results['fm_d']
-            self.ft_0_d = strength_results['ft_0_d']
-            self.fc_0_d = strength_results['fc_0_d']
-        
         # Section properties according to EN 1995-1-1:2004 §6.3.2
         A = section_width * section_depth  # Cross-sectional area [m²]
         I = (section_width * section_depth**3) / 12  # Second moment of area [m⁴]
@@ -842,33 +815,33 @@ wk = {wk:.3f} kN/m² (wind load)""",
             
             'momentum': f"""Momentum and Bending Movement (35-36):
 For rafter (100×200mm):
-MEd = Ed × s × l²/8 = {loads['design_load']:.3f} × {self.spacing:.1f} × {rafter_forces['rafter_length']:.2f}²/8 = {MEd_rafter:.2f} kNm
+Mₑᵈ = Eᵈ × s × l²/8 = {loads['design_load']:.3f} × {self.spacing:.1f} × {rafter_forces['rafter_length']:.2f}²/8 = {MEd_rafter:.2f} kN·m
 
 For purlin (80×160mm):
-MEd = w × l²/8 = {purlin_forces['purlin_load']:.3f} × {self.spacing:.1f}²/8 = {MEd_purlin:.3f} kNm""",
+Mₑᵈ = w × l²/8 = {purlin_forces['purlin_load']:.3f} × {self.spacing:.1f}²/8 = {MEd_purlin:.3f} kN·m""",
             
             'stress': f"""Building Stress Analysis (37):
-σm,d,rafter = MEd/W = {MEd_rafter*1e6:.0f}/{section['section_modulus']*1e9:.0f} = {sigma_m_rafter:.2f} N/mm²
-σm,d,purlin = MEd/W = {MEd_purlin*1e6:.0f}/{section['section_modulus']*1e9:.0f} = {sigma_m_purlin:.2f} N/mm²""",
+σₘ,ᵈ,ᵣₐfₜₑᵣ = Mₑᵈ/W = {MEd_rafter*1e6:.0f}/{section['section_modulus']*1e9:.0f} = {sigma_m_rafter:.2f} N/mm²
+σₘ,ᵈ,ₚᵤᵣₗᵢₙ = Mₑᵈ/W = {MEd_purlin*1e6:.0f}/{section['section_modulus']*1e9:.0f} = {sigma_m_purlin:.2f} N/mm²""",
             
             'inertia': f"""Movement of Inertia (38):
-Irafter = b×h³/12 = {I_rafter*1e12:.0f} mm⁴
-Ipurlin = b×h³/12 = {I_purlin*1e12:.0f} mm⁴""",
+Iᵣₐfₜₑᵣ = b×h³/12 = {I_rafter*1e12:.0f} mm⁴
+Iₚᵤᵣₗᵢₙ = b×h³/12 = {I_purlin*1e12:.0f} mm⁴""",
             
             'brace': f"""Cross Section of Angle Brace (39):
-Abrace = b×h = {A_brace:.0f} mm²
-Wbrace = b×h²/6 = {W_brace:.0f} mm³
-Ibrace = b×h³/12 = {I_brace:.0f} mm⁴""",
+Aᵦᵣₐᶜₑ = b×h = {A_brace:.0f} mm²
+Wᵦᵣₐᶜₑ = b×h²/6 = {W_brace:.0f} mm³
+Iᵦᵣₐᶜₑ = b×h³/12 = {I_brace:.0f} mm⁴""",
             
             'strengths': f"""Calculating Strengths (40):
-fm,d = kmod×fm,k/γM = 0.8×27/1.3 = {fm_d:.2f} N/mm²
-fc,0,d = kmod×fc,0,k/γM = 0.8×22/1.3 = {fc_0_d:.2f} N/mm²
-ft,0,d = kmod×ft,0,k/γM = 0.8×16/1.3 = {ft_0_d:.2f} N/mm²""",
+fₘ,ᵈ = kₘₒᵈ×fₘ,ₖ/γₘ = 0.8×27/1.3 = {fm_d:.2f} N/mm²
+fᶜ,₀,ᵈ = kₘₒᵈ×fᶜ,₀,ₖ/γₘ = 0.8×22/1.3 = {fc_0_d:.2f} N/mm²
+fₜ,₀,ᵈ = kₘₒᵈ×fₜ,₀,ₖ/γₘ = 0.8×16/1.3 = {ft_0_d:.2f} N/mm²""",
             
             'actions': f"""Effort of Actions (41):
-Ed1 = 1.35G + 1.5S + 1.5ψ0W = {Ed1:.3f} kN/m²
-Ed2 = 1.35G + 1.5W + 1.5ψ0S = {Ed2:.3f} kN/m²
-NEd,brace = Ed×Atrib×sin(45°) = {NEd_brace:.2f} kN""",
+Eᵈ₁ = 1.35G + 1.5S + 1.5ψ₀W = {Ed1:.3f} kN/m²
+Eᵈ₂ = 1.35G + 1.5W + 1.5ψ₀S = {Ed2:.3f} kN/m²
+Nₑᵈ,ᵦᵣₐᶜₑ = Eᵈ×Aₜᵣᵢᵦ×sin(45°) = {NEd_brace:.2f} kN""",
             
             'thermal_wall': f"""Layer-by-Layer Thermal Analysis (42):
 Wall assembly thermal resistances:
