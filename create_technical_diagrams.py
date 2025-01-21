@@ -5,13 +5,15 @@ from matplotlib import patches
 import matplotlib.gridspec as gridspec
 
 def set_engineering_style():
-    """Configure matplotlib for engineering diagrams"""
+    """Configure matplotlib for engineering diagrams according to IEEE standards"""
     plt.style.use('default')  # Use default style as base
     
     # High quality figure settings for IEEE documentation
     plt.rcParams['figure.figsize'] = (12, 8)  # Standard figure size
-    plt.rcParams['figure.dpi'] = 300  # High DPI for quality
-    plt.rcParams['savefig.dpi'] = 300  # High save DPI for quality
+    plt.rcParams['figure.dpi'] = 450  # Higher DPI for excellent quality
+    plt.rcParams['savefig.dpi'] = 450  # Higher save DPI for excellent quality
+    plt.rcParams['savefig.format'] = 'png'  # Ensure PNG format
+    plt.rcParams['savefig.bbox'] = 'tight'  # Tight bounding box
     
     # Font settings
     plt.rcParams['font.size'] = 10
@@ -328,10 +330,40 @@ def create_horizontal_projection():
     length1 = 6.6
     length2 = 10.8
     spacing = 1.1
+    column_size = 0.15  # 150mm column size
+    wall_thickness = 0.22  # 220mm MAX block wall thickness
     
-    # Draw main outline
+    # Draw main outline with structural annotations
+    # Main outline
     rect = Rectangle((0, 0), length1, width, fill=False, color='black', linewidth=2)
     ax.add_patch(rect)
+    
+    # Add structural grid with labels
+    for x_pos in np.arange(0, length1+spacing, spacing):
+        if x_pos <= length1:
+            ax.plot([float(x_pos), float(x_pos)], [0, width], 'k:', linewidth=1, alpha=0.5)
+            ax.text(float(x_pos), -0.3, f'Grid {int(x_pos/spacing)+1}', ha='center', fontsize=10)
+    
+    for y_pos in np.arange(0, width+spacing, spacing):
+        if y_pos <= width:
+            ax.plot([0, length1], [float(y_pos), float(y_pos)], 'k:', linewidth=1, alpha=0.5)
+            ax.text(-0.3, float(y_pos), f'Row {chr(65+int(y_pos/spacing))}', va='center', fontsize=10)
+    
+    # Add structural elements with annotations
+    for x_pos in np.arange(0, length1+spacing, spacing):
+        for y_pos in np.arange(0, width+spacing, spacing):
+            if x_pos <= length1 and y_pos <= width:
+                # Add column markers
+                x_float = float(x_pos)
+                y_float = float(y_pos)
+                rect = Rectangle((x_float-column_size/2, y_float-column_size/2),
+                               column_size, column_size,
+                               fill=True, color='gray', alpha=0.3)
+                ax.add_patch(rect)
+                # Add column labels
+                ax.text(x_float, y_float+0.2, 
+                       f'C{int(x_float/spacing)+1}{chr(65+int(y_float/spacing))}',
+                       ha='center', va='bottom', fontsize=8)
     
     # Add purlin lines
     for x in np.arange(0, length1+spacing, spacing):
@@ -368,7 +400,18 @@ def create_horizontal_projection():
 def create_floor_plan():
     """Create enhanced floor plan drawing at 1:50 scale with structural details"""
     set_engineering_style()
-    fig = plt.figure(figsize=(15, 10))
+    
+    # Override style for high-quality floor plan
+    plt.rcParams.update({
+        'figure.figsize': (20, 15),
+        'figure.dpi': 450,
+        'savefig.dpi': 450,
+        'font.size': 12,
+        'axes.labelsize': 14,
+        'axes.titlesize': 16
+    })
+    
+    fig = plt.figure()
     ax = fig.add_subplot(111)
     
     # Building dimensions
@@ -376,6 +419,8 @@ def create_floor_plan():
     length1 = 6.6  # meters
     length2 = 10.8  # meters
     spacing = 1.1  # meters
+    column_size = 0.15  # 150mm column size
+    wall_thickness = 0.22  # 220mm MAX block wall thickness
     column_size = 0.15  # 150mm column size
     wall_thickness = 0.22  # 220mm MAX block wall thickness
     
@@ -530,10 +575,18 @@ def create_construction_details():
 def create_connection_detail_diagram():
     """Create detailed connection technical drawing with force transfer"""
     set_engineering_style()
-    # Override global style for this specific diagram
-    plt.rcParams['figure.figsize'] = (2, 2)  # Tiny figure size
-    plt.rcParams['figure.dpi'] = 72  # Minimal DPI
-    plt.rcParams['savefig.dpi'] = 72  # Minimal save DPI
+    
+    # Override style for high-quality connection details
+    plt.rcParams.update({
+        'figure.figsize': (16, 12),
+        'figure.dpi': 450,
+        'savefig.dpi': 450,
+        'font.size': 12,
+        'axes.labelsize': 14,
+        'axes.titlesize': 16,
+        'lines.linewidth': 2,
+        'patch.linewidth': 1.5
+    })
     fig = plt.figure()
     gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.1)  # Extremely tight spacing
     
@@ -569,11 +622,22 @@ def create_connection_detail_diagram():
                 arrowprops=dict(arrowstyle='<->', color='black', linewidth=1.5))
     ax1.text(-0.04, 0.1, '200mm', va='center', rotation=90, fontsize=10)
     
-    # Add force arrows
-    arrow_style = dict(arrowstyle='->', color='red', linewidth=1.5)
+    # Add enhanced force arrows with clearer visualization
+    arrow_style = dict(arrowstyle='->', color='red', linewidth=2.0,
+                      mutation_scale=15, shrinkA=0, shrinkB=0)
+    
+    # Vertical force
     ax1.annotate('', xy=(0.1, 0.25), xytext=(0.1, 0.35),
                 arrowprops=arrow_style)
-    ax1.text(0.12, 0.3, 'F = 2.34 kN', fontsize=10)
+    ax1.text(0.12, 0.3, 'Fv = 2.34 kN', fontsize=12,
+             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
+    
+    # Horizontal force component
+    ax1.annotate('', xy=(0.15, 0.2), xytext=(0.25, 0.2),
+                arrowprops=dict(arrowstyle='->', color='blue', linewidth=2.0,
+                              mutation_scale=15, shrinkA=0, shrinkB=0))
+    ax1.text(0.17, 0.22, 'Fh = 1.12 kN', fontsize=12,
+             bbox=dict(facecolor='white', edgecolor='none', alpha=0.8))
     
     ax1.set_xlim(-0.1, 0.3)
     ax1.set_ylim(-0.1, 0.4)
@@ -644,9 +708,19 @@ def create_thermal_bridge_analysis():
     """Create comprehensive thermal bridge analysis with temperature distribution and heat flow"""
     set_engineering_style()
     
+    # Override style for high-quality thermal analysis
+    plt.rcParams.update({
+        'figure.figsize': (24, 18),
+        'figure.dpi': 450,
+        'savefig.dpi': 450,
+        'font.size': 12,
+        'axes.labelsize': 14,
+        'axes.titlesize': 16
+    })
+    
     # Create figure with 2x2 grid for detailed analysis
-    fig = plt.figure(figsize=(20, 15))
-    gs = gridspec.GridSpec(2, 2, figure=fig, hspace=0.3, wspace=0.3)
+    fig = plt.figure()
+    gs = gridspec.GridSpec(2, 2, figure=fig, hspace=0.4, wspace=0.4)
     
     # Temperature distribution subplot
     ax1 = fig.add_subplot(gs[0, 0])
@@ -685,13 +759,38 @@ def create_thermal_bridge_analysis():
     
     T = temp_distribution(X, Y)
     
-    # Plot enhanced temperature contours
-    levels = np.linspace(T.min(), T.max(), 40)
-    im1 = ax1.contourf(X, Y, T, levels=levels, cmap='RdBu_r')
-    ax1.set_title('Temperature Distribution\nat Wall-Roof Junction')
+    # Plot enhanced temperature contours with improved visualization
+    levels = np.linspace(T.min(), T.max(), 50)  # More contour levels for smoother gradients
+    im1 = ax1.contourf(X, Y, T, levels=levels, cmap='RdBu_r', alpha=0.8)
+    ax1.set_title('Temperature Distribution at Wall-Roof Junction\nEN ISO 10211:2017 Analysis')
     
-    # Add colorbar with proper spacing
-    cbar1 = fig.colorbar(im1, ax=ax1, label='Temperature (°C)')
+    # Add enhanced colorbar with better labeling
+    cbar1 = fig.colorbar(im1, ax=ax1, label='Temperature (°C)', pad=0.02)
+    cbar1.ax.tick_params(labelsize=10)
+    
+    # Add grid for better readability
+    ax1.grid(True, linestyle=':', alpha=0.3)
+    
+    # Add annotations for critical points and thermal bridges
+    ax1.text(0.05, 0.95, 'External\nT = -20°C', transform=ax1.transAxes,
+             bbox=dict(facecolor='white', alpha=0.8))
+    ax1.text(0.85, 0.05, 'Internal\nT = 20°C', transform=ax1.transAxes,
+             bbox=dict(facecolor='white', alpha=0.8))
+    
+    # Add thermal bridge indicators
+    ax1.annotate('Thermal Bridge\nΨ = 0.08 W/(m·K)',
+                xy=(0.5, 0.7), xytext=(0.7, 0.8),
+                transform=ax1.transAxes,
+                bbox=dict(facecolor='white', alpha=0.8),
+                arrowprops=dict(arrowstyle='->',
+                              connectionstyle='arc3,rad=0.2'))
+                              
+    # Add temperature gradient arrows
+    x_grad, y_grad = np.gradient(-T)
+    skip = 8  # Show fewer arrows for clarity
+    ax1.quiver(X[::skip, ::skip], Y[::skip, ::skip], 
+               x_grad[::skip, ::skip], y_grad[::skip, ::skip],
+               color='white', alpha=0.4, width=0.003, scale=50)
     
     # Add detailed construction elements
     wall = Rectangle((0, 0), 0.2, 0.8, fill=False, color='black', linewidth=1.5)
