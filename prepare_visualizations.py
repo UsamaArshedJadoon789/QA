@@ -8,10 +8,11 @@ df = pd.read_excel('attachments/083d2ec1-9bbf-4f94-bfec-ec6ea70df661/titanic3.xl
 # Set style for better visualizations
 plt.style.use('seaborn-v0_8')
 sns.set_theme(style="whitegrid", font_scale=1.2)
-plt.rcParams['figure.figsize'] = [12, 8]
+plt.rcParams['figure.figsize'] = [10, 6]  # Reduced size for better fit
 plt.rcParams['figure.dpi'] = 300
 plt.rcParams['savefig.bbox'] = 'tight'
-plt.rcParams['savefig.pad_inches'] = 0.5
+plt.rcParams['savefig.pad_inches'] = 0.75  # Increased padding
+plt.rcParams.update({'figure.autolayout': True})  # Enable automatic layout
 
 # Create directory for saving plots
 import os
