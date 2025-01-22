@@ -3,12 +3,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Set style for better visualizations
-plt.style.use('seaborn-v0_8')
-sns.set_theme(style="whitegrid", font_scale=1.2)
+plt.style.use('seaborn-v0_8-white')  # Use white style without grid
+sns.set_theme(style="white", font_scale=1.2)  # Clean style without grid
 plt.rcParams['figure.figsize'] = [10, 6]  # Reduced size for better fit
 plt.rcParams['figure.dpi'] = 300
 plt.rcParams['savefig.bbox'] = 'tight'
 plt.rcParams['savefig.pad_inches'] = 0.75  # Increased padding
+plt.rcParams['axes.grid'] = False  # Explicitly disable grid
+plt.rcParams['axes.spines.top'] = False  # Remove top spine
+plt.rcParams['axes.spines.right'] = False  # Remove right spine
 plt.rcParams.update({'figure.autolayout': True})  # Enable automatic layout
 
 # Create directory for saving plots
